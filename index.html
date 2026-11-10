@@ -1220,16 +1220,23 @@ async function gsCall(name,body){
  const j=await r.json().catch(()=>({}));
  if(!r.ok){const e=new Error(j.error||"http "+r.status);e.code=j.error;throw e}return j}
 function gsDb(){
- const mk=(c,st)=>({
-  where:(f,o,v)=>mk(c,{...st,w:[...(st.w||[]),[f,o,v]]}),
-  orderBy:(f,d)=>mk(c,{...st,o:{f,d:d||"asc"}}),
-  limit:n=>mk(c,{...st,l:n}),
-  get:async()=>{const o=st.o||{f:(st.w&&st.w[0]&&st.w[0][0])||"best",d:"asc"};
-   const j=await gsCall("top",{collection:c,field:o.f,dir:o.d,n:st.l||20});
-   return{docs:(j.rows||[]).map(r=>({id:r.id,exists:true,data:()=>r.data}))}}});
- return{collection:c=>Object.assign(mk(c,{}),{doc:id=>({
-  get:async()=>{const j=await gsCall("get",{collection:c,id});return{exists:!!j.data,id,data:()=>j.data||{}}},
-  set:async d=>{await gsCall("set",{collection:c,uid:gsUid(),secret:gsId("gs_sec",32),data:d})}})})}}
+  const au=()=>({uid:gsUid(),secret:gsId("gs_sec",32)});
+  const call=(op,c,x)=>gsCall("db",{op,collection:c,...au(),...x});
+  const snap=(id,d)=>({exists:!!d,id,data:()=>d||{}});
+  const mk=(c,st)=>({
+   where:(f,o,v)=>mk(c,{...st,w:[...(st.w||[]),[f,o,v]]}),
+   orderBy:(f,d)=>mk(c,{...st,o:{f,d:d||"asc"}}),
+   limit:n=>mk(c,{...st,l:n}),
+   get:async()=>{
+    if(c==="parkour"){const o=st.o||{f:(st.w&&st.w[0]&&st.w[0][0])||"best",d:"asc"};
+     const j=await gsCall("top",{collection:c,field:o.f,dir:o.d,n:st.l||20});
+     return{docs:(j.rows||[]).map(r=>({id:r.id,exists:true,data:()=>r.data}))}}
+    const j=await call("query",c,{where:(st.w||[]).filter(x=>x[1]==="=="),limit:st.l||1000});
+    return{docs:(j.rows||[]).map(r=>({id:r.id,exists:true,data:()=>r.data}))}}});
+  return{collection:c=>Object.assign(mk(c,{}),{doc:id=>({
+   get:async()=>{const j=c==="parkour"?await gsCall("get",{collection:c,id}):await call("get",c,{id});return snap(id,j.data)},
+   set:async d=>{if(c==="parkour"){await gsCall("set",{collection:c,...au(),data:d})}else{await call("set",c,{id,data:d})}},
+   update:async d=>{await call("update",c,{id,data:d})}})})}}
 async function netInit(){
  if(PK.ready)return;PK.ready=true;
  try{if(window.claude&&claude.use){PK.db=await claude.use("db");const U=await claude.use("user");PK.uid=U?await U.id():null}}catch(e){}
@@ -1708,48 +1715,27 @@ const isAdmin=()=>!!(SV.ok&&SV.adminUid&&SV.adminUid===SV.uid);
 const fmtD=t=>{const d=new Date(t),p=n=>String(n).padStart(2,"0");return p(d.getDate())+"."+p(d.getMonth()+1)+"."+d.getFullYear()};
 const fmtDT=t=>{const d=new Date(t),p=n=>String(n).padStart(2,"0");return fmtD(t)+" "+p(d.getHours())+":"+p(d.getMinutes())};
 const addMonths=(t,m)=>{const d=new Date(t);d.setMonth(d.getMonth()+m);return d.getTime()};
-const srvMsg="Server (baza) ulanmagan. Bu funksiya faqat claude.ai ichida ochilgan sahifada, tizimga kirgan holda ishlaydi. Hech narsa o‘zgarmadi.";
+const srvMsg="Server (baza) ulanmagan. Internetni tekshiring yoki bir ozdan keyin qayta urining. Hech narsa o‘zgarmadi.";
 function appToast(t){let e=$("#atoast");if(!e){e=document.createElement("div");e.id="atoast";document.body.appendChild(e)}e.textContent=t;e.classList.remove("show");void e.offsetWidth;e.classList.add("show")}
 
 /* ---- init / refresh ---- */
 function svInit(){
  if(SV.p)return SV.p;
  return SV.p=(async()=>{
-  try{await netInit();SV.db=PK.own?null:PK.db;SV.uid=PK.uid;SV.ok=!!(SV.db&&SV.uid)}catch(e){SV.ok=false}
-  if(SV.ok){try{await svRefresh(true);svRegister()}catch(e){}}
+  try{await netInit();SV.db=PK.db;SV.uid=PK.uid;SV.ok=!!(SV.db&&SV.uid)}catch(e){SV.ok=false}
+  if(SV.ok){try{await svRefresh(true);await svRegister()}catch(e){SV.ok=false;SV.p=null;setTimeout(()=>svInit().then(()=>{if(S.tab==="profile"||S.tab==="chat")render()}),15000)}}
   svBanner();svPaint();
-  if(SV.ok)setInterval(()=>{svRefresh().catch(()=>{})},25000);
+  if(SV.ok&&!SV.iv)SV.iv=setInterval(()=>{svRefresh().catch(()=>{})},25000);
  })()}
 async function svRefresh(first){
  await svLoadCfg();await svLoadLedger();await wheelLoad();await ordersLoadMine();svPaint()}
 async function svLoadCfg(){const d=await svc("config").doc("app").get();
  if(d.exists){const v=d.data()||{};SV.adminUid=String(v.adminUid||"");SV.adminNick=String(v.adminNick||ADMIN_DEFAULT);SV.firstPlayerId=String(v.firstPlayerId||"")}else{SV.adminUid="";SV.adminNick=ADMIN_DEFAULT;SV.firstPlayerId=""}}
 async function svRegister(){if(!SV.ok)return;
- try{
-  const cfgRef=svc("config").doc("app"),userRef=svc("users").doc(SV.uid);
-  const assigned=await SV.db.runTransaction(async tx=>{
-   const pair=await Promise.all([tx.get(cfgRef),tx.get(userRef)]);
-   const cfg=pair[0].exists?(pair[0].data()||{}):{};
-   const u=pair[1].exists?(pair[1].data()||{}):{};
-   let adminUid=String(cfg.adminUid||""),adminNick=String(cfg.adminNick||S.name||"GAMESET Admin");
-   let firstPlayerId=String(cfg.firstPlayerId||"GS-000001");
-   let nextPlayerNumber=Math.max(2,Number(cfg.nextPlayerNumber)||2);
-   /* First successful account transaction owns the first ID and admin role. */
-   if(!adminUid){adminUid=SV.uid;adminNick=S.name||"GAMESET Admin";firstPlayerId="GS-000001";}
-   let playerId=String(u.playerId||"");
-   if(SV.uid===adminUid)playerId="GS-000001";
-   else if(u.idVersion!==2||!/^GS-\d{6}$/.test(playerId)){
-    playerId="GS-"+String(nextPlayerNumber).padStart(6,"0");nextPlayerNumber++;
-   }
-   const old=Array.isArray(u.old)?u.old.slice(0,8):[];
-   if(u.nick&&u.nick!==S.name&&!old.includes(u.nick))old.unshift(u.nick);
-   tx.set(cfgRef,{adminUid,adminNick,firstPlayerId:"GS-000001",nextPlayerNumber,updatedAt:Date.now()},{merge:true});
-   tx.set(userRef,{nick:S.name,g:S.gender,playerId,idVersion:2,role:SV.uid===adminUid?"admin":"player",old:old.slice(0,8),upd:Date.now()},{merge:true});
-   return {adminUid,adminNick,playerId,firstPlayerId:"GS-000001"};
-  });
-  SV.adminUid=assigned.adminUid;SV.adminNick=assigned.adminNick;SV.firstPlayerId=assigned.firstPlayerId;SV.playerId=assigned.playerId;
-  if(SV.uid===SV.adminUid)await alog("admin_claim",SV.uid,S.name,"Birinchi o‘yinchi · GS-000001");
- }catch(e){SV.playerId="";console.warn("svRegister",e)}
+  try{
+   const a=await gsCall("player",{uid:PK.uid,secret:gsId("gs_sec",32),nick:S.name,g:S.gender});
+   SV.adminUid=a.adminUid||"";SV.adminNick=a.adminNick||ADMIN_DEFAULT;SV.firstPlayerId=a.firstPlayerId||"GS-000001";SV.playerId=a.playerId||"";
+  }catch(e){SV.playerId="";console.warn("svRegister",e)}
 }
 function svBanner(){const d=$("#demo");if(!d)return;
  d.textContent=SV.ok?"Server ulangan: CL, Premium, baraban, buyurtmalar va reyting serverda saqlanadi. Do‘stlar, oddiy chatlar va o‘yinchilar soni namuna ma’lumotlar.":"Server ulanmagan: CL, Premium, baraban, buyurtma va reyting ishlamaydi. Do‘stlar, chatlar va o‘yinchilar soni namuna ma’lumotlar."}
@@ -2008,7 +1994,7 @@ async function wheelSpin(){
   if(cur.pend){SV.wheel=cur;await wheelClaim();PK.spinBusy=false;return info("Oldingi sovrin","Oldingi aylantirishdagi sovrin hisobingizga qo‘shildi.")}
   const i=wheelPick(),s=WSEG[i],rec={last:now,prize:s.k,pend:1,n:(+cur.n||0)+1,nick:S.name,carpetUntil:cur.carpetUntil||0};
   await svc("wheel").doc(SV.uid).set(rec);                                                              /* time + result saved on the server BEFORE the animation */
-  const chk=await svc("wheel").doc(SV.uid).get();if(!chk.exists||chk.data().last!==now){PK.spinBusy=false;return info("Xatolik","Aylantirish tasdiqlanmadi. Qayta urinib ko‘ring.")}
+  const chk=await svc("wheel").doc(SV.uid).get();if(!chk.exists||Math.abs((chk.data().last||0)-now)>600000){PK.spinBusy=false;return info("Xatolik","Aylantirish tasdiqlanmadi. Qayta urinib ko‘ring.")}
   SV.wheel=rec;closeM();clearInterval(PK.wtm);
   const w=PK.wh.w,c0=w.rotation.z,want=(((Math.PI/2-(i*Math.PI/3+Math.PI/6)+(Math.random()-.5)*Math.PI/3*.7)%(Math.PI*2))+Math.PI*2)%(Math.PI*2),cm=((c0%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
   WSP.from=c0;WSP.to=c0+Math.PI*2*6+((want-cm+Math.PI*2)%(Math.PI*2));WSP.t=0;WSP.on=true;navigator.vibrate&&navigator.vibrate(30);
