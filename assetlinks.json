@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.gameset.app",
+        "sha256_cert_fingerprints": ["98:4B:D2:C7:2F:F9:5F:13:92:5B:FF:63:78:8C:C3:48:46:69:16:89:66:B4:04:6E:A3:11:D8:96:35:D4:15:67"]
+      }
+    }]
