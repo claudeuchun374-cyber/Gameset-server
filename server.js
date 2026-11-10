@@ -1,25 +1,52 @@
-// GAMESET server — 1-qadam: xonalar va o'yinchi harakatini real vaqtda tarqatish
+// GAMESET server — 2-qadam: o'yinni tarqatish + xonalarda o'yinchilarni real vaqtda ko'rsatish
 const http = require("http");
-const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const { WebSocketServer } = require("ws");
 
 const PORT = process.env.PORT || 3000;
-const MAX_PER_ROOM = 10;
+const MAX_PER_ROOM = 20;
+const INDEX = path.join(__dirname, "index.html");
 
-const app = express();
-app.get("/", (req, res) => res.send("GAMESET server ishlayapti"));
-app.get("/health", (req, res) =>
-  res.json({ ok: true, rooms: rooms.size, players: wss.clients.size })
-);
-
-const server = http.createServer(app);
-const wss = new WebSocketServer({ server });
 const rooms = new Map(); // xona kodi -> Set(ws)
 let nextId = 1;
 
+const server = http.createServer((req, res) => {
+  const url = req.url.split("?")[0];
+  if (url === "/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify({ ok: true, rooms: rooms.size, players: wss.clients.size }));
+  }
+  if (url === "/" || url === "/index.html") {
+    return fs.readFile(INDEX, (err, data) => {
+      if (err) {
+        res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+        return res.end("GAMESET server ishlayapti (index.html hali yuklanmagan)");
+      }
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+      res.end(data);
+    });
+  }
+  res.writeHead(404);
+  res.end("Topilmadi");
+});
+
+const wss = new WebSocketServer({ server });
+
 const num = (v) => (Number.isFinite(+v) ? Math.max(-5000, Math.min(5000, +v)) : 0);
-const pub = (c) => ({ id: c.id, name: c.name, x: c.x, y: c.y, z: c.z, ry: c.ry });
 const send = (ws, obj) => ws.readyState === 1 && ws.send(JSON.stringify(obj));
+
+// faqat ruxsat etilgan maydonlar qabul qilinadi
+function clean(p) {
+  const o = {};
+  if (!p || typeof p !== "object") return o;
+  if ("n" in p) o.n = String(p.n).slice(0, 16);
+  if ("g" in p) o.g = String(p.g).slice(0, 12);
+  if ("pk" in p) o.pk = 1;
+  for (const k of ["x", "y", "z", "r"]) if (k in p) o[k] = num(p[k]);
+  for (const k of ["m", "j"]) if (k in p) o[k] = p[k] ? 1 : 0;
+  return o;
+}
 
 function broadcast(from, obj) {
   const r = rooms.get(from.room);
@@ -32,7 +59,7 @@ function leave(ws) {
   const r = rooms.get(ws.room);
   if (r) {
     r.delete(ws);
-    broadcast(ws, { t: "player_leave", id: ws.id });
+    broadcast(ws, { t: "left", id: ws.id });
     if (r.size === 0) rooms.delete(ws.room);
   }
   ws.room = null;
@@ -41,12 +68,9 @@ function leave(ws) {
 wss.on("connection", (ws) => {
   ws.id = nextId++;
   ws.room = null;
-  ws.name = "Player";
-  ws.x = ws.y = ws.z = ws.ry = 0;
+  ws.p = {};
   ws.msgCount = 0;
-
-  // oddiy himoya: soniyasiga 40 tadan ko'p xabarni e'tiborsiz qoldiramiz
-  const timer = setInterval(() => (ws.msgCount = 0), 1000);
+  const timer = setInterval(() => (ws.msgCount = 0), 1000); // soniyasiga 40 tadan ko'p xabar e'tiborsiz
 
   ws.on("message", (raw) => {
     if (++ws.msgCount > 40) return;
@@ -55,18 +79,18 @@ wss.on("connection", (ws) => {
 
     if (m.t === "join") {
       leave(ws);
-      const code = String(m.room || "LOBBY").toUpperCase().slice(0, 8);
+      const code = String(m.room || "LOBBY").slice(0, 24);
       const r = rooms.get(code) || new Set();
-      if (r.size >= MAX_PER_ROOM) return send(ws, { t: "error", msg: "Xona to'la" });
-      ws.name = String(m.name || "Player").slice(0, 16);
+      if (r.size >= MAX_PER_ROOM) return send(ws, { t: "full" });
+      ws.p = clean(m.p);
       ws.room = code;
       rooms.set(code, r);
+      send(ws, { t: "joined", id: ws.id, peers: [...r].map((c) => ({ id: c.id, p: c.p })) });
       r.add(ws);
-      send(ws, { t: "joined", id: ws.id, room: code, players: [...r].filter((c) => c !== ws).map(pub) });
-      broadcast(ws, { t: "player_join", p: pub(ws) });
-    } else if (m.t === "move" && ws.room) {
-      ws.x = num(m.x); ws.y = num(m.y); ws.z = num(m.z); ws.ry = num(m.ry);
-      broadcast(ws, { t: "move", id: ws.id, x: ws.x, y: ws.y, z: ws.z, ry: ws.ry });
+      broadcast(ws, { t: "pres", id: ws.id, p: ws.p });
+    } else if (m.t === "pres" && ws.room) {
+      ws.p = Object.assign(ws.p, clean(m.p));
+      broadcast(ws, { t: "pres", id: ws.id, p: ws.p });
     }
   });
 
