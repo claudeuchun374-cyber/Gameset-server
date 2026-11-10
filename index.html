@@ -1188,9 +1188,29 @@ function normProf(d){const b=newProf();d=d||{};
  const r=d.rs;if(r&&+r.cp>0&&+r.cp<=PKC.CPS)b.rs={cp:Math.floor(+r.cp),t:Math.max(0,+r.t||0),got:(Array.isArray(r.got)?r.got:[]).map(Number).filter(n=>n>0&&n<=PKC.CPS)};
  return b}
 function loadLocal(){let raw="";try{raw=localStorage.getItem("gs_pk")||"{}";PK.prof=normProf(JSON.parse(raw))}catch(e){try{localStorage.setItem("gs_pk_bak",raw)}catch(_){}}refreshSpeed()}
+const GS_API="https://gameset-server.onrender.com/api/";
+function gsId(k,n){let v="";try{v=localStorage.getItem(k)||""}catch(e){}
+ if(!/^[a-f0-9]+$/.test(v)||v.length!==n){const a=new Uint8Array(n/2);crypto.getRandomValues(a);v=[...a].map(b=>b.toString(16).padStart(2,"0")).join("");try{localStorage.setItem(k,v)}catch(e){}}return v}
+const gsUid=()=>"u"+gsId("gs_uid",16);
+async function gsCall(name,body){
+ const r=await fetch(GS_API+name,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+ const j=await r.json().catch(()=>({}));
+ if(!r.ok){const e=new Error(j.error||"http "+r.status);e.code=j.error;throw e}return j}
+function gsDb(){
+ const mk=(c,st)=>({
+  where:(f,o,v)=>mk(c,{...st,w:[...(st.w||[]),[f,o,v]]}),
+  orderBy:(f,d)=>mk(c,{...st,o:{f,d:d||"asc"}}),
+  limit:n=>mk(c,{...st,l:n}),
+  get:async()=>{const o=st.o||{f:(st.w&&st.w[0]&&st.w[0][0])||"best",d:"asc"};
+   const j=await gsCall("top",{collection:c,field:o.f,dir:o.d,n:st.l||20});
+   return{docs:(j.rows||[]).map(r=>({id:r.id,exists:true,data:()=>r.data}))}}});
+ return{collection:c=>Object.assign(mk(c,{}),{doc:id=>({
+  get:async()=>{const j=await gsCall("get",{collection:c,id});return{exists:!!j.data,id,data:()=>j.data||{}}},
+  set:async d=>{await gsCall("set",{collection:c,uid:gsUid(),secret:gsId("gs_sec",32),data:d})}})})}}
 async function netInit(){
  if(PK.ready)return;PK.ready=true;
  try{if(window.claude&&claude.use){PK.db=await claude.use("db");const U=await claude.use("user");PK.uid=U?await U.id():null}}catch(e){}
+ if(!PK.db||!PK.uid){PK.db=gsDb();PK.uid=gsUid();PK.own=true}
 }
 /* local copy and server copy are merged so a record can never get lost: best time = smaller one, finished count = bigger one */
 async function loadProf(){await netInit();loadLocal();
@@ -1672,7 +1692,7 @@ function appToast(t){let e=$("#atoast");if(!e){e=document.createElement("div");e
 function svInit(){
  if(SV.p)return SV.p;
  return SV.p=(async()=>{
-  try{await netInit();SV.db=PK.db;SV.uid=PK.uid;SV.ok=!!(SV.db&&SV.uid)}catch(e){SV.ok=false}
+  try{await netInit();SV.db=PK.own?null:PK.db;SV.uid=PK.uid;SV.ok=!!(SV.db&&SV.uid)}catch(e){SV.ok=false}
   if(SV.ok){try{await svRefresh(true);svRegister()}catch(e){}}
   svBanner();svPaint();
   if(SV.ok)setInterval(()=>{svRefresh().catch(()=>{})},25000);
