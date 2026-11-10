@@ -432,6 +432,18 @@ textarea{width:100%;background:var(--card);color:var(--tx);border:1px solid var(
 .pbx{background:#ffffff0d;border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:8px;text-align:center}
 .pbx .cno{font-size:24px;font-weight:900;letter-spacing:2px;margin:4px 0;color:var(--cy)}
 .pbx p{margin:6px 0;color:var(--mut)}.pbx .btn{margin:4px 0}
+.rd{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-left:8px;vertical-align:middle;box-shadow:0 0 8px #ef4444}
+.rdot{position:absolute;top:5px;left:calc(50% + 8px);width:11px;height:11px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 2px #0d1236,0 0 8px #ef4444;pointer-events:none}
+.bc{position:relative;height:150px;border-radius:18px;padding:16px;background:linear-gradient(135deg,#6d28d9,#2563eb 55%,#22d3ee);box-shadow:0 8px 22px #0007;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;margin:8px 0;overflow:hidden}
+.bc:before{content:"";position:absolute;right:-30px;top:-40px;width:150px;height:150px;border-radius:50%;background:#ffffff1f}
+.bcc{position:absolute;left:16px;top:16px;width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#fde68a,#f59e0b)}
+.bcn{font:700 21px/1.1 ui-monospace,Menlo,monospace;letter-spacing:1.5px;text-shadow:0 1px 3px #0006;color:#fff}
+.bco{font-size:12px;letter-spacing:1.5px;opacity:.92;font-weight:700;color:#fff}
+.pwh{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:15px;margin-bottom:2px}.pwh span{color:var(--cy);font-weight:800}
+.pws{text-align:center;padding:12px;border-radius:14px;background:#ffffff0d;margin:8px 0;display:flex;flex-direction:column;gap:3px;font-size:22px}.pws b{font-size:15px}.pws small{color:var(--mut);font-size:12px}
+.pwn{color:var(--mut);font-size:13px;text-align:center;margin:6px 0}.cpb{width:100%}
+.rcimg{width:100%;max-height:44vh;object-fit:contain;border-radius:12px;background:#0006;margin:8px 0;display:block}
+.aot{display:flex;align-items:center;gap:8px}.aot small{color:var(--mut)}
 </style>
 </head>
 <body>
@@ -674,7 +686,7 @@ const ti=t=>TABS.findIndex(x=>x[0]===t);
 function go(t){if(t===S.tab&&!S.chat)return;S.dir=ti(t)>=ti(S.tab)?"r":"l";S.tab=t;S.chat=null;$("#view").scrollTop=0;render(true)}
 function render(a){
  if(S.tab==="rating")S.tab="home";
- $("#nav").innerHTML=TABS.map(([id,i,l])=>`<button class="${S.tab===id?"on":""}" onclick="go('${id}')">${ic(i,30)}<span>${l}</span></button>`).join("");
+ $("#nav").innerHTML=TABS.map(([id,i,l])=>`<button class="${S.tab===id?"on":""}" onclick="go('${id}')">${ic(i,30)}<span>${l}</span>${id==="profile"&&typeof isAdmin==="function"&&isAdmin()&&SV.rcpt>0?'<i class="rdot"></i>':""}</button>`).join("");
  $("#clv").textContent=S.gems;
  const m=$("#view");m.className="";
  if(S.tab!=="chat"&&S.tab!=="admin"&&typeof orderStop==="function")orderStop();
@@ -1732,7 +1744,7 @@ function svInit(){
  })()}
 async function svRefresh(first){
  await svLoadCfg();await svLoadLedger();await wheelLoad();await ordersLoadMine();
-  if(isAdmin()){try{const a=await allOrders(),n=a.filter(o=>o.status==="receipt").length;if(SV.rcpt!==undefined&&n>SV.rcpt)appToast("Yangi chek: "+n+" ta tekshirilmagan");SV.rcpt=n}catch(e){}}
+  if(isAdmin()){if(!SV.ia)SV.ia=setInterval(rcptCheck,10000);await rcptCheck()}
   svPaint()}
 async function svLoadCfg(){const d=await svc("config").doc("app").get();
  if(d.exists){const v=d.data()||{};SV.adminUid=String(v.adminUid||"");SV.adminNick=String(v.adminNick||ADMIN_DEFAULT);SV.firstPlayerId=String(v.firstPlayerId||"")}else{SV.adminUid="";SV.adminNick=ADMIN_DEFAULT;SV.firstPlayerId=""}}
@@ -1744,7 +1756,11 @@ async function svRegister(){if(!SV.ok)return;
 }
 function svBanner(){const d=$("#demo");if(!d)return;
  d.textContent=SV.ok?"Server ulangan: CL, Premium, baraban, buyurtmalar va reyting serverda saqlanadi. Do‘stlar, oddiy chatlar va o‘yinchilar soni namuna ma’lumotlar.":"Server ulanmagan: CL, Premium, baraban, buyurtma va reyting ishlamaydi. Do‘stlar, chatlar va o‘yinchilar soni namuna ma’lumotlar."}
-function svPaint(){const e=$("#clv");if(e)e.textContent=S.gems}
+async function rcptCheck(){if(!isAdmin())return;try{const a=await allOrders();SV.rcpt=a.filter(o=>o.status==="receipt").length;svPaint()}catch(e){}}
+const adminBtnLabel=()=>"Admin panel"+(SV.rcpt>0?`<span class="rd"></span>`:"");
+function svPaint(){const e=$("#clv");if(e)e.textContent=S.gems;
+ const pb=document.querySelector("#nav button:last-child");if(pb){let d=pb.querySelector(".rdot");const on=isAdmin()&&SV.rcpt>0;if(on&&!d){d=document.createElement("i");d.className="rdot";pb.appendChild(d)}else if(!on&&d)d.remove()}
+ const ab=$("#apb");if(ab)ab.innerHTML=adminBtnLabel()}
 
 /* ---- ledger: balance is calculated from server records, never typed by the user ---- */
 function calcLedger(rows,adminUid){let cl=0,pe=0;
@@ -1764,7 +1780,7 @@ function spendCL(n,ref){
 async function alog(act,to,toNick,detail){try{await svc("alog").doc(rid("l")).set({t:Date.now(),by:SV.uid,byNick:S.name,act,to:to||"",toNick:toNick||"",detail:detail||""})}catch(e){}}
 
 /* ---- shop → order → admin chat ---- */
-const CARD_NO="5614 6812 7785 8084";
+const CARD_NO="5614 6812 7785 8084",CARD_OWNER="SHUKUROV JAHONGIR";
 async function createOrder(kind,key){
  if(!SV.ok)return info("Server ulanmagan",srvMsg);
  let item,price,amt;
@@ -1772,12 +1788,32 @@ async function createOrder(kind,key){
  else{const p=PLANS.find(x=>x.id===key);if(!p)return;item="Premium · "+p.name;price=p.price;amt=PMONTHS[p.id]}
  const id=rid("o"),no="GS-"+new Date().toISOString().slice(2,10).replace(/-/g,"")+"-"+Math.random().toString(36).slice(2,6).toUpperCase();
  const o={uid:SV.uid,nick:S.name,pid:SV.playerId||"",kind,item,amt,price,no,status:"new",t:Date.now(),upd:Date.now()};
- try{await svc("orders").doc(id).set(o);
-  await orderMsg(id,"s",`Buyurtma: ${no}\nFoydalanuvchi: ${S.name}\nXarid turi: ${kind==="cl"?"CL Crystal":"Premium"}\n${kind==="cl"?"CL miqdori":"Muddat"}: ${kind==="cl"?amt+" CL":item.replace("Premium · ","")}\nTo‘lov summasi: ${fmt(price)}\n\nTo‘lov kartasi: ${CARD_NO}\nShu kartaga aniq ${fmt(price)} o‘tkazing, so‘ng pastdagi tugma orqali chek rasmini yuklang. Admin (${SV.adminNick}) tekshirib tasdiqlaydi.`);
-  try{await svc("orders").doc(id).update({status:"awaiting",upd:Date.now()});o.status="awaiting"}catch(e){}
-  SV.orders.unshift({id,...o});
- }catch(e){return info("Buyurtma yuborilmadi","Server xatosi. Keyinroq urinib ko‘ring. Hech qanday pul yechilmadi.")}
- closeM();closeM2();S.tab="chat";S.chat="o:"+id;S.dir="r";render(true)}
+ try{await svc("orders").doc(id).set(o);SV.orders.unshift({id,...o})}
+ catch(e){return info("Buyurtma yuborilmadi","Server xatosi. Keyinroq urinib ko‘ring. Hech qanday pul yechilmadi.")}
+ closeM2();payWin(id)}
+let PW={id:null,o:null,t:0};
+function pwStop(){clearInterval(PW.t);PW.t=0}
+async function payWin(id){
+ let o=SV.orders.find(x=>x.id===id);
+ if(!o){try{const d=await svc("orders").doc(id).get();if(!d.exists)return;o={id,...d.data()}}catch(e){return}}
+ PW.id=id;sheet(`<div id="pw"><div id="pwb"></div><button class="btn sec" style="margin-top:6px" onclick="closeM()">Yopish</button></div>`);
+ pwPaint(o);pwStop();
+ PW.t=setInterval(async()=>{if(!$("#pw")){pwStop();return}
+  try{const d=await svc("orders").doc(id).get();if(!d.exists)return;const n={id,...d.data()},i=SV.orders.findIndex(x=>x.id===id);if(i>=0)SV.orders[i]=n;
+   const prev=PW.o?PW.o.status:"";if(n.status!==prev){pwPaint(n);if(n.status==="confirmed")svRefresh().catch(()=>{})}}catch(e){}},5000)}
+function pwPaint(o){PW.o=o;const b=$("#pwb");if(!b)return;
+ const card=`<div class="bc"><div class="bcc"></div><div class="bcn">${CARD_NO}</div><div class="bco">${CARD_OWNER}</div></div>`;
+ let body;
+ if(o.status==="confirmed")body=`<div class="pws">✅<b>Tasdiqlandi</b><small>${esc(o.item)} hisobingizga qo‘shildi.</small></div>`;
+ else if(o.status==="rejected")body=`<div class="pws">❌<b>Rad etildi</b><small>To‘lov tasdiqlanmadi.</small></div>`;
+ else if(o.status==="receipt")body=`${card}<div class="pws">⏳<b>Chek yuborildi</b><small>Admin tekshirmoqda. Tasdiqlangach avtomatik qo‘shiladi.</small></div><button class="btn sec sm" onclick="$('#rcf').click()">Boshqa chek yuklash</button><input id="rcf" type="file" accept="image/*" hidden onchange="payUpload(this)">`;
+ else body=`${card}<button class="btn sec sm cpb" onclick="copyCard()">Karta raqamini nusxalash</button><p class="pwn">Aniq <b>${fmt(o.price)}</b> o‘tkazing, so‘ng chekni yuklang.</p><button class="btn" id="pwup" onclick="$('#rcf').click()">📎 Chek yuklash</button><input id="rcf" type="file" accept="image/*" hidden onchange="payUpload(this)">`;
+ b.innerHTML=`<div class="pwh"><b>${esc(o.item)}</b><span>${fmt(o.price)}</span></div>`+body}
+function copyCard(){try{navigator.clipboard.writeText(CARD_NO.replace(/ /g,""));appToast("Karta raqami nusxalandi")}catch(e){appToast(CARD_NO)}}
+async function payUpload(inp){const f=inp.files[0];inp.value="";if(!f||!PW.o)return;const btn=$("#pwup");if(btn){btn.disabled=true;btn.textContent="Yuklanmoqda…"}
+ try{const d=await imgCompress(f);await orderMsg(PW.id,"u","",d);await svc("orders").doc(PW.id).update({status:"receipt",upd:Date.now()});
+  const n={...PW.o,status:"receipt"},i=SV.orders.findIndex(x=>x.id===PW.id);if(i>=0)SV.orders[i]=n;pwPaint(n);appToast("Chek yuborildi")}
+ catch(e){if(btn){btn.disabled=false;btn.textContent="📎 Chek yuklash"}appToast("Yuborilmadi, qayta urinib ko‘ring")}}
 const buyG=i=>createOrder("cl",i);
 const buyP=id=>createOrder("prem",id);
 async function orderMsg(oid,from,text,img){
@@ -1787,9 +1823,9 @@ async function ordersLoadMine(){const s=await svc("orders").where("uid","==",SV.
 const OST={new:["Yangi","#38bdf8"],awaiting:["To‘lov kutilmoqda","#fbbf24"],receipt:["Chek yuborilgan","#a78bfa"],confirmed:["Tasdiqlangan","#34d399"],rejected:["Rad etilgan","#f87171"]};
 const stChip=s=>{const o=OST[s]||[s,"#999"];return `<span class="stc" style="--sc:${o[1]}">${o[0]}</span>`};
 function ordersChatList(){
- if(!SV.ok)return `<div class="row rv"><div class="g"><b>Admin bilan buyurtma chati</b><small>Server ulanmagan: buyurtma chatlari ishlamaydi.</small></div></div>`;
- if(!SV.orders.length)return `<div class="row rv"><div class="g"><b>${esc(SV.adminNick)} · buyurtmalar</b><small>Hali buyurtma yo‘q. CL yoki Premium sotib olsangiz, shu yerda admin bilan chat ochiladi.</small></div></div>`;
- return SV.orders.map(o=>`<div class="row rv" onclick="S.chat='o:${o.id}';render()"><div class="tile sm" style="--c1:#f59e0b;--c2:#7c3aed;align-items:center">${ic("shop",30)}</div><div class="g"><b>${esc(SV.adminNick)} · ${esc(o.item)}</b><small>${esc(o.no)} · ${fmt(o.price)}</small></div>${stChip(o.status)}</div>`).join("")}
+ if(!SV.ok)return `<div class="row rv"><div class="g"><b>Buyurtmalarim</b><small>Server ulanmagan.</small></div></div>`;
+ if(!SV.orders.length)return `<div class="row rv"><div class="g"><b>Buyurtmalarim</b><small>Hali buyurtma yo‘q. CL yoki Premium sotib olsangiz, shu yerda ko‘rinadi.</small></div></div>`;
+ return SV.orders.map(o=>`<div class="row rv" onclick="payWin('${o.id}')"><div class="tile sm" style="--c1:#f59e0b;--c2:#7c3aed;align-items:center">${ic("shop",30)}</div><div class="g"><b>${esc(o.item)}</b><small>${esc(o.no)} · ${fmt(o.price)}</small></div>${stChip(o.status)}</div>`).join("")}
 
 /* ---- order chat room (user side and admin side) ---- */
 const ORM={id:null,adm:false,o:null,msgs:[],cs:"",n:-1,t:0};
@@ -1837,7 +1873,7 @@ function imgCompress(file,max=900,q=.62){return new Promise((res,rej)=>{const fr
  c.getContext("2d").drawImage(im,0,0,c.width,c.height);let qq=q,d=c.toDataURL("image/jpeg",qq);while(d.length>220000&&qq>.3){qq-=.1;d=c.toDataURL("image/jpeg",qq)}res(d)};im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)})}
 
 /* ---- ADMIN (hidden page; every action re-checks the admin uid stored on the server) ---- */
-const AD={sec:"orders",f:"new",oid:null,q:"",busy:false};
+const AD={sec:"orders",f:"receipt",oid:null,q:"",busy:false};
 async function admGuard(){try{await svLoadCfg()}catch(e){}
  if(!isAdmin()){orderStop();if(S.tab==="admin"){S.tab="home";render(true)}info("Ruxsat yo‘q","Bu bo‘lim faqat admin uchun.");return false}return true}
 async function adminClaim(){
@@ -1852,7 +1888,7 @@ async function openAdmin(){if(!await admGuard())return;AD.sec="orders";AD.oid=nu
 function viewAdmin(){
  if(!isAdmin())return `<h2>Admin</h2><p class="empty">Ruxsat yo‘q.</p>`;
  setTimeout(adminLoad,0);
- if(AD.oid)return orderRoomHTML(true);
+ if(AD.oid)return admOrderHTML();
  const T=[["orders","Buyurtmalar"],["give","Berish"],["users","Foydalanuvchilar"],["manage","Boshqaruv"]];
  return `<div class="bar rv"><button class="back" onclick="go('profile')">&larr; Profil</button><b style="flex:1">Admin panel · ${esc(SV.adminNick)}</b></div>
  <div class="chips">${T.map(([k,l])=>`<button class="chip ${AD.sec===k?"on":""}" onclick="AD.sec='${k}';render()">${l}</button>`).join("")}</div><div id="adb"><p class="empty">Yuklanmoqda…</p></div>`}
@@ -1862,9 +1898,46 @@ async function adminLoad(){
  try{
   if(AD.sec==="orders")await admOrders(b);else if(AD.sec==="give")admGive(b);else if(AD.sec==="users")admUsers(b);else await admManage(b)}catch(e){b.innerHTML=`<p class="empty">Ma’lumot o‘qilmadi. Keyinroq urinib ko‘ring.</p>`}}
 async function allOrders(){const s=await svc("orders").limit(300).get();return s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.t-a.t)}
-async function admOrders(b){const all=await allOrders(),cnt=k=>all.filter(o=>o.status===k).length,list=all.filter(o=>o.status===AD.f);
- b.innerHTML=`<div class="chips">${Object.keys(OST).map(k=>`<button class="chip ${AD.f===k?"on":""}" onclick="AD.f='${k}';adminLoad()">${OST[k][0]} (${cnt(k)})</button>`).join("")}</div>`+
- (list.length?list.map(o=>`<div class="row" onclick="AD.oid='${o.id}';render()"><div class="g"><b>${esc(o.no)} · ${esc(o.nick)}</b><small>${esc(o.item)} · ${fmt(o.price)} · ${fmtDT(o.t)}</small></div>${stChip(o.status)}</div>`).join(""):`<p class="empty">Bu holatda buyurtma yo‘q.</p>`)}
+async function admOrders(b){const all=await allOrders(),cnt=k=>all.filter(o=>o.status===k).length,list=all.filter(o=>o.status===AD.f);SV.rcpt=cnt("receipt");svPaint();
+ b.innerHTML=`<div class="chips">${Object.keys(OST).map(k=>`<button class="chip ${AD.f===k?"on":""}" onclick="AD.f='${k}';adminLoad()">${OST[k][0]} (${cnt(k)})${k==="receipt"&&cnt(k)?'<span class="rd"></span>':""}</button>`).join("")}</div>`+
+ (list.length?list.map(o=>`<div class="row" onclick="AD.oid='${o.id}';render()"><div class="g"><b>${esc(o.nick)}${o.pid?" · ID "+esc(o.pid):""}</b><small>${esc(o.item)} · ${fmt(o.price)} · ${fmtDT(o.t)}</small></div>${o.status==="receipt"?'<span class="rd"></span>':stChip(o.status)}</div>`).join(""):`<p class="empty">Bu holatda buyurtma yo‘q.</p>`)}
+function admOrderHTML(){setTimeout(admOrderLoad,0);return `<div class="bar rv"><button class="back" onclick="AD.oid=null;render()">&larr; Orqaga</button><b style="flex:1">Buyurtma</b></div><div id="aob"><p class="empty">Yuklanmoqda…</p></div>`}
+const selKey=o=>o.kind==="cl"?"c"+Math.max(0,PACKS.findIndex(k=>k[0]===o.amt)):"p"+(PLANS.find(p=>PMONTHS[p.id]===o.amt)||PLANS[0]).id;
+const selInfo=k=>k[0]==="c"?{kind:"cl",amt:PACKS[+k.slice(1)][0],item:PACKS[+k.slice(1)][0]+" CL"}:(p=>({kind:"prem",amt:PMONTHS[p.id],item:"Premium · "+p.name}))(PLANS.find(x=>x.id===k.slice(1)));
+async function admOrderLoad(){if(!AD.oid)return;if(!await admGuard())return;const b=$("#aob");if(!b)return;
+ try{const d=await svc("orders").doc(AD.oid).get();if(!d.exists){b.innerHTML=`<p class="empty">Buyurtma topilmadi.</p>`;return}
+  const o={id:AD.oid,...d.data()};AD.ord=o;
+  const ms=(await svc("omsgs").where("oid","==",AD.oid).get()).docs.map(x=>x.data()).filter(m=>m.img).sort((a,b)=>b.t-a.t);
+  if(AD.selFor!==o.id){AD.sel=selKey(o);AD.selFor=o.id}
+  const closed=o.status==="confirmed"||o.status==="rejected";
+  b.innerHTML=`<div class="aot"><div class="pwh" style="flex:1"><b>${esc(o.nick)}</b><span>${o.pid?"ID "+esc(o.pid):""}</span></div></div>
+  <div class="aot"><small>${fmtDT(o.t)}</small>${stChip(o.status)}</div>
+  ${ms.length?`<img class="rcimg" src="${ms[0].img}" alt="" onclick="zoomImg(this.src)">`:`<p class="empty">Chek hali yuborilmagan.</p>`}
+  <div class="pwh"><b>${esc(o.item)}</b><span>${fmt(o.price)}</span></div>
+  ${closed?"":`<div class="st">Yuboriladigan paket</div>
+  <div class="chips">${PACKS.map((k,i)=>`<button class="chip spk ${AD.sel==="c"+i?"on":""}" data-k="c${i}" onclick="admSel('c${i}')">${k[0]} CL</button>`).join("")}</div>
+  <div class="chips">${PLANS.map(p=>`<button class="chip spk ${AD.sel==="p"+p.id?"on":""}" data-k="p${p.id}" onclick="admSel('p${p.id}')">Premium ${p.name}</button>`).join("")}</div>
+  <button class="btn" onclick="admOk()">Tasdiqlash va yuborish</button><button class="btn sec" onclick="admNo()">Rad etish</button>`}`
+ }catch(e){b.innerHTML=`<p class="empty">Ma’lumot o‘qilmadi.</p>`}}
+function admSel(k){AD.sel=k;document.querySelectorAll(".spk").forEach(x=>x.classList.toggle("on",x.dataset.k===k))}
+function zoomImg(src){$("#modal2").innerHTML=`<div class="mod" onclick="closeM2()" style="align-items:center;justify-content:center"><img src="${src}" style="max-width:96%;max-height:92%;border-radius:12px" alt=""></div>`}
+function admOk(){const o=AD.ord;if(!o)return;if(o.status!=="receipt")return info("Chek yo‘q","Tasdiqlash uchun o‘yinchi chek yuborgan bo‘lishi kerak.");
+ const v=selInfo(AD.sel);sheet(`<h3>Yuborishni tasdiqlang</h3><p><b>${esc(o.nick)}</b>${o.pid?" (ID "+esc(o.pid)+")":""} hisobiga <b>${esc(v.item)}</b> qo‘shiladi.<br>To‘lov: ${fmt(o.price)}</p><button class="btn" id="cfok">Yuborish</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
+ $("#cfok").onclick=async()=>{if(AD.busy)return;AD.busy=true;try{await doConfirm2(o.id,v)}finally{AD.busy=false}}}
+async function doConfirm2(id,v){if(!await admGuard())return;
+ try{const d=await svc("orders").doc(id).get();if(!d.exists)return;const o=d.data();
+  if(o.status==="confirmed"){closeM();return info("Allaqachon yuborilgan","Bu buyurtma ikki marta tasdiqlanmaydi.")}
+  if(o.status!=="receipt"){closeM();return info("Tasdiqlab bo‘lmaydi","Buyurtma holati o‘zgargan.")}
+  const gid="g_"+id,g=await svc("ledger").doc(gid).get();
+  if(!g.exists)await svc("ledger").doc(gid).set(v.kind==="cl"?{uid:o.uid,type:"grant",cur:"cl",amt:v.amt,by:SV.uid,ref:id,t:Date.now()}:{uid:o.uid,type:"grant",cur:"prem",months:v.amt,by:SV.uid,ref:id,t:Date.now()});
+  await svc("orders").doc(id).update({status:"confirmed",upd:Date.now(),cBy:SV.uid,cAt:Date.now()});
+  await alog("order_confirm",o.uid,o.nick,o.no+" · "+v.item+" · "+fmt(o.price));
+  closeM();appToast("Yuborildi: "+v.item);rcptCheck();admOrderLoad()}
+ catch(e){closeM();info("Xatolik","Server xatosi. Qayta urinishdan oldin buyurtma holatini tekshiring.")}}
+function admNo(){const o=AD.ord;if(!o||o.status==="confirmed"||o.status==="rejected")return;
+ sheet(`<h3>Rad etish</h3><p>${esc(o.nick)} buyurtmasi rad etiladi. Hisobga hech narsa qo‘shilmaydi.</p><button class="btn" id="rjok">Rad etish</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
+ $("#rjok").onclick=async()=>{if(!await admGuard())return;try{const d=await svc("orders").doc(o.id).get();if(d.data().status==="confirmed"){closeM();return info("Mumkin emas","Allaqachon tasdiqlangan.")}
+  await svc("orders").doc(o.id).update({status:"rejected",upd:Date.now()});await alog("order_reject",o.uid,o.nick,o.no);closeM();rcptCheck();admOrderLoad()}catch(e){closeM();info("Xatolik","Server xatosi.")}}}
 async function admCardMsg(){if(!await admGuard())return;const o=ORM.o;if(!o)return;
  sheet(`<h3>Karta ma’lumotlari</h3><p>Foydalanuvchiga yuboriladigan to‘lov ma’lumotlari. Qabul qilinadi: Uzcard, Humo, Visa, Mastercard.</p><textarea id="cdt" rows="5" placeholder="Karta raqami, egasi, summa: ${fmt(o.price)}"></textarea><button class="btn" id="cdok">Yuborish</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
  $("#cdok").onclick=async()=>{const t=$("#cdt").value.trim();if(!t)return;if(!await admGuard())return;
@@ -1942,7 +2015,7 @@ function admNick(){sheet(`<h3>Admin nikini o‘zgartirish</h3><input id="ank" ma
   try{await svc("config").doc("app").update({adminNick:v});S.name=v;save();await svRegister();await svLoadCfg();await alog("admin_nick",SV.uid,v,"yangi nik: "+v);closeM();render()}catch(e){closeM();info("Xatolik","Saqlanmadi.")}}}
 function adminProfileBtn(){
  if(!SV.ok)return "";
- if(isAdmin())return `<button class="btn rv" onclick="openAdmin()">Admin panel${SV.rcpt?` · ${SV.rcpt} chek`:""}</button>`;
+ if(isAdmin())return `<button class="btn rv" id="apb" onclick="openAdmin()">${adminBtnLabel()}</button>`;
  return "";
 }
 
