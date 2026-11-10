@@ -159,7 +159,7 @@ const bad = (m) => [400, { error: m || "noto'g'ri so'rov" }];
 
 async function configData() {
   const c = (await getDoc("config", "app")) || {};
-  return { ...c, adminUid: await adminUid(), adminNick: c.adminNick || ADMIN_NICK, firstPlayerId: "GS-000001" };
+  return { ...c, adminUid: await adminUid(), adminNick: c.adminNick || ADMIN_NICK, firstPlayerId: "100001" };
 }
 
 async function playerApi(b) {
@@ -171,14 +171,14 @@ async function playerApi(b) {
     const u = (await getDoc("users", uid)) || {};
     const nick = str(b.nick || "Player", 16), g = str(b.g, 8);
     let playerId = String(u.playerId || "");
-    let next = Math.max(2, Number(cfg.nextPlayerNumber) || 2);
-    if (admin) playerId = "GS-000001";
-    else if (u.idVersion !== 2 || !/^GS-\d{6}$/.test(playerId)) { playerId = "GS-" + String(next).padStart(6, "0"); next++; }
+    let next = Math.max(100002, Number(cfg.nextId) || 100002); // faqat raqamli ID: admin 100001, qolganlar 100002 dan
+    if (admin) playerId = "100001";
+    else if (u.idVersion !== 3 || !/^\d{6,9}$/.test(playerId) || playerId === "100001") { playerId = String(next); next++; }
     const old = Array.isArray(u.old) ? u.old.slice(0, 8) : [];
     if (u.nick && u.nick !== nick && !old.includes(u.nick)) old.unshift(u.nick);
-    await putDoc("config", "app", { ...cfg, nextPlayerNumber: next, firstPlayerId: "GS-000001", updatedAt: Date.now() });
-    await putDoc("users", uid, { nick, g, playerId, idVersion: 2, role: admin ? "admin" : "player", old: old.slice(0, 8), upd: Date.now() });
-    return [200, { adminUid: await adminUid(), adminNick: cfg.adminNick || ADMIN_NICK, playerId, firstPlayerId: "GS-000001" }];
+    await putDoc("config", "app", { ...cfg, nextId: next, firstPlayerId: "100001", updatedAt: Date.now() });
+    await putDoc("users", uid, { nick, g, playerId, idVersion: 3, role: admin ? "admin" : "player", old: old.slice(0, 8), upd: Date.now() });
+    return [200, { adminUid: await adminUid(), adminNick: cfg.adminNick || ADMIN_NICK, playerId, firstPlayerId: "100001" }];
   });
 }
 
@@ -210,6 +210,11 @@ async function dbApi(b) {
       if (f === "uid" && ["ledger", "orders", "wheel"].includes(col)) {
         if (!admin && String(v) !== uid) return [403, { error: "ruxsat yo'q" }];
         return [200, { rows: await rowsBy(col, "uid", String(v), lim) }];
+      }
+      if (f === "playerId" && col === "users") {
+        if (!admin) return [403, { error: "ruxsat yo'q" }];
+        if (!/^\d{6,9}$/.test(String(v))) return bad("ID");
+        return [200, { rows: await rowsBy("users", "playerId", String(v), 5) }];
       }
       if (f === "oid" && col === "omsgs") {
         const o = await getDoc("orders", String(v));
@@ -269,7 +274,7 @@ async function dbApi(b) {
         if (d.kind === "cl") ok = PACKS.some((p) => p[0] === d.amt && p[1] === d.price);
         else if (d.kind === "prem") ok = Object.values(PLANS).some((p) => p[0] === d.amt && p[1] === d.price);
         if (!ok) return bad("buyurtma narxi noto'g'ri");
-        await putDoc("orders", id, { uid, nick: str(d.nick, 16), kind: d.kind, item: str(d.item, 60), amt: d.amt, price: d.price, no: str(d.no, 32), status: "new", t: now, upd: now });
+        await putDoc("orders", id, { uid, nick: str(d.nick, 16), pid: /^\d{6,9}$/.test(String(d.pid)) ? String(d.pid) : "", kind: d.kind, item: str(d.item, 60), amt: d.amt, price: d.price, no: str(d.no, 32), status: "new", t: now, upd: now });
         return [200, { ok: true }];
       }
       if (!cur) return [404, { error: "topilmadi" }];
@@ -281,8 +286,8 @@ async function dbApi(b) {
         await putDoc("orders", id, nx);
         return [200, { ok: true }];
       }
-      if (cur.uid !== uid || !keys.every((k) => ["status", "upd"].includes(k)) || d.status !== "receipt" || !["new", "awaiting", "receipt"].includes(cur.status)) return [403, { error: "ruxsat yo'q" }];
-      await putDoc("orders", id, { ...cur, status: "receipt", upd: now });
+      if (cur.uid !== uid || !keys.every((k) => ["status", "upd"].includes(k)) || !((d.status === "receipt" && ["new", "awaiting", "receipt"].includes(cur.status)) || (d.status === "awaiting" && cur.status === "new"))) return [403, { error: "ruxsat yo'q" }];
+      await putDoc("orders", id, { ...cur, status: d.status, upd: now });
       return [200, { ok: true }];
     }
 

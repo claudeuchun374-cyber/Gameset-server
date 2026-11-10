@@ -429,6 +429,9 @@ textarea{width:100%;background:var(--card);color:var(--tx);border:1px solid var(
 #pkwheel{left:50%;top:66%;transform:translateX(-50%);padding:9px 20px;border-radius:99px;border:2px solid #fff;font-size:14px;background:linear-gradient(90deg,#f59e0b,#ef4444,#8b5cf6);box-shadow:0 0 22px #f59e0b88;animation:eggp 1.2s ease-in-out infinite}
 #pkwheel[hidden],#pkcarpet[hidden]{display:none}
 #pkcarpet{left:50%;top:70px;transform:translateX(-50%);padding:6px 14px;border-radius:99px;background:#b91c1ccc;border:2px solid #fde047;font-size:13px}
+.pbx{background:#ffffff0d;border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:8px;text-align:center}
+.pbx .cno{font-size:24px;font-weight:900;letter-spacing:2px;margin:4px 0;color:var(--cy)}
+.pbx p{margin:6px 0;color:var(--mut)}.pbx .btn{margin:4px 0}
 </style>
 </head>
 <body>
@@ -1728,7 +1731,9 @@ function svInit(){
   if(SV.ok&&!SV.iv)SV.iv=setInterval(()=>{svRefresh().catch(()=>{})},25000);
  })()}
 async function svRefresh(first){
- await svLoadCfg();await svLoadLedger();await wheelLoad();await ordersLoadMine();svPaint()}
+ await svLoadCfg();await svLoadLedger();await wheelLoad();await ordersLoadMine();
+  if(isAdmin()){try{const a=await allOrders(),n=a.filter(o=>o.status==="receipt").length;if(SV.rcpt!==undefined&&n>SV.rcpt)appToast("Yangi chek: "+n+" ta tekshirilmagan");SV.rcpt=n}catch(e){}}
+  svPaint()}
 async function svLoadCfg(){const d=await svc("config").doc("app").get();
  if(d.exists){const v=d.data()||{};SV.adminUid=String(v.adminUid||"");SV.adminNick=String(v.adminNick||ADMIN_DEFAULT);SV.firstPlayerId=String(v.firstPlayerId||"")}else{SV.adminUid="";SV.adminNick=ADMIN_DEFAULT;SV.firstPlayerId=""}}
 async function svRegister(){if(!SV.ok)return;
@@ -1759,15 +1764,17 @@ function spendCL(n,ref){
 async function alog(act,to,toNick,detail){try{await svc("alog").doc(rid("l")).set({t:Date.now(),by:SV.uid,byNick:S.name,act,to:to||"",toNick:toNick||"",detail:detail||""})}catch(e){}}
 
 /* ---- shop → order → admin chat ---- */
+const CARD_NO="5614 6812 7785 8084";
 async function createOrder(kind,key){
  if(!SV.ok)return info("Server ulanmagan",srvMsg);
  let item,price,amt;
  if(kind==="cl"){const k=PACKS[key];if(!k)return;item=k[0]+" CL";price=k[1];amt=k[0]}
  else{const p=PLANS.find(x=>x.id===key);if(!p)return;item="Premium · "+p.name;price=p.price;amt=PMONTHS[p.id]}
  const id=rid("o"),no="GS-"+new Date().toISOString().slice(2,10).replace(/-/g,"")+"-"+Math.random().toString(36).slice(2,6).toUpperCase();
- const o={uid:SV.uid,nick:S.name,kind,item,amt,price,no,status:"new",t:Date.now(),upd:Date.now()};
+ const o={uid:SV.uid,nick:S.name,pid:SV.playerId||"",kind,item,amt,price,no,status:"new",t:Date.now(),upd:Date.now()};
  try{await svc("orders").doc(id).set(o);
-  await orderMsg(id,"s",`Buyurtma: ${no}\nFoydalanuvchi: ${S.name}\nXarid turi: ${kind==="cl"?"CL Crystal":"Premium"}\n${kind==="cl"?"CL miqdori":"Muddat"}: ${kind==="cl"?amt+" CL":item.replace("Premium · ","")}\nTo‘lov summasi: ${fmt(price)}\n\nQabul qilinadigan kartalar: Uzcard, Humo, Visa, Mastercard.\nAdmin (${SV.adminNick}) karta ma’lumotlarini shu chatga yuboradi. To‘lovdan keyin chek rasmini shu yerga yuboring.`);
+  await orderMsg(id,"s",`Buyurtma: ${no}\nFoydalanuvchi: ${S.name}\nXarid turi: ${kind==="cl"?"CL Crystal":"Premium"}\n${kind==="cl"?"CL miqdori":"Muddat"}: ${kind==="cl"?amt+" CL":item.replace("Premium · ","")}\nTo‘lov summasi: ${fmt(price)}\n\nTo‘lov kartasi: ${CARD_NO}\nShu kartaga aniq ${fmt(price)} o‘tkazing, so‘ng pastdagi tugma orqali chek rasmini yuklang. Admin (${SV.adminNick}) tekshirib tasdiqlaydi.`);
+  try{await svc("orders").doc(id).update({status:"awaiting",upd:Date.now()});o.status="awaiting"}catch(e){}
   SV.orders.unshift({id,...o});
  }catch(e){return info("Buyurtma yuborilmadi","Server xatosi. Keyinroq urinib ko‘ring. Hech qanday pul yechilmadi.")}
  closeM();closeM2();S.tab="chat";S.chat="o:"+id;S.dir="r";render(true)}
@@ -1793,6 +1800,8 @@ function orderRoomHTML(adm){
  orderStop();ORM.t=setInterval(()=>{const inRoom=adm?(S.tab==="admin"&&AD.oid===id):(S.tab==="chat"&&S.chat==="o:"+id);if(!inRoom){orderStop();return}orderPaint()},4000);
  setTimeout(orderPaint,0);
  return `<div class="chat"><div class="bar"><button class="back" onclick="orderBack()">&larr; Orqaga</button><b style="flex:1" id="oht">Buyurtma</b></div><div id="ohd"></div><div class="msgs" id="msgs"><p class="empty">Yuklanmoqda…</p></div><div id="ocp"></div></div>`}
+function payBox(o){const rc=o.status==="receipt";return `<div class="pbx">${rc?`<p>✅ Chek yuborildi. Admin to‘lovni tekshirmoqda.</p>`:`<small>To‘lov kartasi</small><div class="cno">${CARD_NO}</div><button class="btn sec sm" onclick="copyCard()">Raqamni nusxalash</button><p>O‘tkazing: <b>${fmt(o.price)}</b></p>`}<button class="btn" onclick="$('#rcf').click()">📎 ${rc?"Yana chek yuklash":"Chek rasmini yuklash"}</button><input id="rcf" type="file" accept="image/*" hidden onchange="orderImg(this)"></div>`}
+function copyCard(){try{navigator.clipboard.writeText(CARD_NO.replace(/ /g,""));appToast("Karta raqami nusxalandi")}catch(e){appToast(CARD_NO)}}
 function orderBack(){orderStop();if(ORM.adm){AD.oid=null;render()}else{S.chat=null;render()}}
 async function orderPaint(){
  if(!SV.ok||!ORM.id)return;
@@ -1802,7 +1811,7 @@ async function orderPaint(){
   if(ORM.adm&&!isAdmin())return;
   const s=await svc("omsgs").where("oid","==",ORM.id).get();ms=s.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>a.t-b.t)}catch(e){return}
  ORM.o=o;const hd=$("#ohd"),box=$("#msgs");if(!hd||!box)return;
- $("#oht").textContent=ORM.adm?`${o.no} · ${o.nick}`:`${SV.adminNick} · ${o.no}`;
+ $("#oht").textContent=ORM.adm?`${o.no} · ${o.nick}${o.pid?" · ID "+o.pid:""}`:`${SV.adminNick} · ${o.no}`;
  hd.innerHTML=`<div class="ohd"><div><b>${esc(o.item)}</b><small>${fmt(o.price)} · ${fmtDT(o.t)}</small></div>${stChip(o.status)}</div>`;
  if(ORM.n!==ms.length||ORM.cs!==o.status+"|"+ms.length){
   const me=f=>ORM.adm?f==="a":f==="u";
@@ -1812,7 +1821,7 @@ async function orderPaint(){
  if(ORM.cs.split("|")[0]!==key){const cp=$("#ocp");
   const closed=o.status==="confirmed"||o.status==="rejected";
   cp.innerHTML=closed?`<p class="ctr" style="color:var(--mut)">${o.status==="confirmed"?"Buyurtma tasdiqlangan. Rahmat!":"Buyurtma rad etilgan."}</p>`:
-   `${ORM.adm?`<div class="oact"><button class="btn sec sm" onclick="admCardMsg()">Karta yuborish</button><button class="btn sm" onclick="admConfirm()">Tasdiqlash</button><button class="btn sec sm" onclick="admReject()">Rad etish</button></div>`:""}
+   `${ORM.adm?`<div class="oact"><button class="btn sec sm" onclick="admCardMsg()">Karta yuborish</button><button class="btn sm" onclick="admConfirm()">Tasdiqlash</button><button class="btn sec sm" onclick="admReject()">Rad etish</button></div>`:payBox(o)}
     <div class="bar"><label class="ico">${ic("create",30)}<input type="file" accept="image/*" hidden onchange="orderImg(this)"></label><input id="omi" placeholder="${ORM.adm?"Xabar":"Xabar yoki chek rasmi"}" onkeydown="if(event.key==='Enter')orderSend()"><button class="btn sm" onclick="orderSend()">Yuborish</button></div>`;
   ORM.cs=key}
  ORM.cs=key+"|"+ms.length}
@@ -1844,14 +1853,14 @@ function viewAdmin(){
  if(!isAdmin())return `<h2>Admin</h2><p class="empty">Ruxsat yo‘q.</p>`;
  setTimeout(adminLoad,0);
  if(AD.oid)return orderRoomHTML(true);
- const T=[["orders","Buyurtmalar"],["users","Foydalanuvchilar"],["manage","Boshqaruv"]];
+ const T=[["orders","Buyurtmalar"],["give","Berish"],["users","Foydalanuvchilar"],["manage","Boshqaruv"]];
  return `<div class="bar rv"><button class="back" onclick="go('profile')">&larr; Profil</button><b style="flex:1">Admin panel · ${esc(SV.adminNick)}</b></div>
  <div class="chips">${T.map(([k,l])=>`<button class="chip ${AD.sec===k?"on":""}" onclick="AD.sec='${k}';render()">${l}</button>`).join("")}</div><div id="adb"><p class="empty">Yuklanmoqda…</p></div>`}
 async function adminLoad(){
  if(AD.oid)return;const b=$("#adb");if(!b)return;
  if(!await admGuard())return;
  try{
-  if(AD.sec==="orders")await admOrders(b);else if(AD.sec==="users")admUsers(b);else await admManage(b)}catch(e){b.innerHTML=`<p class="empty">Ma’lumot o‘qilmadi. Keyinroq urinib ko‘ring.</p>`}}
+  if(AD.sec==="orders")await admOrders(b);else if(AD.sec==="give")admGive(b);else if(AD.sec==="users")admUsers(b);else await admManage(b)}catch(e){b.innerHTML=`<p class="empty">Ma’lumot o‘qilmadi. Keyinroq urinib ko‘ring.</p>`}}
 async function allOrders(){const s=await svc("orders").limit(300).get();return s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.t-a.t)}
 async function admOrders(b){const all=await allOrders(),cnt=k=>all.filter(o=>o.status===k).length,list=all.filter(o=>o.status===AD.f);
  b.innerHTML=`<div class="chips">${Object.keys(OST).map(k=>`<button class="chip ${AD.f===k?"on":""}" onclick="AD.f='${k}';adminLoad()">${OST[k][0]} (${cnt(k)})</button>`).join("")}</div>`+
@@ -1880,15 +1889,34 @@ function admReject(){const o=ORM.o;if(!o)return;if(o.status==="confirmed"||o.sta
  sheet(`<h3>Buyurtmani rad etish</h3><p>${esc(o.no)} rad etiladi. Hisobga hech narsa qo‘shilmaydi.</p><button class="btn" id="rjok">Rad etish</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
  $("#rjok").onclick=async()=>{if(!await admGuard())return;try{const d=await svc("orders").doc(o.id).get(),c=d.data();if(c.status==="confirmed"){closeM();return info("Mumkin emas","Bu buyurtma allaqachon tasdiqlangan.")}
   await svc("orders").doc(o.id).update({status:"rejected",upd:Date.now()});await orderMsg(o.id,"s","Buyurtma rad etildi.");await alog("order_reject",o.uid,o.nick,o.no);closeM();ORM.cs="";orderPaint()}catch(e){closeM();info("Xatolik","Server xatosi.")}}}
+/* berish: ID kiritib, paket tanlab yuborish */
+function admGive(b){b.innerHTML=`<div class="bar"><input id="gid" inputmode="numeric" maxlength="9" placeholder="O‘yinchi ID (faqat raqam)" value="${esc(AD.gid||"")}" oninput="this.value=this.value.replace(/\\D/g,'')" onkeydown="if(event.key==='Enter')admFind()"><button class="btn sm" onclick="admFind()">Topish</button></div><div id="gres"><p class="empty">O‘yinchi ID raqamini yozing.</p></div>`;if(AD.gid)admFind()}
+async function admFind(){if(!await admGuard())return;const q=($("#gid").value||"").replace(/\D/g,"");AD.gid=q;const r=$("#gres");
+ if(!/^\d{6,9}$/.test(q)){r.innerHTML=`<p class="empty">ID 6–9 ta raqamdan iborat.</p>`;return}
+ r.innerHTML=`<p class="empty">Qidirilmoqda…</p>`;
+ try{const s=await svc("users").where("playerId","==",q).get();if(!s.docs.length){r.innerHTML=`<p class="empty">Bunday ID topilmadi.</p>`;return}
+  const d=s.docs[0],u=d.data(),uid=d.id,c=calcLedger(await ledgerOf(uid),SV.adminUid);
+  r.innerHTML=`<div class="hero dk"><b>${esc(u.nick||"?")}</b><p style="margin-top:4px">ID: ${esc(q)} · CL: <b>${nf(c.cl)}</b> · Premium: <b>${c.pe>Date.now()?fmtD(c.pe)+" gacha":"yo‘q"}</b></p></div>
+  <div class="st">CL Crystal</div>${PACKS.map((k,i)=>`<button class="btn sec" onclick="admPack('${esc(uid)}','cl',${i})">${k[0]} CL · ${fmt(k[1])}</button>`).join("")}
+  <div class="st">Premium</div>${PLANS.map(p=>`<button class="btn sec" onclick="admPack('${esc(uid)}','prem','${p.id}')">${p.name} · ${fmt(p.price)}</button>`).join("")}`
+ }catch(e){r.innerHTML=`<p class="empty">Qidirib bo‘lmadi.</p>`}}
+function admPack(uid,kind,key){let item,amt;
+ if(kind==="cl"){const k=PACKS[key];if(!k)return;item=k[0]+" CL";amt=k[0]}else{const p=PLANS.find(x=>x.id===key);if(!p)return;item="Premium · "+p.name;amt=PMONTHS[p.id]}
+ sheet(`<h3>Yuborishni tasdiqlang</h3><p>ID <b>${esc(AD.gid)}</b> hisobiga <b>${esc(item)}</b> qo‘shiladi.</p><button class="btn" id="gvok">Yuborish</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
+ $("#gvok").onclick=async()=>{if(AD.busy)return;AD.busy=true;
+  try{if(!await admGuard())return;const d=await svc("users").doc(uid).get(),nick=d.exists?d.data().nick:"?";
+   await svc("ledger").doc(rid("g")).set(kind==="cl"?{uid,type:"grant",cur:"cl",amt,by:SV.uid,ref:"manual",t:Date.now()}:{uid,type:"grant",cur:"prem",months:amt,by:SV.uid,ref:"manual",t:Date.now()});
+   await alog(kind==="cl"?"grant_cl":"grant_prem",uid,nick,item);closeM();appToast(nick+" ga "+item+" yuborildi");admFind()}
+  catch(e){closeM();info("Xatolik","Yuborilmadi. Server xatosi.")}finally{AD.busy=false}}}
 /* users */
-function admUsers(b){b.innerHTML=`<div class="bar"><input id="uq" placeholder="Nik yoki akkaunt ID" value="${esc(AD.q)}" onkeydown="if(event.key==='Enter')admSearch()"><button class="btn sm" onclick="admSearch()">Qidirish</button></div><div id="ures"><p class="empty">Nik yoki akkaunt ID yozing.</p></div>`;if(AD.q)admSearch()}
+function admUsers(b){b.innerHTML=`<div class="bar"><input id="uq" placeholder="Nik yoki ID raqam" value="${esc(AD.q)}" onkeydown="if(event.key==='Enter')admSearch()"><button class="btn sm" onclick="admSearch()">Qidirish</button></div><div id="ures"><p class="empty">Nik yoki akkaunt ID yozing.</p></div>`;if(AD.q)admSearch()}
 async function admSearch(){if(!await admGuard())return;const q=($("#uq").value||"").trim().toLowerCase();AD.q=q;const r=$("#ures");if(!q){r.innerHTML=`<p class="empty">Nik yoki akkaunt ID yozing.</p>`;return}
  r.innerHTML=`<p class="empty">Qidirilmoqda…</p>`;
- try{const s=await svc("users").limit(500).get(),us=s.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.id.toLowerCase().includes(q)||String(u.nick||"").toLowerCase().includes(q)||(u.old||[]).some(n=>String(n).toLowerCase().includes(q)));
-  r.innerHTML=us.length?us.slice(0,30).map(u=>`<div class="row" onclick="admUser('${esc(u.id)}')"><img src="${CI[CI[u.g]?u.g:"boy"].head}" width="40" height="40" alt="" style="border-radius:10px;object-fit:cover"><div class="g"><b>${esc(u.nick||"?")}</b><small>ID: ${esc(u.id)}${(u.old||[]).length?" · oldingi: "+esc(u.old.join(", ")):""}</small></div></div>`).join(""):`<p class="empty">Topilmadi.</p>`}catch(e){r.innerHTML=`<p class="empty">Qidirib bo‘lmadi.</p>`}}
+ try{const s=await svc("users").limit(500).get(),us=s.docs.map(d=>({id:d.id,...d.data()})).filter(u=>String(u.playerId||"").includes(q)||u.id.toLowerCase().includes(q)||String(u.nick||"").toLowerCase().includes(q)||(u.old||[]).some(n=>String(n).toLowerCase().includes(q)));
+  r.innerHTML=us.length?us.slice(0,30).map(u=>`<div class="row" onclick="admUser('${esc(u.id)}')"><img src="${CI[CI[u.g]?u.g:"boy"].head}" width="40" height="40" alt="" style="border-radius:10px;object-fit:cover"><div class="g"><b>${esc(u.nick||"?")}</b><small>ID: ${esc(u.playerId||u.id)}${(u.old||[]).length?" · oldingi: "+esc(u.old.join(", ")):""}</small></div></div>`).join(""):`<p class="empty">Topilmadi.</p>`}catch(e){r.innerHTML=`<p class="empty">Qidirib bo‘lmadi.</p>`}}
 async function admUser(uid){if(!await admGuard())return;
  try{const d=await svc("users").doc(uid).get(),u=d.exists?d.data():{nick:"?"},c=calcLedger(await ledgerOf(uid),SV.adminUid);
-  sheet(`<h3>${esc(u.nick||"?")}</h3><p style="word-break:break-all">Akkaunt ID: ${esc(uid)}</p><p>CL balans: <b>${nf(c.cl)}</b><br>Premium: <b>${c.pe>Date.now()?"faol, tugash sanasi "+fmtD(c.pe):"yo‘q"}</b></p><button class="btn" onclick="admGiveCL('${esc(uid)}')">CL berish</button><button class="btn" onclick="admGivePrem('${esc(uid)}')">Premium berish</button><button class="btn sec" onclick="closeM()">Yopish</button>`)}catch(e){info("Xatolik","Foydalanuvchi o‘qilmadi.")}}
+  sheet(`<h3>${esc(u.nick||"?")}</h3><p style="word-break:break-all">ID: ${esc(u.playerId||uid)}</p><p>CL balans: <b>${nf(c.cl)}</b><br>Premium: <b>${c.pe>Date.now()?"faol, tugash sanasi "+fmtD(c.pe):"yo‘q"}</b></p><button class="btn" onclick="admGiveCL('${esc(uid)}')">CL berish</button><button class="btn" onclick="admGivePrem('${esc(uid)}')">Premium berish</button><button class="btn sec" onclick="closeM()">Yopish</button>`)}catch(e){info("Xatolik","Foydalanuvchi o‘qilmadi.")}}
 function admGiveCL(uid){sheet(`<h3>CL berish</h3><p>Miqdorni yozing (1 – 100 000).</p><input id="gcl" type="number" inputmode="numeric" min="1" max="100000" placeholder="Masalan 80"><button class="btn" id="gcok">Tasdiqlash</button><button class="btn sec" onclick="admUser('${esc(uid)}')">Orqaga</button>`);
  $("#gcok").onclick=async()=>{const n=Math.floor(+$("#gcl").value);if(!(n>=1&&n<=100000))return appToast("Miqdor 1 dan 100 000 gacha");if(AD.busy)return;AD.busy=true;
   try{if(!await admGuard())return;const d=await svc("users").doc(uid).get(),nick=d.exists?d.data().nick:"?";
@@ -1914,7 +1942,7 @@ function admNick(){sheet(`<h3>Admin nikini o‘zgartirish</h3><input id="ank" ma
   try{await svc("config").doc("app").update({adminNick:v});S.name=v;save();await svRegister();await svLoadCfg();await alog("admin_nick",SV.uid,v,"yangi nik: "+v);closeM();render()}catch(e){closeM();info("Xatolik","Saqlanmadi.")}}}
 function adminProfileBtn(){
  if(!SV.ok)return "";
- if(isAdmin())return `<button class="btn rv" onclick="openAdmin()">Admin panel</button>`;
+ if(isAdmin())return `<button class="btn rv" onclick="openAdmin()">Admin panel${SV.rcpt?` · ${SV.rcpt} chek`:""}</button>`;
  return "";
 }
 
