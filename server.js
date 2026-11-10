@@ -335,12 +335,114 @@ async function dbApi(b) {
   });
 }
 
+
+// ---------- SOCIAL: do'stlar, shaxsiy chat, online ----------
+const UID_RE = /^u[a-f0-9]{16}$/;
+const getF = async (uid) => { const d = (await getDoc("friends", uid)) || {}; return { f: d.f || [], in: d.in || [], out: d.out || [] }; };
+const putF = (uid, d) => putDoc("friends", uid, d);
+async function profiles(uids) {
+  uids = [...new Set(uids)].filter((x) => UID_RE.test(x));
+  const out = {};
+  if (!uids.length) return out;
+  const list = "(" + uids.join(",") + ")";
+  const [us, ns] = await Promise.all([
+    sb("docs?collection=eq.users&id=in." + list + "&select=id,data"),
+    sb("docs?collection=eq.uname&id=in." + list + "&select=id,data"),
+  ]);
+  for (const id of uids) out[id] = { uid: id, un: "", nick: "", g: "boy" };
+  for (const r of ns) out[r.id].un = str(r.data && r.data.un, 16);
+  for (const r of us) { out[r.id].nick = str(r.data && r.data.nick, 16); out[r.id].g = str(r.data && r.data.g, 8) || "boy"; }
+  for (const id of uids) if (!out[id].nick) out[id].nick = out[id].un || "Player";
+  return out;
+}
+
+async function social(b) {
+  const uid = String(b.uid || "");
+  if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
+  if (!(await getDoc("uname", uid))) return [403, { error: "Avval akkaunt yarating" }];
+  const op = String(b.op || "");
+  const to = String(b.to || "");
+  const needTo = ["add", "accept", "decline", "remove", "send"].includes(op);
+  if (needTo && (!UID_RE.test(to) || to === uid)) return bad("foydalanuvchi");
+  if ((op === "add" || op === "send") && blocked("so|" + uid, 150)) return [429, { error: "Juda ko'p so'rov, birozdan keyin urinib ko'ring" }];
+
+  if (op === "sync") {
+    const now = Date.now();
+    await putDoc("pres", uid, { t: now });
+    const F = await getF(uid);
+    const [pres, recent, msgs] = await Promise.all([
+      F.f.length ? sb("docs?collection=eq.pres&id=in.(" + F.f.join(",") + ")&select=id,data") : [],
+      sb("docs?collection=eq.pres&order=updated_at.desc&limit=30&select=id,data"),
+      sb("docs?collection=eq.dm&or=(data->>a.eq." + uid + ",data->>b.eq." + uid + ")&order=updated_at.desc&limit=200&select=id,data"),
+    ]);
+    const live = (r) => now - (+(r.data && r.data.t) || 0) < 45000;
+    const onSet = new Set(pres.filter(live).map((r) => r.id));
+    const onlineIds = recent.filter(live).map((r) => r.id).filter((id) => id !== uid).slice(0, 20);
+    const prof = await profiles([...F.f, ...F.in, ...onlineIds]);
+    return [200, {
+      friends: F.f.map((id) => ({ ...prof[id], on: onSet.has(id) })),
+      req: F.in.map((id) => prof[id]),
+      out: F.out,
+      online: onlineIds.map((id) => ({ ...prof[id], on: true, fr: F.f.includes(id) })),
+      msgs: msgs.map((r) => ({ id: r.id, ...r.data })).sort((x, y) => x.t - y.t),
+    }];
+  }
+
+  if (op === "search") {
+    const q = String(b.q || "").toLowerCase();
+    if (!/^[a-z0-9_]{2,16}$/.test(q)) return bad("qidiruv");
+    const rows = await sb("docs?collection=eq.login&id=like." + q + "*&select=id,data&limit=10");
+    const ids = rows.map((r) => r.data && r.data.uid).filter((x) => UID_RE.test(x) && x !== uid);
+    const F = await getF(uid);
+    const prof = await profiles(ids);
+    return [200, { users: ids.map((id) => ({ ...prof[id], st: F.f.includes(id) ? "friend" : F.out.includes(id) ? "sent" : F.in.includes(id) ? "got" : "none" })) }];
+  }
+
+  if (!needTo) return bad("op");
+
+  return serial(async () => {
+    if (!(await getDoc("uname", to))) return [404, { error: "Foydalanuvchi topilmadi" }];
+    const A = await getF(uid), B = await getF(to);
+    const rm = (arr, x) => arr.filter((y) => y !== x);
+    const add = (arr, x) => (arr.includes(x) ? arr : [...arr, x]);
+    if (op === "add") {
+      if (A.f.includes(to)) return [200, { ok: true }];
+      if (A.in.includes(to)) { // u allaqachon so'rov yuborgan, shu bilan do'st bo'lamiz
+        A.in = rm(A.in, to); B.out = rm(B.out, uid); A.f = add(A.f, to); B.f = add(B.f, uid);
+      } else {
+        if (A.out.length >= 100 || B.in.length >= 100) return [409, { error: "So'rovlar limiti to'ldi" }];
+        A.out = add(A.out, to); B.in = add(B.in, uid);
+      }
+    } else if (op === "accept") {
+      if (!A.in.includes(to)) return [404, { error: "So'rov topilmadi" }];
+      if (A.f.length >= 200 || B.f.length >= 200) return [409, { error: "Do'stlar limiti to'ldi" }];
+      A.in = rm(A.in, to); B.out = rm(B.out, uid); A.f = add(A.f, to); B.f = add(B.f, uid);
+    } else if (op === "decline") {
+      A.in = rm(A.in, to); B.out = rm(B.out, uid);
+    } else if (op === "remove") {
+      A.f = rm(A.f, to); B.f = rm(B.f, uid);
+    } else if (op === "send") {
+      if (!A.f.includes(to)) return [403, { error: "Faqat do'stlarga yozish mumkin" }];
+      const text = str(b.text, 500).trim();
+      if (!text) return bad("xabar bo'sh");
+      addTry("so|" + uid);
+      const now = Date.now();
+      const id = "m" + now + nodeCrypto.randomBytes(3).toString("hex");
+      await putDoc("dm", id, { a: uid, b: to, pair: [uid, to].sort().join("_"), text, t: now });
+      return [200, { ok: true }];
+    }
+    await putF(uid, A); await putF(to, B);
+    return [200, { ok: true }];
+  });
+}
+
 async function api(name, body, ip) {
   if (!HAS_DB) return [503, { error: "baza ulanmagan" }];
   if (name === "register") return register(body);
   if (name === "login") return login(body, ip);
   if (name === "player") return playerApi(body);
   if (name === "db") return dbApi(body);
+  if (name === "social") return social(body);
   if (body.collection !== "parkour") return [403, { error: "ruxsat yo'q" }];
   if (name === "get") {
     const id = String(body.id || "");
@@ -391,6 +493,14 @@ const server = http.createServer(async (req, res) => {
   if (url === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify({ ok: true, db: HAS_DB, rooms: rooms.size, players: wss.clients.size }));
+  }
+  const STATIC = { "/manifest.json": ["manifest.json", "application/manifest+json"], "/sw.js": ["sw.js", "text/javascript"], "/icon-192.png": ["icon-192.png", "image/png"], "/icon-512.png": ["icon-512.png", "image/png"], "/.well-known/assetlinks.json": ["assetlinks.json", "application/json"] };
+  if (STATIC[url]) {
+    return fs.readFile(path.join(__dirname, STATIC[url][0]), (err, data) => {
+      if (err) { res.writeHead(404); return res.end("Topilmadi"); }
+      res.writeHead(200, { "Content-Type": STATIC[url][1], "Cache-Control": "no-cache" });
+      res.end(data);
+    });
   }
   if (url === "/" || url === "/index.html") {
     return fs.readFile(INDEX, (err, data) => {
