@@ -52,6 +52,8 @@ function cleanDoc(d) {
   return o;
 }
 
+const same = (x, y) => { const p = Buffer.from(String(x || "")), q = Buffer.from(String(y || "")); return p.length === q.length && nodeCrypto.timingSafeEqual(p, q); };
+
 async function checkAuth(uid, secret) {
   if (!/^u[a-f0-9]{16}$/.test(uid) || !/^[a-f0-9]{32}$/.test(secret)) return false;
   const h = sha(secret);
@@ -63,14 +65,70 @@ async function checkAuth(uid, secret) {
       body: JSON.stringify({ collection: "auth", id: uid, data: { h } }),
     });
     const again = await sb("docs?collection=eq.auth&id=eq." + enc(uid) + "&select=data");
-    return again.length === 1 && again[0].data.h === h;
+    return again.length === 1 && same(again[0].data.h, h);
   }
-  const a = Buffer.from(rows[0].data.h || ""), b = Buffer.from(h);
-  return a.length === b.length && nodeCrypto.timingSafeEqual(a, b);
+  const d = rows[0].data || {};
+  return same(d.h, h) || (Array.isArray(d.hs) && d.hs.some((x) => same(x, h)));
 }
 
-async function api(name, body) {
+// ---------- login: nom + parol (parol scrypt bilan xeshlanadi, ochiq saqlanmaydi) ----------
+const scrypt = (pw, salt) => new Promise((res, rej) => nodeCrypto.scrypt(pw, salt, 32, (e, k) => (e ? rej(e) : res(k))));
+const tries = new Map(); // kalit -> [vaqtlar]
+function blocked(key, max) {
+  const now = Date.now();
+  const a = (tries.get(key) || []).filter((t) => now - t < 600000);
+  tries.set(key, a);
+  return a.length >= max;
+}
+const addTry = (key) => tries.set(key, [...(tries.get(key) || []), Date.now()]);
+const putDoc = (collection, id, data, prefer) =>
+  sb("docs?on_conflict=collection,id", {
+    method: "POST",
+    headers: { Prefer: prefer || "resolution=merge-duplicates" },
+    body: JSON.stringify({ collection, id, data, updated_at: new Date().toISOString() }),
+  });
+const getDoc = async (collection, id) => {
+  const r = await sb("docs?collection=eq." + collection + "&id=eq." + enc(id) + "&select=data");
+  return r[0] ? r[0].data : null;
+};
+
+async function register(body) {
+  const uid = String(body.uid || "");
+  if (!(await checkAuth(uid, String(body.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
+  const un = String(body.username || ""), pw = String(body.password || "");
+  if (!/^[A-Za-z0-9_]{3,16}$/.test(un)) return [400, { error: "Nom 3-16 ta lotin harf, raqam yoki _ bo'lsin" }];
+  if (pw.length < 6 || pw.length > 64) return [400, { error: "Parol 6-64 belgi bo'lsin" }];
+  if (await getDoc("uname", uid)) return [409, { error: "Bu akkaunt allaqachon ro'yxatdan o'tgan" }];
+  const salt = nodeCrypto.randomBytes(16).toString("hex");
+  const ph = (await scrypt(pw, salt)).toString("hex");
+  await putDoc("login", un.toLowerCase(), { uid, salt, ph }, "resolution=ignore-duplicates");
+  const mine = await getDoc("login", un.toLowerCase());
+  if (!mine || mine.uid !== uid || mine.ph !== ph) return [409, { error: "Bu nom band, boshqasini tanlang" }];
+  await putDoc("uname", uid, { un });
+  return [200, { ok: true }];
+}
+
+async function login(body, ip) {
+  const un = String(body.username || "").toLowerCase(), pw = String(body.password || "");
+  if (!/^[a-z0-9_]{3,16}$/.test(un) || pw.length < 1 || pw.length > 64) return [403, { error: "Nom yoki parol noto'g'ri" }];
+  const k1 = "u|" + un + "|" + ip, k2 = "i|" + ip;
+  if (blocked(k1, 6) || blocked(k2, 30)) return [429, { error: "Juda ko'p urinish. 10 daqiqadan keyin qayta urinib ko'ring" }];
+  const rec = await getDoc("login", un);
+  const salt = rec ? rec.salt : "00".repeat(16);
+  const ph = (await scrypt(pw, salt)).toString("hex");
+  if (!rec || !same(rec.ph, ph)) { addTry(k1); addTry(k2); return [403, { error: "Nom yoki parol noto'g'ri" }]; }
+  tries.delete(k1);
+  const secret = nodeCrypto.randomBytes(16).toString("hex"); // shu qurilma uchun yangi kalit
+  const cur = (await getDoc("auth", rec.uid)) || {};
+  const hs = [...(Array.isArray(cur.hs) ? cur.hs : []), sha(secret)].slice(-5);
+  await putDoc("auth", rec.uid, { h: cur.h || "", hs });
+  return [200, { uid: rec.uid, secret }];
+}
+
+async function api(name, body, ip) {
   if (!HAS_DB) return [503, { error: "baza ulanmagan" }];
+  if (name === "register") return register(body);
+  if (name === "login") return login(body, ip);
   if (body.collection !== "parkour") return [403, { error: "ruxsat yo'q" }];
   if (name === "get") {
     const id = String(body.id || "");
@@ -109,7 +167,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") { res.writeHead(204, CORS); return res.end(); }
   if (req.method === "POST" && url.startsWith("/api/")) {
     try {
-      const [code, out] = await api(url.slice(5), await readJson(req));
+      const [code, out] = await api(url.slice(5), await readJson(req), String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim());
       res.writeHead(code, { "Content-Type": "application/json", ...CORS });
       return res.end(JSON.stringify(out));
     } catch (e) {

@@ -624,10 +624,33 @@ function viewProfile(){return `
 <div class="hero ${S.premium?"":"dk"} rv" onclick="premiumPage()"><b class="fl">${ic("premium",32)} ${S.premium?"Premium faol · "+fmtD(SV.premEnd)+" gacha":"Premium olish"}</b><p style="margin-top:4px;opacity:.85;color:inherit">${S.premium?"O‘yin yaratish ochiq.":"O‘yin yaratishni oching. Oyiga 40 000 so‘mdan."}</p></div>
 <div class="st rv">Do‘stlar</div>${FRIENDS.map(userRow).join("")}
 <button class="btn sec rv" onclick="info('Do‘st qo‘shish','Do‘stlik so‘rovlari uchun haqiqiy akkauntlar kerak. Keyingi bosqichda qo‘shiladi.')">Do‘st qo‘shish</button>
+<button class="btn sec rv" onclick="accountSheet()">${gsUn()?"Akkaunt: "+esc(gsUn()):"Akkaunt yaratish / Kirish"}</button>
 <div class="st rv">${ic("settings",28)} Sozlamalar</div>
 ${[["priv","Yopiq profil"],["notif","Bildirishnomalar"],["blurimg","Notanishlardan rasmlarni xiralashtirish"]].map(([k,l])=>`<div class="sw rv">${l}<button class="tg ${S.set[k]?"on":""}" onclick="S.set.${k}=!S.set.${k};save();render();layoutApp()"></button></div>`).join("")}
 ${S.premium?`<button class="btn big rv" onclick="creator()">${ic("create",36)} O‘yin yaratish +</button>`:""}
 ${adminProfileBtn()}<p style="color:var(--mut);font-size:12px;margin-top:12px;word-break:break-all">${SV.ok?"O‘yinchi ID: <b style=\"color:var(--cy)\">"+esc(SV.playerId||"ID berilmoqda…")+"</b><br>"+"Akkaunt ID: "+esc(SV.uid)+"<br>":"O‘yinchi ID: serverga kirgach beriladi.<br>"}Maxfiylik: ismingiz, personajingiz va sozlamalaringiz shu qurilmada saqlanadi; CL, Premium, baraban va Rainbow Parkour natijalari serverda.</p>`}
+
+/* ---- AKKAUNT: nom + parol (qurilma almashganda ham natijalar saqlansin) ---- */
+function gsUn(){try{return localStorage.getItem("gs_un")||""}catch(e){return ""}}
+function accountSheet(){
+ if(!PK.own)return info("Akkaunt","Akkaunt tizimi serverga ulangach ishlaydi. Bir necha soniyadan keyin urinib ko‘ring.");
+ const un=gsUn();
+ if(un){sheet(`<h3>Akkaunt</h3><p>Siz <b>${esc(un)}</b> sifatida kirgansiz. Natijalaringiz serverda saqlanadi.</p><button class="btn sec" id="lo">Chiqish</button><button class="btn sec" onclick="closeM()">Yopish</button>`);
+  $("#lo").onclick=()=>{try{["gs_uid","gs_sec","gs_un","gs_pk"].forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload()};return}
+ sheet(`<h3>Akkaunt</h3><p>Akkaunt yaratsangiz, boshqa telefondan ham nom va parol bilan kirib, natijalaringizni saqlab qolasiz.</p><button class="btn" onclick="accForm('new')">Akkaunt yaratish</button><button class="btn sec" onclick="accForm('in')">Kirish</button><button class="btn sec" onclick="closeM()">Yopish</button>`)}
+function accForm(mode){
+ const nw=mode==="new";
+ sheet(`<h3>${nw?"Akkaunt yaratish":"Kirish"}</h3><input id="au" maxlength="16" autocapitalize="none" autocomplete="username" placeholder="Nom (lotin harf, raqam, _)"><input id="ap" type="password" maxlength="64" autocomplete="${nw?"new-password":"current-password"}" placeholder="Parol (kamida 6 belgi)">${nw?"":"<p style=\"font-size:12px\">Kirsangiz, shu qurilmadagi hozirgi natijalar akkauntga qo‘shilmaydi.</p>"}<p id="ae" style="color:#ff8a8a;min-height:18px;font-size:13px"></p><button class="btn" id="ago">${nw?"Yaratish":"Kirish"}</button><button class="btn sec" onclick="accountSheet()">Orqaga</button>`);
+ $("#ago").onclick=async()=>{
+  const u=$("#au").value.trim(),pw=$("#ap").value;$("#ae").textContent="";$("#ago").disabled=true;
+  try{
+   if(nw){await gsCall("register",{uid:gsUid(),secret:gsId("gs_sec",32),username:u,password:pw});
+    try{localStorage.setItem("gs_un",u)}catch(e){}closeM();appToast("Akkaunt yaratildi");render()}
+   else{const j=await gsCall("login",{username:u,password:pw});
+    try{localStorage.setItem("gs_uid",j.uid.slice(1));localStorage.setItem("gs_sec",j.secret);localStorage.setItem("gs_un",u);localStorage.removeItem("gs_pk")}catch(e){}
+    try{const d=await gsCall("get",{collection:"parkour",id:j.uid});if(d.data&&d.data.name){S.name=String(d.data.name).slice(0,16);if(d.data.g&&CI[d.data.g])S.gender=d.data.g;save()}}catch(e){}
+    closeM();location.reload()}
+  }catch(e){$("#ae").textContent=e.message||"Xatolik";$("#ago").disabled=false}}}
 function editName(){sheet(`<h3>Foydalanuvchi nomi</h3><input id="nn" maxlength="16" value="${esc(S.name)}"><button class="btn" id="sv">Saqlash</button>`);$("#sv").onclick=()=>{const v=$("#nn").value.trim();if(v){S.name=v;save();if(SV.ok){svRegister();if(PK.db&&PK.uid)flush()}}closeM();render()}}
 
 /* ===== CHARACTER EDITOR ===== */
