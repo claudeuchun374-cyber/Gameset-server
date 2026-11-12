@@ -1,4 +1,4 @@
-// GAMESET server — 2-qadam: o'yinni tarqatish + xonalarda o'yinchilarni real vaqtda ko'rsatish
+// GAMESET server — o'yin + xonalar + akkaunt + CL/Premium/baraban/buyurtma/admin
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -31,10 +31,10 @@ const enc = encodeURIComponent;
 const sha = (x) => nodeCrypto.createHash("sha256").update(String(x)).digest("hex");
 const TOP_FIELDS = new Set(["best", "count", "rb"]);
 
-function readJson(req, max = 60000) {
+function readJson(req) {
   return new Promise((resolve, reject) => {
     let n = 0, chunks = [];
-    req.on("data", (c) => { n += c.length; if (n > max) { reject(new Error("katta")); req.destroy(); } else chunks.push(c); });
+    req.on("data", (c) => { n += c.length; if (n > 400000) { reject(new Error("katta")); req.destroy(); } else chunks.push(c); });
     req.on("end", () => { try { resolve(JSON.parse(Buffer.concat(chunks).toString() || "{}")); } catch (e) { reject(new Error("json")); } });
     req.on("error", reject);
   });
@@ -43,7 +43,9 @@ function readJson(req, max = 60000) {
 // o'yinchi ma'lumotini tozalash: raqamli maydonlar haqiqiy raqam bo'lishi shart
 function cleanDoc(d) {
   if (!d || typeof d !== "object" || Array.isArray(d)) throw new Error("data");
-  const o = { ...d };
+  const ALLOW = ["name","g","best","last","count","lv","xp","rb","tr","trTot","pets","ep","eq","eggs","auto","e3f","spk","spa","tails","tail","maxCp","rs","upd"];
+  const o = {};
+  for (const k of ALLOW) if (k in d) o[k] = d[k];
   for (const k of ["best", "count", "rb"]) {
     if (k in o && !(typeof o[k] === "number" && Number.isFinite(o[k]) && o[k] >= 0 && o[k] < 1e12)) delete o[k];
   }
@@ -126,71 +128,326 @@ async function login(body, ip) {
 }
 
 
-// ---------- foydalanuvchi o'yinlari (e'lon qilish / ro'yxat / o'chirish) ----------
-// Hozircha faqat shu nomdagi akkauntlar e'lon qila oladi (Premium serverga ko'chirilgach almashtiriladi)
-const CREATORS = (process.env.CREATORS || "jahongir,johongir").toLowerCase().split(",").map((x) => x.trim()).filter(Boolean);
-const gameKinds = new Set(["Parkour", "Yig'ish", "Poyga", "Boshqa"]);
-const pubTimes = new Map();
+// ---------- 3-qadam: CL, Premium, baraban, buyurtmalar, admin (hamma qoida SERVERDA tekshiriladi) ----------
+const ADMIN_USER = (process.env.ADMIN_USER || "jahongir").toLowerCase(); // shu nom bilan ro'yxatdan o'tgan akkaunt = admin
+const ADMIN_NICK = process.env.ADMIN_NICK || "JAHONGIR";
+const PACKS = [[40, 5000], [80, 10000], [200, 25000], [400, 50000]]; // [CL, so'm]
+const PLANS = { m1: [1, 40000], m3: [3, 100000], y1: [12, 350000] }; // [oy, so'm]
+const DAY = 864e5;
+const DB_COLS = new Set(["config", "users", "ledger", "orders", "omsgs", "wheel", "wlog", "alog"]);
+const ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
+const ORDER_ST = new Set(["new", "awaiting", "receipt", "confirmed", "rejected"]);
 
-async function publishGame(body) {
-  const uid = String(body.uid || "");
-  if (!(await checkAuth(uid, String(body.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
-  const un = await getDoc("uname", uid);
-  if (!un || !CREATORS.includes(String(un.un).toLowerCase())) return [403, { error: "O'yin e'lon qilish hozircha faqat Premium/yaratuvchi akkauntlar uchun" }];
-  const g = body.game || {};
-  const name = String(g.n || "").trim().slice(0, 30);
-  const html = String(g.html || "");
-  const img = String(g.img || "");
-  if (name.length < 2) return [400, { error: "O'yin nomi kamida 2 belgi bo'lsin" }];
-  if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(img) || img.length > 60000) return [400, { error: "Rasm noto'g'ri yoki juda katta" }];
-  if (html.length < 50 || html.length > 450000) return [400, { error: "O'yin fayli 450 KB dan kichik bo'lishi kerak" }];
-  const kind = gameKinds.has(g.c) ? g.c : "Boshqa";
-  const now = Date.now();
-  const arr = (pubTimes.get(uid) || []).filter((t) => now - t < 600000);
-  if (arr.length >= 5) return [429, { error: "Juda tez-tez e'lon qilyapsiz, biroz kuting" }];
-  const mine = (await sb("docs?collection=eq.games&select=id,data&limit=3000")).filter((r) => r.data && r.data.uid === uid);
-  if (mine.length >= 20) return [400, { error: "Eng ko'pi bilan 20 ta o'yin e'lon qilish mumkin" }];
-  pubTimes.set(uid, [...arr, now]);
-  const id = nodeCrypto.randomBytes(5).toString("hex");
-  await putDoc("gamehtml", id, { html });
-  await putDoc("games", id, { n: name, c: kind, by: un.un, uid, img, at: now });
-  return [200, { ok: true, id }];
+let chain = Promise.resolve(); // yozuvlar ketma-ket bajariladi (balans bo'yicha poyga bo'lmasin)
+const serial = (fn) => { const p = chain.then(fn, fn); chain = p.catch(() => {}); return p; };
+
+let adminCache = { t: 0, uid: "" };
+async function adminUid() {
+  if (Date.now() - adminCache.t < 20000) return adminCache.uid;
+  const rec = await getDoc("login", ADMIN_USER);
+  adminCache = { t: Date.now(), uid: rec ? String(rec.uid) : "" };
+  return adminCache.uid;
 }
-async function gamesList() {
-  const rows = (await sb("docs?collection=eq.games&select=id,data&limit=3000")).filter((r) => r.data && r.data.n);
-  rows.sort((a, b) => (b.data.at || 0) - (a.data.at || 0));
-  return [200, { games: rows.slice(0, 40).map((r) => ({ id: r.id, n: r.data.n, c: r.data.c, by: r.data.by, img: r.data.img, uid: r.data.uid, at: r.data.at })) }];
+async function rowsBy(col, field, val, limit) {
+  const r = await sb("docs?collection=eq." + col + "&data->>" + field + "=eq." + enc(val) + "&select=id,data&limit=" + limit);
+  return r.map((x) => ({ id: x.id, data: x.data }));
 }
-async function gameGet(body) {
-  const id = String(body.id || "");
-  if (!/^[a-f0-9]{10}$/.test(id)) return [400, { error: "id" }];
-  const d = await getDoc("gamehtml", id);
-  return d ? [200, { html: d.html }] : [404, { error: "O'yin topilmadi" }];
+const calcBal = (rows) => { let cl = 0; for (const r of rows) if (r.cur === "cl") cl += (r.type === "grant" ? 1 : -1) * (+r.amt || 0); return Math.max(0, Math.round(cl)); };
+const int = (v, a, b) => Number.isInteger(v) && v >= a && v <= b;
+const str = (v, n) => String(v == null ? "" : v).slice(0, n);
+const bad = (m) => [400, { error: m || "noto'g'ri so'rov" }];
+
+async function configData() {
+  const c = (await getDoc("config", "app")) || {};
+  return { ...c, adminUid: await adminUid(), adminNick: c.adminNick || ADMIN_NICK, firstPlayerId: "100001" };
 }
-async function unpublishGame(body) {
-  const uid = String(body.uid || ""), id = String(body.id || "");
-  if (!(await checkAuth(uid, String(body.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
-  if (!/^[a-f0-9]{10}$/.test(id)) return [400, { error: "id" }];
-  const g = await getDoc("games", id);
-  if (!g || g.uid !== uid) return [403, { error: "Bu sizning o'yiningiz emas" }];
-  await sb("docs?collection=eq.games&id=eq." + enc(id), { method: "DELETE", headers: { Prefer: "return=minimal" } });
-  await sb("docs?collection=eq.gamehtml&id=eq." + enc(id), { method: "DELETE", headers: { Prefer: "return=minimal" } });
-  return [200, { ok: true }];
+
+async function playerApi(b) {
+  const uid = String(b.uid || "");
+  if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
+  return serial(async () => {
+    const admin = (await adminUid()) === uid;
+    const cfg = (await getDoc("config", "app")) || {};
+    const u = (await getDoc("users", uid)) || {};
+    const nick = str(b.nick || "Player", 16), g = str(b.g, 8);
+    let playerId = String(u.playerId || "");
+    let next = Math.max(100002, Number(cfg.nextId) || 100002); // faqat raqamli ID: admin 100001, qolganlar 100002 dan
+    if (admin) playerId = "100001";
+    else if (u.idVersion !== 3 || !/^\d{6,9}$/.test(playerId) || playerId === "100001") { playerId = String(next); next++; }
+    const old = Array.isArray(u.old) ? u.old.slice(0, 8) : [];
+    if (u.nick && u.nick !== nick && !old.includes(u.nick)) old.unshift(u.nick);
+    await putDoc("config", "app", { ...cfg, nextId: next, firstPlayerId: "100001", updatedAt: Date.now() });
+    await putDoc("users", uid, { nick, g, playerId, idVersion: 3, role: admin ? "admin" : "player", old: old.slice(0, 8), upd: Date.now() });
+    return [200, { adminUid: await adminUid(), adminNick: cfg.adminNick || ADMIN_NICK, playerId, firstPlayerId: "100001" }];
+  });
+}
+
+async function dbApi(b) {
+  const col = String(b.collection || ""), op = String(b.op || "");
+  if (!DB_COLS.has(col)) return [403, { error: "ruxsat yo'q" }];
+  const id = b.id == null ? "" : String(b.id);
+  if (op === "get" && col === "config" && id === "app") return [200, { data: await configData() }];
+  const uid = String(b.uid || "");
+  if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
+  const admin = uid !== "" && (await adminUid()) === uid;
+  if (op !== "get" && op !== "query" && blocked("db|" + uid, 400)) return [429, { error: "juda ko'p so'rov" }];
+
+  if (op === "get") {
+    if (!ID_RE.test(id)) return bad("id");
+    const d = await getDoc(col, id);
+    if (!d) return [200, { data: null }];
+    const own = col === "config" ? false : col === "users" || col === "wheel" ? id === uid : d.uid === uid;
+    if (col === "omsgs" || col === "wlog" || col === "alog") { if (!admin) return [403, { error: "ruxsat yo'q" }]; }
+    else if (!admin && !own) return [403, { error: "ruxsat yo'q" }];
+    return [200, { data: d }];
+  }
+
+  if (op === "query") {
+    const lim = Math.max(1, Math.min(1000, parseInt(b.limit) || 100));
+    const w = Array.isArray(b.where) ? b.where.filter((x) => Array.isArray(x) && x[1] === "==") : [];
+    if (w.length) {
+      const [f, , v] = w[0];
+      if (f === "uid" && ["ledger", "orders", "wheel"].includes(col)) {
+        if (!admin && String(v) !== uid) return [403, { error: "ruxsat yo'q" }];
+        return [200, { rows: await rowsBy(col, "uid", String(v), lim) }];
+      }
+      if (f === "playerId" && col === "users") {
+        if (!admin) return [403, { error: "ruxsat yo'q" }];
+        if (!/^\d{6,9}$/.test(String(v))) return bad("ID");
+        return [200, { rows: await rowsBy("users", "playerId", String(v), 5) }];
+      }
+      if (f === "oid" && col === "omsgs") {
+        const o = await getDoc("orders", String(v));
+        if (!o || (!admin && o.uid !== uid)) return [403, { error: "ruxsat yo'q" }];
+        return [200, { rows: await rowsBy("omsgs", "oid", String(v), lim) }];
+      }
+      return bad("filtr");
+    }
+    if (!admin) return [403, { error: "ruxsat yo'q" }];
+    const r = await sb("docs?collection=eq." + col + "&select=id,data&order=updated_at.desc&limit=" + Math.min(lim, 500));
+    return [200, { rows: r.map((x) => ({ id: x.id, data: x.data })) }];
+  }
+
+  if (op !== "set" && op !== "update") return bad("op");
+  if (!ID_RE.test(id)) return bad("id");
+  const d = b.data;
+  if (!d || typeof d !== "object" || Array.isArray(d) || JSON.stringify(d).length > 320000) return bad("data");
+
+  return serial(async () => {
+    const cur = await getDoc(col, id);
+    const now = Date.now();
+
+    if (col === "config") {
+      if (!admin || op !== "update" || typeof d.adminNick !== "string" || !d.adminNick.trim()) return [403, { error: "ruxsat yo'q" }];
+      await putDoc("config", "app", { ...(cur || {}), adminNick: str(d.adminNick.trim(), 16), updatedAt: now });
+      return [200, { ok: true }];
+    }
+    if (col === "users") return [403, { error: "ruxsat yo'q" }];
+
+    if (col === "ledger") {
+      if (op !== "set") return [403, { error: "ruxsat yo'q" }];
+      if (cur) return [200, { ok: true, dup: true }]; // bir xil id ikki marta yozilmaydi
+      if (d.type === "spend") {
+        if (d.uid !== uid || d.cur !== "cl" || !int(d.amt, 0, 1e6)) return bad("ledger");
+        const bal = calcBal((await rowsBy("ledger", "uid", uid, 1000)).map((r) => r.data));
+        if (bal < d.amt) return [409, { error: "CL yetarli emas" }];
+        await putDoc("ledger", id, { uid, type: "spend", cur: "cl", amt: d.amt, ref: str(d.ref, 60), by: uid, t: now });
+        return [200, { ok: true }];
+      }
+      if (d.type === "grant") {
+        if (!admin) return [403, { error: "ruxsat yo'q" }];
+        if (!ID_RE.test(String(d.uid || ""))) return bad("uid");
+        const row = { uid: String(d.uid), type: "grant", by: uid, ref: str(d.ref, 60), t: now };
+        if (d.cur === "cl" && int(d.amt, 1, 1e6)) { row.cur = "cl"; row.amt = d.amt; }
+        else if (d.cur === "prem" && int(d.months, 1, 24)) { row.cur = "prem"; row.months = d.months; }
+        else return bad("grant");
+        await putDoc("ledger", id, row);
+        return [200, { ok: true }];
+      }
+      return bad("ledger");
+    }
+
+    if (col === "orders") {
+      if (op === "set") {
+        if (cur || d.uid !== uid) return [403, { error: "ruxsat yo'q" }];
+        let ok = false;
+        if (d.kind === "cl") ok = PACKS.some((p) => p[0] === d.amt && p[1] === d.price);
+        else if (d.kind === "prem") ok = Object.values(PLANS).some((p) => p[0] === d.amt && p[1] === d.price);
+        if (!ok) return bad("buyurtma narxi noto'g'ri");
+        await putDoc("orders", id, { uid, nick: str(d.nick, 16), pid: /^\d{6,9}$/.test(String(d.pid)) ? String(d.pid) : "", kind: d.kind, item: str(d.item, 60), amt: d.amt, price: d.price, no: str(d.no, 32), status: "new", t: now, upd: now });
+        return [200, { ok: true }];
+      }
+      if (!cur) return [404, { error: "topilmadi" }];
+      const keys = Object.keys(d);
+      if (admin) {
+        if (!keys.every((k) => ["status", "upd", "cBy", "cAt"].includes(k)) || (d.status !== undefined && !ORDER_ST.has(d.status))) return bad("order");
+        const nx = { ...cur }; if (d.status) nx.status = d.status; nx.upd = now;
+        if (d.status === "confirmed") { nx.cBy = uid; nx.cAt = now; }
+        await putDoc("orders", id, nx);
+        return [200, { ok: true }];
+      }
+      if (cur.uid !== uid || !keys.every((k) => ["status", "upd"].includes(k)) || !((d.status === "receipt" && ["new", "awaiting", "receipt"].includes(cur.status)) || (d.status === "awaiting" && cur.status === "new"))) return [403, { error: "ruxsat yo'q" }];
+      await putDoc("orders", id, { ...cur, status: d.status, upd: now });
+      return [200, { ok: true }];
+    }
+
+    if (col === "omsgs") {
+      if (op !== "set" || cur) return [403, { error: "ruxsat yo'q" }];
+      const o = await getDoc("orders", String(d.oid || ""));
+      if (!o || (!admin && o.uid !== uid)) return [403, { error: "ruxsat yo'q" }];
+      const from = admin ? (d.from === "s" ? "s" : "a") : d.from === "s" ? "s" : "u";
+      const img = typeof d.img === "string" && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(d.img) && d.img.length <= 300000 ? d.img : "";
+      await putDoc("omsgs", id, { oid: String(d.oid), from, fromUid: uid, text: str(d.text, 2000), img, t: now });
+      return [200, { ok: true }];
+    }
+
+    if (col === "wheel") {
+      if (id !== uid) return [403, { error: "ruxsat yo'q" }];
+      if (op === "set") {
+        if (cur && cur.last && now - cur.last < DAY) return [409, { error: "baraban hali tayyor emas" }];
+        await putDoc("wheel", uid, { last: now, prize: str(d.prize, 20), pend: 1, n: ((cur && +cur.n) || 0) + 1, nick: str(d.nick, 16), carpetUntil: (cur && cur.carpetUntil) || 0, carpetReady: !!(cur && cur.carpetReady) });
+        return [200, { ok: true }];
+      }
+      if (!cur) return [404, { error: "topilmadi" }];
+      const nx = { ...cur };
+      for (const k of Object.keys(d)) {
+        if (k === "pend") { if (d.pend !== 0 || !cur.pend) return [409, { error: "sovrin allaqachon olingan" }]; nx.pend = 0; }
+        else if (k === "claimedAt") nx.claimedAt = now;
+        else if (k === "carpetReady") nx.carpetReady = !!d.carpetReady;
+        else if (k === "carpetUntil") { if (!(typeof d.carpetUntil === "number" && d.carpetUntil >= 0 && d.carpetUntil <= now + 120000)) return bad("carpet"); nx.carpetUntil = d.carpetUntil; }
+        else return bad("maydon");
+      }
+      await putDoc("wheel", uid, nx);
+      return [200, { ok: true }];
+    }
+
+    if (col === "wlog") {
+      if (op !== "set" || cur || d.uid !== uid) return [403, { error: "ruxsat yo'q" }];
+      await putDoc("wlog", id, { uid, nick: str(d.nick, 16), prize: str(d.prize, 20), t: now });
+      return [200, { ok: true }];
+    }
+    if (col === "alog") {
+      if (!admin || op !== "set" || cur) return [403, { error: "ruxsat yo'q" }];
+      await putDoc("alog", id, { t: now, by: uid, byNick: str(d.byNick, 16), act: str(d.act, 30), to: str(d.to, 40), toNick: str(d.toNick, 16), detail: str(d.detail, 200) });
+      return [200, { ok: true }];
+    }
+    return [403, { error: "ruxsat yo'q" }];
+  });
+}
+
+
+// ---------- SOCIAL: do'stlar, shaxsiy chat, online ----------
+const UID_RE = /^u[a-f0-9]{16}$/;
+const getF = async (uid) => { const d = (await getDoc("friends", uid)) || {}; return { f: d.f || [], in: d.in || [], out: d.out || [] }; };
+const putF = (uid, d) => putDoc("friends", uid, d);
+async function profiles(uids) {
+  uids = [...new Set(uids)].filter((x) => UID_RE.test(x));
+  const out = {};
+  if (!uids.length) return out;
+  const list = "(" + uids.join(",") + ")";
+  const [us, ns] = await Promise.all([
+    sb("docs?collection=eq.users&id=in." + list + "&select=id,data"),
+    sb("docs?collection=eq.uname&id=in." + list + "&select=id,data"),
+  ]);
+  for (const id of uids) out[id] = { uid: id, un: "", nick: "", g: "boy" };
+  for (const r of ns) out[r.id].un = str(r.data && r.data.un, 16);
+  for (const r of us) { out[r.id].nick = str(r.data && r.data.nick, 16); out[r.id].g = str(r.data && r.data.g, 8) || "boy"; }
+  for (const id of uids) if (!out[id].nick) out[id].nick = out[id].un || "Player";
+  return out;
+}
+
+async function social(b) {
+  const uid = String(b.uid || "");
+  if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
+  if (!(await getDoc("uname", uid))) return [403, { error: "Avval akkaunt yarating" }];
+  const op = String(b.op || "");
+  const to = String(b.to || "");
+  const needTo = ["add", "accept", "decline", "remove", "send"].includes(op);
+  if (needTo && (!UID_RE.test(to) || to === uid)) return bad("foydalanuvchi");
+  if ((op === "add" || op === "send") && blocked("so|" + uid, 150)) return [429, { error: "Juda ko'p so'rov, birozdan keyin urinib ko'ring" }];
+
+  if (op === "sync") {
+    const now = Date.now();
+    await putDoc("pres", uid, { t: now });
+    const F = await getF(uid);
+    const [pres, recent, msgs] = await Promise.all([
+      F.f.length ? sb("docs?collection=eq.pres&id=in.(" + F.f.join(",") + ")&select=id,data") : [],
+      sb("docs?collection=eq.pres&order=updated_at.desc&limit=30&select=id,data"),
+      sb("docs?collection=eq.dm&or=(data->>a.eq." + uid + ",data->>b.eq." + uid + ")&order=updated_at.desc&limit=200&select=id,data"),
+    ]);
+    const live = (r) => now - (+(r.data && r.data.t) || 0) < 45000;
+    const onSet = new Set(pres.filter(live).map((r) => r.id));
+    const onlineIds = recent.filter(live).map((r) => r.id).filter((id) => id !== uid).slice(0, 20);
+    const prof = await profiles([...F.f, ...F.in, ...onlineIds]);
+    return [200, {
+      friends: F.f.map((id) => ({ ...prof[id], on: onSet.has(id) })),
+      req: F.in.map((id) => prof[id]),
+      out: F.out,
+      online: onlineIds.map((id) => ({ ...prof[id], on: true, fr: F.f.includes(id) })),
+      msgs: msgs.map((r) => ({ id: r.id, ...r.data })).sort((x, y) => x.t - y.t),
+    }];
+  }
+
+  if (op === "search") {
+    const q = String(b.q || "").toLowerCase();
+    if (!/^[a-z0-9_]{2,16}$/.test(q)) return bad("qidiruv");
+    const rows = await sb("docs?collection=eq.login&id=like." + q + "*&select=id,data&limit=10");
+    const ids = rows.map((r) => r.data && r.data.uid).filter((x) => UID_RE.test(x) && x !== uid);
+    const F = await getF(uid);
+    const prof = await profiles(ids);
+    return [200, { users: ids.map((id) => ({ ...prof[id], st: F.f.includes(id) ? "friend" : F.out.includes(id) ? "sent" : F.in.includes(id) ? "got" : "none" })) }];
+  }
+
+  if (!needTo) return bad("op");
+
+  return serial(async () => {
+    if (!(await getDoc("uname", to))) return [404, { error: "Foydalanuvchi topilmadi" }];
+    const A = await getF(uid), B = await getF(to);
+    const rm = (arr, x) => arr.filter((y) => y !== x);
+    const add = (arr, x) => (arr.includes(x) ? arr : [...arr, x]);
+    if (op === "add") {
+      if (A.f.includes(to)) return [200, { ok: true }];
+      if (A.in.includes(to)) { // u allaqachon so'rov yuborgan, shu bilan do'st bo'lamiz
+        A.in = rm(A.in, to); B.out = rm(B.out, uid); A.f = add(A.f, to); B.f = add(B.f, uid);
+      } else {
+        if (A.out.length >= 100 || B.in.length >= 100) return [409, { error: "So'rovlar limiti to'ldi" }];
+        A.out = add(A.out, to); B.in = add(B.in, uid);
+      }
+    } else if (op === "accept") {
+      if (!A.in.includes(to)) return [404, { error: "So'rov topilmadi" }];
+      if (A.f.length >= 200 || B.f.length >= 200) return [409, { error: "Do'stlar limiti to'ldi" }];
+      A.in = rm(A.in, to); B.out = rm(B.out, uid); A.f = add(A.f, to); B.f = add(B.f, uid);
+    } else if (op === "decline") {
+      A.in = rm(A.in, to); B.out = rm(B.out, uid);
+    } else if (op === "remove") {
+      A.f = rm(A.f, to); B.f = rm(B.f, uid);
+    } else if (op === "send") {
+      if (!A.f.includes(to)) return [403, { error: "Faqat do'stlarga yozish mumkin" }];
+      const text = str(b.text, 500).trim();
+      if (!text) return bad("xabar bo'sh");
+      addTry("so|" + uid);
+      const now = Date.now();
+      const id = "m" + now + nodeCrypto.randomBytes(3).toString("hex");
+      await putDoc("dm", id, { a: uid, b: to, pair: [uid, to].sort().join("_"), text, t: now });
+      return [200, { ok: true }];
+    }
+    await putF(uid, A); await putF(to, B);
+    return [200, { ok: true }];
+  });
 }
 
 async function api(name, body, ip) {
   if (!HAS_DB) return [503, { error: "baza ulanmagan" }];
   if (name === "register") return register(body);
   if (name === "login") return login(body, ip);
-  if (name === "publish") return publishGame(body);
-  if (name === "games_list") return gamesList();
-  if (name === "game") return gameGet(body);
-  if (name === "unpublish") return unpublishGame(body);
-  if (body.collection !== "parkour" && body.collection !== "parkour2") return [403, { error: "ruxsat yo'q" }];
+  if (name === "player") return playerApi(body);
+  if (name === "db") return dbApi(body);
+  if (name === "social") return social(body);
+  if (body.collection !== "parkour") return [403, { error: "ruxsat yo'q" }];
   if (name === "get") {
     const id = String(body.id || "");
     if (!/^[A-Za-z0-9_-]{1,40}$/.test(id)) return [400, { error: "id" }];
-    const rows = await sb("docs?collection=eq." + body.collection + "&id=eq." + enc(id) + "&select=data");
+    const rows = await sb("docs?collection=eq.parkour&id=eq." + enc(id) + "&select=data");
     return [200, { data: rows[0] ? rows[0].data : null }];
   }
   if (name === "set") {
@@ -200,7 +457,7 @@ async function api(name, body, ip) {
     await sb("docs?on_conflict=collection,id", {
       method: "POST",
       headers: { Prefer: "resolution=merge-duplicates" },
-      body: JSON.stringify({ collection: body.collection, id: uid, data, updated_at: new Date().toISOString() }),
+      body: JSON.stringify({ collection: "parkour", id: uid, data, updated_at: new Date().toISOString() }),
     });
     return [200, { ok: true }];
   }
@@ -209,7 +466,7 @@ async function api(name, body, ip) {
     if (!TOP_FIELDS.has(f)) return [400, { error: "field" }];
     const dir = body.dir === "desc" ? -1 : 1;
     const n = Math.max(1, Math.min(100, parseInt(body.n) || 20));
-    let rows = await sb("docs?collection=eq." + body.collection + "&select=id,data&limit=3000");
+    let rows = await sb("docs?collection=eq.parkour&select=id,data&limit=3000");
     rows = rows.filter((r) => r.data && typeof r.data[f] === "number" && r.data[f] > 0);
     rows.sort((x, y) => (x.data[f] - y.data[f]) * dir);
     return [200, { rows: rows.slice(0, n) }];
@@ -221,21 +478,10 @@ const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers
 
 const server = http.createServer(async (req, res) => {
   const url = req.url.split("?")[0];
-  if (url === "/.well-known/assetlinks.json") { // Android ilovasi (APK) manzil satrisiz ochilishi uchun
-    res.writeHead(200, { "Content-Type": "application/json" });
-    return res.end(JSON.stringify([{
-      relation: ["delegate_permission/common.handle_all_urls"],
-      target: {
-        namespace: "android_app",
-        package_name: "com.gameset.app",
-        sha256_cert_fingerprints: ["98:4B:D2:C7:2F:F9:5F:13:92:5B:FF:63:78:8C:C3:48:46:69:16:89:66:B4:04:6E:A3:11:D8:96:35:D4:15:67"],
-      },
-    }]));
-  }
   if (req.method === "OPTIONS") { res.writeHead(204, CORS); return res.end(); }
   if (req.method === "POST" && url.startsWith("/api/")) {
     try {
-      const [code, out] = await api(url.slice(5), await readJson(req, url === "/api/publish" ? 700000 : 60000), String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim());
+      const [code, out] = await api(url.slice(5), await readJson(req), String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim());
       res.writeHead(code, { "Content-Type": "application/json", ...CORS });
       return res.end(JSON.stringify(out));
     } catch (e) {
@@ -247,6 +493,14 @@ const server = http.createServer(async (req, res) => {
   if (url === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
     return res.end(JSON.stringify({ ok: true, db: HAS_DB, rooms: rooms.size, players: wss.clients.size }));
+  }
+  const STATIC = { "/manifest.json": ["manifest.json", "application/manifest+json"], "/sw.js": ["sw.js", "text/javascript"], "/icon-192.png": ["icon-192.png", "image/png"], "/icon-512.png": ["icon-512.png", "image/png"], "/.well-known/assetlinks.json": ["assetlinks.json", "application/json"] };
+  if (STATIC[url]) {
+    return fs.readFile(path.join(__dirname, STATIC[url][0]), (err, data) => {
+      if (err) { res.writeHead(404); return res.end("Topilmadi"); }
+      res.writeHead(200, { "Content-Type": STATIC[url][1], "Cache-Control": "no-cache" });
+      res.end(data);
+    });
   }
   if (url === "/" || url === "/index.html") {
     return fs.readFile(INDEX, (err, data) => {
