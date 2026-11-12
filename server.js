@@ -1,4 +1,4 @@
-// GAMESET server — o'yin + xonalar + akkaunt + CL/Premium/baraban/buyurtma/admin
+// GAMESET server — 2-qadam: o'yinni tarqatish + xonalarda o'yinchilarni real vaqtda ko'rsatish
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -31,10 +31,10 @@ const enc = encodeURIComponent;
 const sha = (x) => nodeCrypto.createHash("sha256").update(String(x)).digest("hex");
 const TOP_FIELDS = new Set(["best", "count", "rb"]);
 
-function readJson(req) {
+function readJson(req, max = 60000) {
   return new Promise((resolve, reject) => {
     let n = 0, chunks = [];
-    req.on("data", (c) => { n += c.length; if (n > 400000) { reject(new Error("katta")); req.destroy(); } else chunks.push(c); });
+    req.on("data", (c) => { n += c.length; if (n > max) { reject(new Error("katta")); req.destroy(); } else chunks.push(c); });
     req.on("end", () => { try { resolve(JSON.parse(Buffer.concat(chunks).toString() || "{}")); } catch (e) { reject(new Error("json")); } });
     req.on("error", reject);
   });
@@ -43,9 +43,7 @@ function readJson(req) {
 // o'yinchi ma'lumotini tozalash: raqamli maydonlar haqiqiy raqam bo'lishi shart
 function cleanDoc(d) {
   if (!d || typeof d !== "object" || Array.isArray(d)) throw new Error("data");
-  const ALLOW = ["name","g","best","last","count","lv","xp","rb","tr","trTot","pets","ep","eq","eggs","auto","e3f","spk","spa","tails","tail","maxCp","rs","upd"];
-  const o = {};
-  for (const k of ALLOW) if (k in d) o[k] = d[k];
+  const o = { ...d };
   for (const k of ["best", "count", "rb"]) {
     if (k in o && !(typeof o[k] === "number" && Number.isFinite(o[k]) && o[k] >= 0 && o[k] < 1e12)) delete o[k];
   }
@@ -128,291 +126,71 @@ async function login(body, ip) {
 }
 
 
-// ---------- 3-qadam: CL, Premium, baraban, buyurtmalar, admin (hamma qoida SERVERDA tekshiriladi) ----------
-const ADMIN_USER = (process.env.ADMIN_USER || "jahongir").toLowerCase(); // shu nom bilan ro'yxatdan o'tgan akkaunt = admin
-const ADMIN_NICK = process.env.ADMIN_NICK || "JAHONGIR";
-const PACKS = [[40, 5000], [80, 10000], [200, 25000], [400, 50000]]; // [CL, so'm]
-const PLANS = { m1: [1, 40000], m3: [3, 100000], y1: [12, 350000] }; // [oy, so'm]
-const DAY = 864e5;
-const DB_COLS = new Set(["config", "users", "ledger", "orders", "omsgs", "wheel", "wlog", "alog"]);
-const ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
-const ORDER_ST = new Set(["new", "awaiting", "receipt", "confirmed", "rejected"]);
+// ---------- foydalanuvchi o'yinlari (e'lon qilish / ro'yxat / o'chirish) ----------
+// Hozircha faqat shu nomdagi akkauntlar e'lon qila oladi (Premium serverga ko'chirilgach almashtiriladi)
+const CREATORS = (process.env.CREATORS || "jahongir,johongir").toLowerCase().split(",").map((x) => x.trim()).filter(Boolean);
+const gameKinds = new Set(["Parkour", "Yig'ish", "Poyga", "Boshqa"]);
+const pubTimes = new Map();
 
-let chain = Promise.resolve(); // yozuvlar ketma-ket bajariladi (balans bo'yicha poyga bo'lmasin)
-const serial = (fn) => { const p = chain.then(fn, fn); chain = p.catch(() => {}); return p; };
-
-let adminCache = { t: 0, uid: "" };
-async function adminUid() {
-  if (Date.now() - adminCache.t < 20000) return adminCache.uid;
-  const rec = await getDoc("login", ADMIN_USER);
-  adminCache = { t: Date.now(), uid: rec ? String(rec.uid) : "" };
-  return adminCache.uid;
+async function publishGame(body) {
+  const uid = String(body.uid || "");
+  if (!(await checkAuth(uid, String(body.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
+  const un = await getDoc("uname", uid);
+  if (!un || !CREATORS.includes(String(un.un).toLowerCase())) return [403, { error: "O'yin e'lon qilish hozircha faqat Premium/yaratuvchi akkauntlar uchun" }];
+  const g = body.game || {};
+  const name = String(g.n || "").trim().slice(0, 30);
+  const html = String(g.html || "");
+  const img = String(g.img || "");
+  if (name.length < 2) return [400, { error: "O'yin nomi kamida 2 belgi bo'lsin" }];
+  if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(img) || img.length > 60000) return [400, { error: "Rasm noto'g'ri yoki juda katta" }];
+  if (html.length < 50 || html.length > 450000) return [400, { error: "O'yin fayli 450 KB dan kichik bo'lishi kerak" }];
+  const kind = gameKinds.has(g.c) ? g.c : "Boshqa";
+  const now = Date.now();
+  const arr = (pubTimes.get(uid) || []).filter((t) => now - t < 600000);
+  if (arr.length >= 5) return [429, { error: "Juda tez-tez e'lon qilyapsiz, biroz kuting" }];
+  const mine = (await sb("docs?collection=eq.games&select=id,data&limit=3000")).filter((r) => r.data && r.data.uid === uid);
+  if (mine.length >= 20) return [400, { error: "Eng ko'pi bilan 20 ta o'yin e'lon qilish mumkin" }];
+  pubTimes.set(uid, [...arr, now]);
+  const id = nodeCrypto.randomBytes(5).toString("hex");
+  await putDoc("gamehtml", id, { html });
+  await putDoc("games", id, { n: name, c: kind, by: un.un, uid, img, at: now });
+  return [200, { ok: true, id }];
 }
-async function rowsBy(col, field, val, limit) {
-  const r = await sb("docs?collection=eq." + col + "&data->>" + field + "=eq." + enc(val) + "&select=id,data&limit=" + limit);
-  return r.map((x) => ({ id: x.id, data: x.data }));
+async function gamesList() {
+  const rows = (await sb("docs?collection=eq.games&select=id,data&limit=3000")).filter((r) => r.data && r.data.n);
+  rows.sort((a, b) => (b.data.at || 0) - (a.data.at || 0));
+  return [200, { games: rows.slice(0, 40).map((r) => ({ id: r.id, n: r.data.n, c: r.data.c, by: r.data.by, img: r.data.img, uid: r.data.uid, at: r.data.at })) }];
 }
-const calcBal = (rows) => { let cl = 0; for (const r of rows) if (r.cur === "cl") cl += (r.type === "grant" ? 1 : -1) * (+r.amt || 0); return Math.max(0, Math.round(cl)); };
-const int = (v, a, b) => Number.isInteger(v) && v >= a && v <= b;
-const str = (v, n) => String(v == null ? "" : v).slice(0, n);
-const bad = (m) => [400, { error: m || "noto'g'ri so'rov" }];
-
-async function configData() {
-  const c = (await getDoc("config", "app")) || {};
-  return { ...c, adminUid: await adminUid(), adminNick: c.adminNick || ADMIN_NICK, firstPlayerId: "100001" };
+async function gameGet(body) {
+  const id = String(body.id || "");
+  if (!/^[a-f0-9]{10}$/.test(id)) return [400, { error: "id" }];
+  const d = await getDoc("gamehtml", id);
+  return d ? [200, { html: d.html }] : [404, { error: "O'yin topilmadi" }];
 }
-
-async function playerApi(b) {
-  const uid = String(b.uid || "");
-  if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
-  return serial(async () => {
-    const admin = (await adminUid()) === uid;
-    const cfg = (await getDoc("config", "app")) || {};
-    const u = (await getDoc("users", uid)) || {};
-    const nick = str(b.nick || "Player", 16), g = str(b.g, 8);
-    let playerId = String(u.playerId || "");
-    let next = Math.max(100002, Number(cfg.nextId) || 100002); // faqat raqamli ID: admin 100001, qolganlar 100002 dan
-    if (admin) playerId = "100001";
-    else if (u.idVersion !== 3 || !/^\d{6,9}$/.test(playerId) || playerId === "100001") { playerId = String(next); next++; }
-    const old = Array.isArray(u.old) ? u.old.slice(0, 8) : [];
-    if (u.nick && u.nick !== nick && !old.includes(u.nick)) old.unshift(u.nick);
-    await putDoc("config", "app", { ...cfg, nextId: next, firstPlayerId: "100001", updatedAt: Date.now() });
-    await putDoc("users", uid, { nick, g, playerId, idVersion: 3, role: admin ? "admin" : "player", old: old.slice(0, 8), upd: Date.now() });
-    return [200, { adminUid: await adminUid(), adminNick: cfg.adminNick || ADMIN_NICK, playerId, firstPlayerId: "100001" }];
-  });
-}
-
-async function dbApi(b) {
-  const col = String(b.collection || ""), op = String(b.op || "");
-  if (!DB_COLS.has(col)) return [403, { error: "ruxsat yo'q" }];
-  const id = b.id == null ? "" : String(b.id);
-  if (op === "get" && col === "config" && id === "app") return [200, { data: await configData() }];
-  const uid = String(b.uid || "");
-  if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
-  const admin = uid !== "" && (await adminUid()) === uid;
-  if (op !== "get" && op !== "query" && blocked("db|" + uid, 400)) return [429, { error: "juda ko'p so'rov" }];
-
-  if (op === "get") {
-    if (!ID_RE.test(id)) return bad("id");
-    const d = await getDoc(col, id);
-    if (!d) return [200, { data: null }];
-    const own = col === "config" ? false : col === "users" || col === "wheel" ? id === uid : d.uid === uid;
-    if (col === "omsgs" || col === "wlog" || col === "alog") { if (!admin) return [403, { error: "ruxsat yo'q" }]; }
-    else if (!admin && !own) return [403, { error: "ruxsat yo'q" }];
-    return [200, { data: d }];
-  }
-
-  if (op === "query") {
-    const lim = Math.max(1, Math.min(1000, parseInt(b.limit) || 100));
-    const w = Array.isArray(b.where) ? b.where.filter((x) => Array.isArray(x) && x[1] === "==") : [];
-    if (w.length) {
-      const [f, , v] = w[0];
-      if (f === "uid" && ["ledger", "orders", "wheel"].includes(col)) {
-        if (!admin && String(v) !== uid) return [403, { error: "ruxsat yo'q" }];
-        return [200, { rows: await rowsBy(col, "uid", String(v), lim) }];
-      }
-      if (f === "playerId" && col === "users") {
-        if (!admin) return [403, { error: "ruxsat yo'q" }];
-        if (!/^\d{6,9}$/.test(String(v))) return bad("ID");
-        return [200, { rows: await rowsBy("users", "playerId", String(v), 5) }];
-      }
-      if (f === "oid" && col === "omsgs") {
-        const o = await getDoc("orders", String(v));
-        if (!o || (!admin && o.uid !== uid)) return [403, { error: "ruxsat yo'q" }];
-        return [200, { rows: await rowsBy("omsgs", "oid", String(v), lim) }];
-      }
-      return bad("filtr");
-    }
-    if (!admin) return [403, { error: "ruxsat yo'q" }];
-    const r = await sb("docs?collection=eq." + col + "&select=id,data&order=updated_at.desc&limit=" + Math.min(lim, 500));
-    return [200, { rows: r.map((x) => ({ id: x.id, data: x.data })) }];
-  }
-
-  if (op !== "set" && op !== "update") return bad("op");
-  if (!ID_RE.test(id)) return bad("id");
-  const d = b.data;
-  if (!d || typeof d !== "object" || Array.isArray(d) || JSON.stringify(d).length > 320000) return bad("data");
-
-  return serial(async () => {
-    const cur = await getDoc(col, id);
-    const now = Date.now();
-
-    if (col === "config") {
-      if (!admin || op !== "update" || typeof d.adminNick !== "string" || !d.adminNick.trim()) return [403, { error: "ruxsat yo'q" }];
-      await putDoc("config", "app", { ...(cur || {}), adminNick: str(d.adminNick.trim(), 16), updatedAt: now });
-      return [200, { ok: true }];
-    }
-    if (col === "users") return [403, { error: "ruxsat yo'q" }];
-
-    if (col === "ledger") {
-      if (op !== "set") return [403, { error: "ruxsat yo'q" }];
-      if (cur) return [200, { ok: true, dup: true }]; // bir xil id ikki marta yozilmaydi
-      if (d.type === "spend") {
-        if (d.uid !== uid || d.cur !== "cl" || !int(d.amt, 0, 1e6)) return bad("ledger");
-        const bal = calcBal((await rowsBy("ledger", "uid", uid, 1000)).map((r) => r.data));
-        if (bal < d.amt) return [409, { error: "CL yetarli emas" }];
-        await putDoc("ledger", id, { uid, type: "spend", cur: "cl", amt: d.amt, ref: str(d.ref, 60), by: uid, t: now });
-        return [200, { ok: true }];
-      }
-      if (d.type === "grant") {
-        if (!admin) return [403, { error: "ruxsat yo'q" }];
-        if (!ID_RE.test(String(d.uid || ""))) return bad("uid");
-        const row = { uid: String(d.uid), type: "grant", by: uid, ref: str(d.ref, 60), t: now };
-        if (d.cur === "cl" && int(d.amt, 1, 1e6)) { row.cur = "cl"; row.amt = d.amt; }
-        else if (d.cur === "prem" && int(d.months, 1, 24)) { row.cur = "prem"; row.months = d.months; }
-        else return bad("grant");
-        await putDoc("ledger", id, row);
-        return [200, { ok: true }];
-      }
-      return bad("ledger");
-    }
-
-    if (col === "orders") {
-      if (op === "set") {
-        if (cur || d.uid !== uid) return [403, { error: "ruxsat yo'q" }];
-        let ok = false;
-        if (d.kind === "cl") ok = PACKS.some((p) => p[0] === d.amt && p[1] === d.price);
-        else if (d.kind === "prem") ok = Object.values(PLANS).some((p) => p[0] === d.amt && p[1] === d.price);
-        if (!ok) return bad("buyurtma narxi noto'g'ri");
-        await putDoc("orders", id, { uid, nick: str(d.nick, 16), pid: /^\d{6,9}$/.test(String(d.pid)) ? String(d.pid) : "", kind: d.kind, item: str(d.item, 60), amt: d.amt, price: d.price, no: str(d.no, 32), status: "new", t: now, upd: now });
-        return [200, { ok: true }];
-      }
-      if (!cur) return [404, { error: "topilmadi" }];
-      const keys = Object.keys(d);
-      if (admin) {
-        if (!keys.every((k) => ["status", "upd", "cBy", "cAt"].includes(k)) || (d.status !== undefined && !ORDER_ST.has(d.status))) return bad("order");
-        const nx = { ...cur }; if (d.status) nx.status = d.status; nx.upd = now;
-        if (d.status === "confirmed") { nx.cBy = uid; nx.cAt = now; }
-        await putDoc("orders", id, nx);
-        return [200, { ok: true }];
-      }
-      if (cur.uid !== uid || !keys.every((k) => ["status", "upd"].includes(k)) || !((d.status === "receipt" && ["new", "awaiting", "receipt"].includes(cur.status)) || (d.status === "awaiting" && cur.status === "new"))) return [403, { error: "ruxsat yo'q" }];
-      await putDoc("orders", id, { ...cur, status: d.status, upd: now });
-      return [200, { ok: true }];
-    }
-
-    if (col === "omsgs") {
-      if (op !== "set" || cur) return [403, { error: "ruxsat yo'q" }];
-      const o = await getDoc("orders", String(d.oid || ""));
-      if (!o || (!admin && o.uid !== uid)) return [403, { error: "ruxsat yo'q" }];
-      const from = admin ? (d.from === "s" ? "s" : "a") : d.from === "s" ? "s" : "u";
-      const img = typeof d.img === "string" && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(d.img) && d.img.length <= 300000 ? d.img : "";
-      await putDoc("omsgs", id, { oid: String(d.oid), from, fromUid: uid, text: str(d.text, 2000), img, t: now });
-      return [200, { ok: true }];
-    }
-
-    if (col === "wheel") {
-      if (id !== uid) return [403, { error: "ruxsat yo'q" }];
-      if (op === "set") {
-        if (cur && cur.last && now - cur.last < 36e5) return [409, { error: "baraban hali tayyor emas" }];
-        await putDoc("wheel", uid, { last: now, prize: str(d.prize, 20), pend: 1, n: ((cur && +cur.n) || 0) + 1, nick: str(d.nick, 16), carpetUntil: (cur && cur.carpetUntil) || 0, carpetReady: !!(cur && cur.carpetReady) });
-        return [200, { ok: true }];
-      }
-      if (!cur) return [404, { error: "topilmadi" }];
-      const nx = { ...cur };
-      for (const k of Object.keys(d)) {
-        if (k === "pend") { if (d.pend !== 0 || !cur.pend) return [409, { error: "sovrin allaqachon olingan" }]; nx.pend = 0; }
-        else if (k === "claimedAt") nx.claimedAt = now;
-        else if (k === "carpetReady") nx.carpetReady = !!d.carpetReady;
-        else if (k === "carpetUntil") { if (!(typeof d.carpetUntil === "number" && d.carpetUntil >= 0 && d.carpetUntil <= now + 120000)) return bad("carpet"); nx.carpetUntil = d.carpetUntil; }
-        else return bad("maydon");
-      }
-      await putDoc("wheel", uid, nx);
-      return [200, { ok: true }];
-    }
-
-    if (col === "wlog") {
-      if (op !== "set" || cur || d.uid !== uid) return [403, { error: "ruxsat yo'q" }];
-      await putDoc("wlog", id, { uid, nick: str(d.nick, 16), prize: str(d.prize, 20), t: now });
-      return [200, { ok: true }];
-    }
-    if (col === "alog") {
-      if (!admin || op !== "set" || cur) return [403, { error: "ruxsat yo'q" }];
-      await putDoc("alog", id, { t: now, by: uid, byNick: str(d.byNick, 16), act: str(d.act, 30), to: str(d.to, 40), toNick: str(d.toNick, 16), detail: str(d.detail, 200) });
-      return [200, { ok: true }];
-    }
-    return [403, { error: "ruxsat yo'q" }];
-  });
-}
-
-
-// ---------- Do'stlar, so'rovlar, onlayn holat, shaxsiy chat (faqat do'stlar o'rtasida) ----------
-const SEEN_MS = 70000;
-const pairKey = (a, b) => [a, b].sort().join("_");
-const uniq = (a) => [...new Set(a)].slice(0, 300);
-async function fdoc(uid) { const d = await getDoc("friends", uid); return { l: (d && d.l) || [], i: (d && d.i) || [], o: (d && d.o) || [] }; }
-async function pubUser(uid) {
-  const u = await getDoc("users", uid);
-  return u ? { uid, n: u.nick, pid: u.playerId, g: u.g, on: Date.now() - (u.seen || 0) < SEEN_MS } : null;
-}
-async function socialApi(b) {
-  const uid = String(b.uid || "");
-  let op = String(b.op || "");
-  if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
-  if (blocked("soc|" + uid, 900)) return [429, { error: "juda ko'p so'rov" }];
-  const to = String(b.to || b.with || "");
-  if (op === "list") {
-    const me = await getDoc("users", uid);
-    if (me) await putDoc("users", uid, { ...me, seen: Date.now() });
-    const fd = await fdoc(uid);
-    const friends = (await Promise.all(fd.l.map(pubUser))).filter(Boolean);
-    const inc = (await Promise.all(fd.i.map(pubUser))).filter(Boolean);
-    return [200, { friends, inc, out: fd.o }];
-  }
-  if (op === "search") {
-    const q = str(b.q, 32).trim();
-    if (!q) return [200, { rows: [] }];
-    const rows = /^\d{6,9}$/.test(q) ? await rowsBy("users", "playerId", q, 3) : await rowsBy("users", "nick", q, 5);
-    const fd = await fdoc(uid);
-    return [200, { rows: rows.filter((r) => r.id !== uid).map((r) => ({ uid: r.id, n: r.data.nick, pid: r.data.playerId, g: r.data.g, rel: fd.l.includes(r.id) ? "friend" : fd.o.includes(r.id) ? "out" : fd.i.includes(r.id) ? "inc" : "none" })) }];
-  }
-  if (!ID_RE.test(to) || to === uid) return bad("id");
-  if (op === "msgs") {
-    if (!(await fdoc(uid)).l.includes(to)) return [403, { error: "faqat do'stlar" }];
-    const d = await getDoc("dms", pairKey(uid, to));
-    return [200, { m: ((d && d.m) || []).slice(-100) }];
-  }
-  return serial(async () => {
-    const me = await fdoc(uid), th = await fdoc(to);
-    if (!(await getDoc("users", to))) return [404, { error: "topilmadi" }];
-    const save = async () => { await putDoc("friends", uid, me); await putDoc("friends", to, th); };
-    if (op === "request") {
-      if (me.l.includes(to)) return [200, { ok: true }];
-      if (me.i.includes(to)) op = "accept"; // ikkalasi ham so'ragan: avtomatik qabul
-      else { th.i = uniq([...th.i, uid]); me.o = uniq([...me.o, to]); await save(); return [200, { ok: true }]; }
-    }
-    if (op === "accept") {
-      if (!me.i.includes(to)) return [409, { error: "so'rov yo'q" }];
-      me.i = me.i.filter((x) => x !== to); th.o = th.o.filter((x) => x !== uid);
-      me.l = uniq([...me.l, to]); th.l = uniq([...th.l, uid]); await save(); return [200, { ok: true }];
-    }
-    if (op === "decline") { me.i = me.i.filter((x) => x !== to); th.o = th.o.filter((x) => x !== uid); await save(); return [200, { ok: true }]; }
-    if (op === "remove") { me.l = me.l.filter((x) => x !== to); th.l = th.l.filter((x) => x !== uid); await save(); return [200, { ok: true }]; }
-    if (op === "send") {
-      if (!me.l.includes(to)) return [403, { error: "faqat do'stlar" }];
-      const text = str(b.text, 1000).trim();
-      if (!text) return bad("matn");
-      const k = pairKey(uid, to), d = (await getDoc("dms", k)) || { m: [] };
-      d.m = [...d.m, { f: uid, x: text, t: Date.now() }].slice(-300);
-      await putDoc("dms", k, d);
-      return [200, { ok: true }];
-    }
-    return bad("op");
-  });
+async function unpublishGame(body) {
+  const uid = String(body.uid || ""), id = String(body.id || "");
+  if (!(await checkAuth(uid, String(body.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
+  if (!/^[a-f0-9]{10}$/.test(id)) return [400, { error: "id" }];
+  const g = await getDoc("games", id);
+  if (!g || g.uid !== uid) return [403, { error: "Bu sizning o'yiningiz emas" }];
+  await sb("docs?collection=eq.games&id=eq." + enc(id), { method: "DELETE", headers: { Prefer: "return=minimal" } });
+  await sb("docs?collection=eq.gamehtml&id=eq." + enc(id), { method: "DELETE", headers: { Prefer: "return=minimal" } });
+  return [200, { ok: true }];
 }
 
 async function api(name, body, ip) {
   if (!HAS_DB) return [503, { error: "baza ulanmagan" }];
   if (name === "register") return register(body);
   if (name === "login") return login(body, ip);
-  if (name === "player") return playerApi(body);
-  if (name === "social") return socialApi(body);
-  if (name === "db") return dbApi(body);
-  if (body.collection !== "parkour") return [403, { error: "ruxsat yo'q" }];
+  if (name === "publish") return publishGame(body);
+  if (name === "games_list") return gamesList();
+  if (name === "game") return gameGet(body);
+  if (name === "unpublish") return unpublishGame(body);
+  if (body.collection !== "parkour" && body.collection !== "parkour2") return [403, { error: "ruxsat yo'q" }];
   if (name === "get") {
     const id = String(body.id || "");
     if (!/^[A-Za-z0-9_-]{1,40}$/.test(id)) return [400, { error: "id" }];
-    const rows = await sb("docs?collection=eq.parkour&id=eq." + enc(id) + "&select=data");
+    const rows = await sb("docs?collection=eq." + body.collection + "&id=eq." + enc(id) + "&select=data");
     return [200, { data: rows[0] ? rows[0].data : null }];
   }
   if (name === "set") {
@@ -422,7 +200,7 @@ async function api(name, body, ip) {
     await sb("docs?on_conflict=collection,id", {
       method: "POST",
       headers: { Prefer: "resolution=merge-duplicates" },
-      body: JSON.stringify({ collection: "parkour", id: uid, data, updated_at: new Date().toISOString() }),
+      body: JSON.stringify({ collection: body.collection, id: uid, data, updated_at: new Date().toISOString() }),
     });
     return [200, { ok: true }];
   }
@@ -431,7 +209,7 @@ async function api(name, body, ip) {
     if (!TOP_FIELDS.has(f)) return [400, { error: "field" }];
     const dir = body.dir === "desc" ? -1 : 1;
     const n = Math.max(1, Math.min(100, parseInt(body.n) || 20));
-    let rows = await sb("docs?collection=eq.parkour&select=id,data&limit=3000");
+    let rows = await sb("docs?collection=eq." + body.collection + "&select=id,data&limit=3000");
     rows = rows.filter((r) => r.data && typeof r.data[f] === "number" && r.data[f] > 0);
     rows.sort((x, y) => (x.data[f] - y.data[f]) * dir);
     return [200, { rows: rows.slice(0, n) }];
@@ -443,10 +221,21 @@ const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers
 
 const server = http.createServer(async (req, res) => {
   const url = req.url.split("?")[0];
+  if (url === "/.well-known/assetlinks.json") { // Android ilovasi (APK) manzil satrisiz ochilishi uchun
+    res.writeHead(200, { "Content-Type": "application/json" });
+    return res.end(JSON.stringify([{
+      relation: ["delegate_permission/common.handle_all_urls"],
+      target: {
+        namespace: "android_app",
+        package_name: "com.gameset.app",
+        sha256_cert_fingerprints: ["98:4B:D2:C7:2F:F9:5F:13:92:5B:FF:63:78:8C:C3:48:46:69:16:89:66:B4:04:6E:A3:11:D8:96:35:D4:15:67"],
+      },
+    }]));
+  }
   if (req.method === "OPTIONS") { res.writeHead(204, CORS); return res.end(); }
   if (req.method === "POST" && url.startsWith("/api/")) {
     try {
-      const [code, out] = await api(url.slice(5), await readJson(req), String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim());
+      const [code, out] = await api(url.slice(5), await readJson(req, url === "/api/publish" ? 700000 : 60000), String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim());
       res.writeHead(code, { "Content-Type": "application/json", ...CORS });
       return res.end(JSON.stringify(out));
     } catch (e) {
@@ -454,14 +243,6 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(500, { "Content-Type": "application/json", ...CORS });
       return res.end(JSON.stringify({ error: "server xatosi" }));
     }
-  }
-  const ST = { "/manifest.json": ["application/manifest+json", "manifest.json"], "/sw.js": ["text/javascript", "sw.js"], "/icon-192.png": ["image/png", "icon-192.png"], "/icon-512.png": ["image/png", "icon-512.png"] };
-  if (ST[url]) {
-    return fs.readFile(path.join(__dirname, ST[url][1]), (err, d) => {
-      if (err) { res.writeHead(404); return res.end(); }
-      res.writeHead(200, { "Content-Type": ST[url][0], "Cache-Control": url === "/sw.js" ? "no-cache" : "public, max-age=86400" });
-      res.end(d);
-    });
   }
   if (url === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
