@@ -43,9 +43,10 @@ function readJson(req) {
 // o'yinchi ma'lumotini tozalash: raqamli maydonlar haqiqiy raqam bo'lishi shart
 function cleanDoc(d) {
   if (!d || typeof d !== "object" || Array.isArray(d)) throw new Error("data");
-  const ALLOW = ["name","g","best","last","count","lv","xp","rb","tr","trTot","pets","ep","eq","eggs","auto","e3f","spk","spa","tails","tail","maxCp","rs","upd","wins"];
+  const ALLOW = ["name","g","best","last","count","lv","xp","rb","tr","trTot","pets","ep","eq","eggs","auto","e3f","spk","spa","tails","tail","maxCp","rs","upd","wins","cu"];
   const o = {};
   for (const k of ALLOW) if (k in d) o[k] = d[k];
+  if ("cu" in d) o.cu = Math.max(0, Math.min(Date.now() + 3.7e6, Math.floor(+d.cu) || 0));
   if ("wins" in d) o.wins = Math.max(0, Math.min(100000, Math.floor(+d.wins) || 0));
   for (const k of ["best", "count", "rb"]) {
     if (k in o && !(typeof o[k] === "number" && Number.isFinite(o[k]) && o[k] >= 0 && o[k] < 1e12)) delete o[k];
