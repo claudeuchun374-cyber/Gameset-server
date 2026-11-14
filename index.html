@@ -1068,7 +1068,7 @@ const OBD2={plain:{m:1,w:[1,1,1,1],d:0},zig:{m:3,w:[2,2,2,1],d:1},wave:{m:2,w:[1
 /* WORLDS: har bir olam o'z xaritasi, checkpointlari, tuxumlari va xazinasi bilan */
 const WORLDS=[
  {id:1,name:"Dream Island",cps:100,zones:ZONES,obd:OBD,seed:20260707,w0:[7,9.5],g0:[1.5,2.3],l0:2,dkLen:50,dif0:0,treasure:100000,eggs:[0,1,2],need:null},
- {id:2,name:"Neon Galaxy",cps:200,zones:ZONES2,obd:OBD2,seed:20261111,w0:[5,6.5],g0:[2.2,3],l0:3.5,dkLen:40,dif0:.3,treasure:1000000,eggs:[3,4,5],need:{wins:50,rb:25}}];
+ {id:2,name:"Neon Galaxy",cps:200,zones:ZONES2,obd:OBD2,seed:20261111,w0:[5,6.5],g0:[2.2,3],l0:3.5,dkLen:40,dif0:.3,treasure:1000000,eggs:[3,4,5],need:{wins:20,rb:25}}];
 const WLD=()=>WORLDS[CW-1],ZN=()=>WLD().zones;
 const SWD=100,PADZ=SWD/2-8;   /* START maydonchasi: 100x100 (kattalashtirildi) */     /* 1 / 10 / 100 trophies */
 function buildMap(){
