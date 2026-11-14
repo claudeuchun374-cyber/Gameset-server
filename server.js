@@ -137,7 +137,7 @@ async function login(body, ip) {
 // ---------- 3-qadam: CL, Premium, baraban, buyurtmalar, admin (hamma qoida SERVERDA tekshiriladi) ----------
 const ADMIN_USER = (process.env.ADMIN_USER || "jahongir").toLowerCase(); // shu nom bilan ro'yxatdan o'tgan akkaunt = admin
 const ADMIN_NICK = process.env.ADMIN_NICK || "JAHONGIR";
-const PACKS = [[40, 5000], [80, 10000], [200, 25000], [400, 50000]]; // [CL, so'm]
+const PACKS = [[40, 5000], [80, 10000], [200, 25000], [400, 50000], [800, 95000], [1500, 175000], [3000, 340000], [5000, 550000], [8000, 860000], [12000, 1250000]]; // [CL, so'm]
 const PLANS = { m1: [1, 40000], m3: [3, 100000], y1: [12, 350000] }; // [oy, so'm]
 const DAY = 864e5;
 const WHEEL_CD = 36e5; // baraban har 1 soatda ochiladi
