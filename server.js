@@ -602,6 +602,7 @@ function clean(p) {
   if ("n" in p) o.n = String(p.n).slice(0, 16);
   if ("g" in p) o.g = String(p.g).slice(0, 12);
   if ("pk" in p) o.pk = 1;
+  if ("e" in p) o.e = String(p.e).replace(/[^a-z0-9_,]/g, "").slice(0, 70);
   for (const k of ["x", "y", "z", "r"]) if (k in p) o[k] = num(p[k]);
   for (const k of ["m", "j"]) if (k in p) o[k] = p[k] ? 1 : 0;
   return o;
