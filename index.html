@@ -494,6 +494,38 @@ textarea{width:100%;background:var(--card);color:var(--tx);border:1px solid var(
 .c3g{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.c3g span{width:70px;font-size:12px;color:#9fb0ff}
 .c3sw{display:flex;gap:5px}.c3sw i{width:22px;height:22px;border-radius:7px;display:block}.c3tip{font-size:12.5px;color:#cbd5ff;line-height:1.45}
 @media (orientation:landscape) and (max-height:560px){.c3main{flex-direction:row}.c3bot{width:min(330px,42vw);max-height:none;border-top:0;border-left:1px solid #2b3570}}
+
+.bgp{width:100%;aspect-ratio:1.5;border-radius:14px;position:relative;overflow:hidden}.bgp.big{width:240px;margin:0 auto 10px}
+.pbg-dark{background:radial-gradient(circle at 50% 30%,#23232e,#050507 72%)}
+.pbg-fire{background:linear-gradient(180deg,#2a0a05,#8a1c0a 58%,#ff6a00)}.pbg-fire::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 100%,#ffb300 0 9%,transparent 10%),radial-gradient(circle at 50% 104%,#ff5200 0 13%,transparent 14%),radial-gradient(circle at 82% 100%,#ffb300 0 8%,transparent 9%);animation:flame 1.6s ease-in-out infinite alternate}
+.pbg-ice{background:linear-gradient(180deg,#0b2a55,#2a7fd0 60%,#bfe9ff)}.pbg-ice::before{content:"";position:absolute;inset:-40px 0 0;background-image:radial-gradient(#fff 1.6px,transparent 2.2px),radial-gradient(#cfeeff 1px,transparent 1.6px);background-size:34px 34px,23px 23px;background-position:0 0,11px 17px;animation:snow 7s linear infinite;opacity:.85}
+.pbg-rainbow{background:linear-gradient(120deg,#ef4444,#f59e0b,#facc15,#22c55e,#3b82f6,#8b5cf6,#ec4899,#ef4444);background-size:300% 100%;animation:rbm 6s linear infinite}
+.pbg-galaxy{background:radial-gradient(ellipse at 28% 22%,#7c3aed88,transparent 52%),radial-gradient(ellipse at 80% 72%,#2563eb77,transparent 56%),radial-gradient(ellipse at 55% 50%,#ec489944,transparent 60%),#070320}.pbg-galaxy::before{content:"";position:absolute;inset:0;background-image:radial-gradient(#fff 1.2px,transparent 1.8px),radial-gradient(#c4b5fd 1px,transparent 1.6px);background-size:46px 46px,29px 29px;background-position:0 0,13px 21px;animation:twk 3s ease-in-out infinite alternate}
+.pbg-neon{background:linear-gradient(180deg,#12062e,#3b0a5e 55%,#ff2d95 100%)}.pbg-neon::after{content:"";position:absolute;inset:auto 0 0;height:58%;background:linear-gradient(#0b0620,#0b0620) 4% 100%/9% 70% no-repeat,linear-gradient(#150a30,#150a30) 15% 100%/8% 95% no-repeat,linear-gradient(#0b0620,#0b0620) 25% 100%/10% 55% no-repeat,linear-gradient(#150a30,#150a30) 38% 100%/9% 85% no-repeat,linear-gradient(#0b0620,#0b0620) 50% 100%/11% 100% no-repeat,linear-gradient(#150a30,#150a30) 63% 100%/9% 62% no-repeat,linear-gradient(#0b0620,#0b0620) 75% 100%/10% 90% no-repeat,linear-gradient(#150a30,#150a30) 88% 100%/9% 70% no-repeat;filter:drop-shadow(0 -2px 6px #22d3ee)}
+.pbg-forest{background:linear-gradient(180deg,#06251a,#0f6b3a 70%,#16a34a)}.pbg-forest::after{content:"";position:absolute;inset:auto 0 0;height:55%;background:#052e16;clip-path:polygon(0 100%,0 62%,6% 30%,12% 62%,18% 22%,26% 66%,33% 36%,40% 64%,48% 18%,56% 62%,63% 34%,70% 66%,78% 26%,86% 62%,93% 38%,100% 60%,100% 100%)}.pbg-forest::before{content:"";position:absolute;inset:0;background-image:radial-gradient(#fde047 2px,transparent 3px);background-size:61px 53px;animation:twk 2.2s ease-in-out infinite alternate;z-index:1}
+.pbg-crystal{background:linear-gradient(160deg,#0e7490,#6d28d9 55%,#1e1b4b)}.pbg-crystal::before{content:"";position:absolute;inset:0;background:repeating-conic-gradient(from 20deg at 50% 125%,#a5f3fc66 0 9deg,#c4b5fd44 9deg 18deg,#22d3ee33 18deg 27deg)}
+@keyframes flame{to{transform:translateY(-8%) scale(1.06)}}@keyframes snow{to{transform:translateY(40px)}}@keyframes rbm{to{background-position:300% 0}}@keyframes twk{from{opacity:.35}to{opacity:1}}
+.phero{position:relative;border-radius:22px;overflow:hidden;margin:6px 0 10px;min-height:330px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;border:1px solid #ffffff22}.phero.small{min-height:270px}
+.phero canvas{position:relative;z-index:2;width:250px;height:290px;touch-action:manipulation}.phero.small canvas{width:220px;height:230px}
+.phint{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:3;padding:5px 12px;border-radius:99px;background:#0b1030b3;font-size:12px;color:#e2e8f0;white-space:nowrap}
+.pnm{position:relative;z-index:3;display:flex;align-items:center;gap:8px;padding:6px 16px;margin:-8px 0 2px;border-radius:99px;background:#0b1030cc;font-size:20px}.pnm em{font-style:normal;font-size:11px;color:#fbbf24}.pid{position:relative;z-index:3;font-size:12px;color:#cbd5ff;margin-bottom:10px}
+.pcl{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:18px;background:linear-gradient(90deg,#1b1f4a,#2b1f6a);border:1px solid #5b6cff55;margin-bottom:10px}.pcl b{font-size:22px;display:block}.pcl small{color:var(--mut)}.pcl .btn{margin-left:auto}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}.pgrid button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:16px;border:1px solid #5b6cff55;background:linear-gradient(160deg,#1b1f4a,#141842);color:#fff}.pgrid b{font-size:12px}
+.emc{width:100%;aspect-ratio:120/150;display:block}.emc.big{border-radius:16px;background:#ffffff0d}.shn{margin:14px 2px 6px;font-size:15px}.shn small{color:var(--mut);font-weight:600;font-size:11px;margin-left:6px}
+.colb{font-style:normal;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:#ffffff1c;margin-top:2px}.c-fire{color:#fb923c}.c-ice{color:#7dd3fc}.c-rainbow{color:#f472b6}.c-shadow{color:#a78bfa}.c-galaxy{color:#c4b5fd}.c-nature{color:#4ade80}
+.slr{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0}.slt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;border-radius:12px;border:1.5px solid #3a4590;background:#1a2257;color:#fff;font-size:10px}.slt canvas{width:100%}
+#pkemo,#pkchat{position:absolute;right:max(22px,env(safe-area-inset-right,0px));width:56px;height:56px;border-radius:50%;border:2px solid #ffffffaa;background:linear-gradient(160deg,#4c1d95,#1d4ed8);display:flex;align-items:center;justify-content:center;z-index:6;padding:0}
+#pkemo{bottom:196px}#pkchat{bottom:128px}#pkemo::before{content:"";width:32px;height:32px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><circle cx='24' cy='24' r='20' fill='%23fde047' stroke='%23b45309' stroke-width='2.5'/><circle cx='17' cy='20' r='3' fill='%2378350f'/><circle cx='31' cy='20' r='3' fill='%2378350f'/><path d='M14 29c3 7 17 7 20 0' fill='none' stroke='%2378350f' stroke-width='3' stroke-linecap='round'/></svg>") center/contain no-repeat}
+#pkchat::before{content:"";width:30px;height:30px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M8 10h32a4 4 0 014 4v18a4 4 0 01-4 4H22l-9 8v-8H8a4 4 0 01-4-4V14a4 4 0 014-4z' fill='%2338bdf8' stroke='%23075985' stroke-width='2.5' stroke-linejoin='round'/><circle cx='16' cy='23' r='2.6' fill='white'/><circle cx='24' cy='23' r='2.6' fill='white'/><circle cx='32' cy='23' r='2.6' fill='white'/></svg>") center/contain no-repeat}
+#pkcn{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:99px;background:#ef4444;color:#fff;font:800 11px/20px system-ui;text-align:center;font-style:normal}
+#pkrad{position:absolute;inset:0;z-index:12;background:#050a24cc;display:flex;align-items:center;justify-content:center}.rdw{position:relative;width:min(88vh,330px);height:min(88vh,330px)}
+.rdb{position:absolute;left:calc(50% + var(--x)*min(31vh,100px) - 44px);top:calc(50% + var(--y)*min(31vh,100px) - 54px);width:88px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px;border-radius:16px;border:2px solid #a78bfa;background:linear-gradient(160deg,#2a1b6e,#14224e);color:#fff;font-size:11px;font-weight:800}.rdb canvas{width:72px}
+.rdc{position:absolute;left:calc(50% - 26px);top:calc(50% - 26px);width:52px;height:52px;border-radius:50%;border:2px solid #fff6;background:#1b1f4a;display:flex;align-items:center;justify-content:center;color:#fff}
+.rdx{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:16px;width:44px;height:44px;border-radius:50%;border:0;background:#ffffff22;color:#fff;font-size:26px}
+#pkchp{position:absolute;left:max(12px,env(safe-area-inset-left,0px));bottom:60px;width:min(310px,52vw);max-height:56%;z-index:11;display:flex;flex-direction:column;border-radius:16px;background:#0a1030ee;border:1px solid #5b6cffaa;overflow:hidden}#pkchp[hidden]{display:none}
+#pkcl{flex:1;overflow-y:auto;padding:8px;max-height:150px;min-height:70px}.cm{display:flex;gap:8px;padding:4px 2px;align-items:flex-start}.cm img{width:30px;height:30px;border-radius:8px;object-fit:cover}.cm b{display:block;font-size:12px;color:#7dd3fc}.cm span{font-size:13px;word-break:break-word}
+.cin{display:flex;gap:6px;padding:6px;border-top:1px solid #2b3570}.cin input{flex:1;min-width:0;padding:8px 10px;border-radius:10px;border:1px solid #3a4590;background:#141a45;color:#fff;font-size:14px}.cin button{width:40px;border:0;border-radius:10px;background:#22d3ee url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path d='M6 24L42 8 30 42l-7-14z' fill='white'/></svg>") center/22px no-repeat}
+.cpi{position:relative;width:100%;aspect-ratio:1;border-radius:14px;background:linear-gradient(160deg,#2a1b6e,#14224e);display:flex;align-items:center;justify-content:center;overflow:hidden}.cpi img{width:84%;filter:hue-rotate(var(--h)) drop-shadow(0 0 10px #f472b6)}.cpi i{position:absolute;bottom:6px;right:8px;font-style:normal;font-weight:900;font-size:12px;padding:2px 8px;border-radius:99px;background:#0b1030cc;color:#fde047}
 </style>
 </head>
 <body>
@@ -520,6 +552,8 @@ textarea{width:100%;background:var(--card);color:var(--tx);border:1px solid var(
  <button id="pkegg" hidden onclick="eggSheet(PK._ne)"><span data-x="star" data-s="22"></span>EGG</button>
  <button id="pkportal" hidden onclick="portalGo()"><span style="font-size:22px">🌀</span><span id="pkpt">PORTAL</span></button>
  <div id="pktrb"><b id="pktrb2">0 🏆</b></div>
+ <button id="pkemo" onclick="radialOpen()" aria-label="Emote"></button><button id="pkchat" onclick="chatToggle()" aria-label="Chat"><i id="pkcn" hidden></i></button><div id="pkrad" hidden></div>
+ <div id="pkchp" hidden><div id="pkcl"></div><div class="cin"><input id="pkci" maxlength="120" placeholder="Xabar yozing…" onkeydown="if(event.key==='Enter')chatSend()"><button onclick="chatSend()" aria-label="Yuborish"></button></div></div>
  <button id="pkwheel" hidden onclick="wheelSheet()"><span style="font-size:22px">🏆</span>BARABAN</button>
  <div id="pkcarpet" hidden><span data-x="jump" data-s="20"></span>Uchar gilam</div>
  <div id="pkj"><i></i></div><button id="pkjump"><span data-x="jump" data-s="26"></span>Sakrash</button><div id="pktoast"></div>
@@ -560,9 +594,9 @@ const api={ // TODO backend: auth, friends, chat, rooms (WebSocket), payments
 };
 
 /* ===== STATE ===== */
-const S={tab:"home",dir:"r",q:"",gq:"",cat:"Hammasi",chat:null,room:null,premium:false,gems:0,gender:"boy",eq:{},avOwned:["boy","dgirl"],likes:{},inv:{},own:[],ch:mk("#f1c27d","#8b5cf6","1","0"),name:"Player123",blocked:{},set:{priv:true,notif:true,blurimg:true}};
-try{const s=JSON.parse(localStorage.getItem("gs2")||"{}");Object.assign(S,{name:s.name||S.name,set:s.set||S.set,ch:s.ch||S.ch,own:s.own||S.own,gender:s.gender||S.gender,gems:0,avOwned:s.avOwned||S.avOwned,eq:(s.eq&&typeof s.eq==="object")?s.eq:{},likes:s.likes||{},inv:s.inv||{}});if(S.gender==="girl"&&!(s.avOwned||[]).includes("girl"))S.gender="dgirl";if(!S.avOwned.includes(S.gender))S.gender="boy"}catch(e){}
-const save=()=>{try{localStorage.setItem("gs2",JSON.stringify({name:S.name,set:S.set,ch:S.ch,own:S.own,gender:S.gender,avOwned:S.avOwned,eq:S.eq,likes:S.likes,inv:S.inv}))}catch(e){}};
+const S={tab:"home",dir:"r",q:"",gq:"",cat:"Hammasi",chat:null,room:null,premium:false,gems:0,gender:"boy",eq:{},bg:"",pem:"",gem:["em_wave","em_laugh","em_dance","em_clap","em_victory"],custT:0,avOwned:["boy","dgirl"],likes:{},inv:{},own:[],ch:mk("#f1c27d","#8b5cf6","1","0"),name:"Player123",blocked:{},set:{priv:true,notif:true,blurimg:true}};
+try{const s=JSON.parse(localStorage.getItem("gs2")||"{}");Object.assign(S,{name:s.name||S.name,set:s.set||S.set,ch:s.ch||S.ch,own:s.own||S.own,gender:s.gender||S.gender,gems:0,avOwned:s.avOwned||S.avOwned,eq:(s.eq&&typeof s.eq==="object")?s.eq:{},bg:typeof s.bg==="string"?s.bg:"",pem:typeof s.pem==="string"?s.pem:"",gem:(Array.isArray(s.gem)&&s.gem.length===5&&s.gem.every(x=>typeof x==="string"))?s.gem:S.gem,custT:+s.custT||0,likes:s.likes||{},inv:s.inv||{}});if(S.gender==="girl"&&!(s.avOwned||[]).includes("girl"))S.gender="dgirl";if(!S.avOwned.includes(S.gender))S.gender="boy"}catch(e){}
+const save=()=>{try{localStorage.setItem("gs2",JSON.stringify({name:S.name,set:S.set,ch:S.ch,own:S.own,gender:S.gender,avOwned:S.avOwned,eq:S.eq,bg:S.bg,pem:S.pem,gem:S.gem,custT:S.custT,likes:S.likes,inv:S.inv}))}catch(e){}};
 
 
 /* ===== SHEETS ===== */
@@ -623,9 +657,7 @@ function searchHTML(){const q=S.q.trim().toLowerCase();if(!q)return"";
 function onSearch(v){S.q=v;$("#sr").innerHTML=searchHTML();$("#sr").hidden=!v.trim();$("#hm").hidden=!!v.trim();soFind(v)}
 function scrollCar(d){const c=$("#car");c.scrollBy({left:d*190,behavior:"smooth"})}
 async function joinGame(id,name){const r=await api.joinFriend(id,name);info("Qo‘shilib bo‘lmadi",r.reason)}
-function userSheet(id){const u=uFind(id);if(!u)return;
- const st=u.fr?"friend":SO.out.includes(u.uid)?"sent":SO.req.some(r=>r.uid===u.uid)?"got":"none";
- sheet(`<div class="ctr"><div class="tile big" style="${tcol(u.n)}">${avImg(u)}<i class="od ${u.on?"on":""}"></i></div><h3>${esc(u.n)}</h3><p>@${esc(u.un||"")} · ${stat(u)} · ${u.fr?"Do‘st":"Do‘st emas"}</p></div>${st==="friend"?`<button class="btn" onclick="closeM();chatWith('${u.uid}')">Xabar yozish</button><button class="btn sec" onclick="frAct('remove','${u.uid}','Do‘stlikdan chiqarildi')">Do‘stlikdan chiqarish</button>`:st==="sent"?`<button class="btn sec" disabled>So‘rov yuborilgan</button>`:st==="got"?`<button class="btn" onclick="frAct('accept','${u.uid}','Do‘st qo‘shildi')">Qabul qilish</button>`:`<button class="btn" onclick="frAct('add','${u.uid}','So‘rov yuborildi')">Do‘st qo‘shish</button>`}<button class="btn sec" onclick="closeM()">Yopish</button>`)}
+
 
 /* ===== GAMES TAB ===== */
 function viewGames(){return `
@@ -977,19 +1009,7 @@ function chatMenu(id){const b=S.blocked[id];
 function chatWith(id){if(!FRIENDS.some(f=>f.uid===id))return;S.tab="chat";openChat(id)}
 
 /* ===== PROFILE ===== */
-function viewProfile(){return `
-<div class="pav2 rv" onclick="shopSheet('av')"><img ${thAttr(S.gender,S.eq,"full")} src="${thSrc(S.gender,S.eq,"full",CI[S.gender].full)}" alt=""></div>
-<div class="ctr rv"><h2 class="fl" style="margin:4px 0 0;justify-content:center">${esc(S.name)} ${S.premium?ic("premium",24):""} ${isAdmin()?"<span style=\"font-size:11px;color:#fbbf24\">ADMIN</span>":""}</h2><button class="back" onclick="editName()">Nomni o‘zgartirish</button><br><button class="swb" onclick="shopSheet('av')">${ic("shop",22)}Avatar do‘koni</button></div>
-<div class="hero dk fl rv"><span class="cl">${ic("crystal",54)}</span><div><b style="font-size:20px">${S.gems} CL</b><p style="color:var(--mut);font-size:13px">CL Crystal: o‘yin valyutasi. Sotib olish: yuqoridagi kristall va + tugmasi.</p></div></div>
-<div class="qk rv" style="grid-template-columns:1fr"><button onclick="shopSheet('av')" style="flex-direction:row;justify-content:center;gap:12px;font-size:15px">${ic("shop",40)}Do‘kon</button></div>
-<div class="hero ${S.premium?"":"dk"} rv" onclick="premiumPage()"><b class="fl">${ic("premium",32)} ${S.premium?"Premium faol · "+fmtD(SV.premEnd)+" gacha":"Premium olish"}</b><p style="margin-top:4px;opacity:.85;color:inherit">${S.premium?"O‘yin yaratish ochiq.":"O‘yin yaratishni oching. Oyiga 40 000 so‘mdan."}</p></div>
-<div class="st rv">Do‘stlar</div>${FRIENDS.length?FRIENDS.map(userRow).join(""):'<p class="empty">'+(SO.ok?"Hali do‘stlar yo‘q.":"Do‘stlar yuklanmoqda…")+'</p>'}
-<button class="btn sec rv" onclick="addFriendSheet()">Do‘st qo‘shish</button>
-<button class="btn sec rv" onclick="accountSheet()">${gsUn()?"Akkaunt: "+esc(gsUn()):"Akkaunt yaratish / Kirish"}</button>
-<div class="st rv">${ic("settings",28)} Sozlamalar</div>
-${[["priv","Yopiq profil"],["notif","Bildirishnomalar"],["blurimg","Notanishlardan rasmlarni xiralashtirish"]].map(([k,l])=>`<div class="sw rv">${l}<button class="tg ${S.set[k]?"on":""}" onclick="S.set.${k}=!S.set.${k};save();render();layoutApp()"></button></div>`).join("")}
-${canCreate()?`<button class="btn big rv" onclick="creator()">${ic("create",36)} O‘yin yaratish +</button>`:""}
-${adminProfileBtn()}<p style="color:var(--mut);font-size:12px;margin-top:12px;word-break:break-all">${SV.ok?"O‘yinchi ID: <b style=\"color:var(--cy)\">"+esc(SV.playerId||"ID berilmoqda…")+"</b><br>"+"Akkaunt ID: "+esc(SV.uid)+"<br>":"O‘yinchi ID: serverga kirgach beriladi.<br>"}Maxfiylik: ismingiz, personajingiz va sozlamalaringiz shu qurilmada saqlanadi; CL, Premium, baraban va Rainbow Parkour natijalari serverda.</p>`}
+
 
 /* ---- AKKAUNT: nom + parol (qurilma almashganda ham natijalar saqlansin) ---- */
 function gsUn(){try{return localStorage.getItem("gs_un")||""}catch(e){return ""}}
@@ -1263,7 +1283,7 @@ function makeCharBase(id){
  P(.52,.15,.12,H,-.1,2.14,.36,null,.04);P(.3,.13,.12,H,.22,2.11,.37,null,.04);
  [[-.2,2.4,0,.4,.2],[.12,2.42,-.05,-.3,.1],[.28,2.36,.08,.5,-.2]].forEach(([x,y,z,rz,rx])=>{const t=P(.2,.22,.2,H,x,y,z,null,.05);t.rotation.z=rz;t.rotation.x=rx});
  return g}
-function animChar(g,t,mv,air){const u=g.userData;if(u.fx)tickFx(g,t);
+function animChar(g,t,mv,air){const u=g.userData;u.air=!!air;if(u.fx||u.anim||u.ftr)tickFx(g,t);if(u.em&&emoteTick(g,t))return;
  if(air){u.la.rotation.x=u.ra.rotation.x=-2.5;u.ll.rotation.x=.5;u.rl.rotation.x=-.4}
  else if(mv){const s=Math.sin(t*11)*.95;u.ll.rotation.x=s;u.rl.rotation.x=-s;u.la.rotation.x=-s*.9;u.ra.rotation.x=s*.9}
  else{u.ll.rotation.x*=.7;u.rl.rotation.x*=.7;u.la.rotation.x*=.7;u.ra.rotation.x*=.7}}
@@ -1813,7 +1833,7 @@ async function autoLoop(i){if(AUTO.run)return;AUTO.run=true;const E=EGGS[i];
  AUTO.run=false}
 /* ---- SHOP window: SPEED + TAILS ---- */
 function shopWin(sec){loadLocal();
- sheet(`<div class="shw"><div class="shd"><div class="shh"><h3 class="fl" style="gap:8px">${ic("shop",30)} SHOP</h3><div class="balrow" id="shopbal"></div><button class="ico" onclick="closeM()" aria-label="Yopish">&times;</button></div><div class="chips"><button class="chip on" onclick="shopGo('speed')">SPEED</button><button class="chip" onclick="shopGo('tails')">TAILS</button></div></div><div id="shopmsg"></div><div id="shopc"></div></div>`,"shwn");
+ sheet(`<div class="shw"><div class="shd"><div class="shh"><h3 class="fl" style="gap:8px">${ic("shop",30)} SHOP</h3><div class="balrow" id="shopbal"></div><button class="ico" onclick="closeM()" aria-label="Yopish">&times;</button></div><div class="chips"><button class="chip on" onclick="shopGo('speed')">SPEED</button><button class="chip" onclick="shopGo('tails')">TAILS</button><button class="chip" onclick="shopGo('carpet')">FLYING CARPET</button></div></div><div id="shopmsg"></div><div id="shopc"></div></div>`,"shwn");
  shopRefresh();if(sec)setTimeout(()=>shopGo(sec),60)}
 function shopGo(s){const e=$("#sh-"+s);if(e&&e.scrollIntoView)e.scrollIntoView({behavior:"smooth",block:"start"})}
 function shopMsg(t){const e=$("#shopmsg");if(e)e.textContent=t}
@@ -1826,7 +1846,7 @@ function shopRefresh(){const c=$("#shopc");if(!c)return;const p=PK.prof,b=spdBre
   ${own?`<button class="btn sm ${eq?"sec":""}" onclick="equipTail('${eq?"":t.id}')">${eq?"UNEQUIP":"EQUIP"}</button>`:`<button class="btn sm" ${can?"":"disabled"} onclick="askBuy('tail','${t.id}')">${can?"Sotib olish":(t.cur==="cl"?"CL":"Kubik")+" yetmaydi"}</button>`}</div>`}).join("");
  c.innerHTML=`<p class="note">Jami tezlik: <b style="color:#fde047">+${(b.tot*100).toFixed(1).replace(/\.0$/,"")}%</b> (pet + paket + Tail + rebirth, maks. +${PKC.CAPSPD*100}%)</p>
  <div class="shs" id="sh-speed"><h4>${ICX.bolt(22)} SPEED</h4><div class="spg">${sp}</div><small class="note">1x = +1% haqiqiy tezlik. Bir vaqtda bitta paket faol bo‘ladi.</small></div>
- <div class="shs" id="sh-tails"><h4>TAILS</h4><div class="tlg">${tl}</div><small class="note">Bir vaqtda bitta Tail jihozlanadi. Sotib olingan Tail inventoryga qo‘shiladi.</small></div>`}
+ <div class="shs" id="sh-tails"><h4>TAILS</h4><div class="tlg">${tl}</div><small class="note">Bir vaqtda bitta Tail jihozlanadi. Sotib olingan Tail inventoryga qo‘shiladi.</small></div>${carpetSec()}`}
 function askBuy(kind,id){let it,cost,cur,title;
  if(kind==="spk"){it=SPK.find(x=>x.id===id);if(!it||PK.prof.spk[id])return;cost=it.cl;cur="cl";title=it.x+"x Speed"}
  else{it=TAILS.find(x=>x.id===id);if(!it||PK.prof.tails[id])return;cost=it.price;cur=it.cur;title=it.n}
@@ -2038,20 +2058,21 @@ async function saveResult(ms){
 const WS_URL="wss://gameset-server.onrender.com";
 function wsRoom(code){return new Promise((res,rej)=>{
  let ws;try{ws=new WebSocket(WS_URL)}catch(e){return rej(e)}
- const peers=new Map(),cbs=[],room={};let done=false;
+ const peers=new Map(),cbs=[],chatCbs=[],room={};let done=false;
  const list=()=>[...peers].map(([id,p])=>({peer:"w"+id,kind:"viewer",isMe:false,presence:p}));
  const fire=()=>{const arr=list();cbs.forEach(f=>{try{f({peers:arr})}catch(e){}})};
  const fail=m=>{if(!done){done=true;try{ws.close()}catch(e){}rej(new Error(m))}};
  const to=setTimeout(()=>fail("timeout"),70000);
- ws.onopen=()=>ws.send(JSON.stringify({t:"join",room:code,p:{pk:1,n:S.name,g:S.gender,e:eqCode(S.eq),x:0,y:0,z:0,r:0,m:0,j:0}}));
+ ws.onopen=()=>ws.send(JSON.stringify({t:"join",room:code,uid:gsUid(),secret:gsSec(),p:{pk:1,n:S.name,g:S.gender,e:eqCode(S.eq),x:0,y:0,z:0,r:0,m:0,j:0}}));
  ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(x){return}
   if(m.t==="joined"){clearTimeout(to);done=true;m.peers.forEach(x=>peers.set(x.id,x.p));res(room);fire()}
   else if(m.t==="full")fail("full");
   else if(m.t==="pres"){peers.set(m.id,m.p);fire()}
-  else if(m.t==="left"){peers.delete(m.id);fire()}};
+  else if(m.t==="left"){peers.delete(m.id);fire()}
+  else if(m.t==="chat"){chatCbs.forEach(f=>{try{f(m)}catch(e){}})}};
  ws.onerror=()=>fail("error");
  ws.onclose=()=>{if(!done)fail("close");else{peers.clear();fire()}};
- room.presence=p=>{if(ws.readyState===1)ws.send(JSON.stringify({t:"pres",p}));return Promise.resolve()};
+ room.presence=p=>{if(ws.readyState===1)ws.send(JSON.stringify({t:"pres",p}));return Promise.resolve()};room.chat=text=>{if(ws.readyState===1)ws.send(JSON.stringify({t:"chat",text}))};room.onChat=f=>chatCbs.push(f);
  room.peers=list;room.onPeers=f=>{cbs.push(f)};
  room.leave=()=>{clearTimeout(to);try{ws.close()}catch(e){}return Promise.resolve()};
 })}
@@ -2060,7 +2081,7 @@ async function joinServer(){
   for(let i=1;i<=8;i++){
    let nr;try{nr=await wsRoom((CW===2?"parkour2-":"parkour-")+i)}catch(e){if(e.message==="full")continue;throw e}
    PK.room=nr;PK.shard=i;
-   nr.onPeers(ch=>syncPeers(ch.peers));syncPeers(nr.peers());return}
+   nr.onChat(chatRecv);nr.onPeers(ch=>syncPeers(ch.peers));syncPeers(nr.peers());return}
  }catch(e){PK.room=null}
 }
 function syncPeers(peers){
@@ -2070,6 +2091,8 @@ function syncPeers(peers){
    const mk=document.createElement("img");mk.className="pm";mk.src=thSrc(gid,{},"tile",CI[gid].head);mk.alt="";$("#pkmk").appendChild(mk);
    r={g,mk,x:+s.x||0,y:+s.y||0,z:+s.z||0,r:0,m:0,j:0,ek:s.g+"|"+s.e};PK.remote.set(p.peer,r)}
   if(r.ek!==s.g+"|"+s.e){const g2=AVALL.includes(s.g)?s.g:"boy",ng=makeChar(g2,eqDecode(s.e)),lb2=r.g.children.find(c=>c.isSprite);ng.position.copy(r.g.position);ng.rotation.copy(r.g.rotation);if(lb2)ng.add(lb2);PK.scene.remove(r.g);PK.scene.add(ng);r.g=ng;r.ek=s.g+"|"+s.e}
+  if(r.em!==(s.em||"")){r.em=s.em||"";const eid=r.em.split(".")[0],ee=EMI[eid];if(eid&&ee&&ee.k==="game"){if(r.g.userData.em)emoteStop(r.g);emoteStart(r.g,eid,PK.mt)}else if(r.g.userData.em)emoteStop(r.g)}
+  if(r.g.userData.em&&(s.m||s.j))emoteStop(r.g)
   r.x=+s.x||0;r.y=+s.y||0;r.z=+s.z||0;r.r=+s.r||0;r.m=s.m?1:0;r.j=s.j?1:0});
  for(const [k,r] of PK.remote)if(!seen.has(k)){PK.scene.remove(r.g);if(r.mk)r.mk.remove();PK.remote.delete(k)}
  $("#pkn").textContent=(PK.remote.size+1)+(PK.room?" · S"+PK.shard:"")}
@@ -2096,7 +2119,7 @@ function frame(ts){
  if(P.y<M.cps[PK.cp].y-32){respawn();toast("Checkpointdan qayta boshlandi")}
  checkpoints();
  const sp=Math.hypot(P.vx,P.vz);if(sp>.5){const tr=Math.atan2(P.vx,P.vz);let d=tr-PK.ry;d=Math.atan2(Math.sin(d),Math.cos(d));PK.ry+=d*Math.min(1,14*dt)}
- PK.me.position.set(P.x,P.y,P.z);PK.me.rotation.y=PK.ry;animChar(PK.me,PK.mt,sp>.8&&P.grounded,!P.grounded);
+ PK.me.position.set(P.x,P.y,P.z);PK.me.rotation.y=PK.ry;if(PK.me.userData.em&&(sp>.8||!P.grounded))cancelEmote();animChar(PK.me,PK.mt,sp>.8&&P.grounded,!P.grounded);
  updPets(dt);for(const e of PK.eggs){e.egg.rotation.y+=dt*.7;e.egg.position.y=(e.by||3)+Math.sin(PK.mt*1.6+e.id)*.18;if(e.upd)e.upd(PK.mt,dt)}updChest(dt);updWheel(dt);updPortal(dt);updTrail(dt,sp>.8||!P.grounded);
  for(const r of PK.remote.values()){r.g.visible=Math.hypot(r.g.position.x-P.x,r.g.position.z-P.z)<80;const k=Math.min(1,12*dt);r.g.position.x=lerp(r.g.position.x,r.x,k);r.g.position.y=lerp(r.g.position.y,r.y,k);r.g.position.z=lerp(r.g.position.z,r.z,k);let d=r.r-r.g.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));r.g.rotation.y+=d*k;animChar(r.g,PK.mt,r.m&&!r.j,r.j)}
  const cp=Math.cos(PK.pitch),tx=P.x,ty=P.y+1.5,tz=P.z;
@@ -2150,8 +2173,8 @@ async function openBoard(tab="tr"){
 const AVL=[{id:"boy",n:"O‘g‘il bola"},{id:"dgirl",n:"Qiz bola"},{id:"dboy",n:"Street Boy"},{id:"girl",n:"Street Girl"},{id:"evil",n:"Evil Avatar",new:1},{id:"ice",n:"Ice Avatar",new:1},{id:"rainbow",n:"Rainbow Avatar",new:1}];
 const AVP={boy:0,dgirl:0,dboy:119,girl:99,evil:799,ice:1099,rainbow:1499}; /* CL narxlari */
 const AVALL=AVL.map(a=>a.id);
-const SLOTK=["sh","pn","fw","hr","mk"];
-const SHOPT=[["av","Avatar"],["sh","Futbolka"],["pn","Shim"],["fw","Oyoq kiyim"],["hr","Soch"],["mk","Maska"],["ot","Boshqa"]];
+const SLOTK=["sh","pn","fw","hr","mk","hd","bk","au","ob","sd","ft"];
+const SHOPT=[["av","Avatar"],["sh","Futbolka"],["pn","Shim"],["fw","Oyoq kiyim"],["hr","Soch"],["mk","Maska"],["hd","Bosh"],["bk","Qanot"],["au","Aura"],["ob","Aylanuvchi"],["sd","Yelka"],["ft","Izlar"],["bg","Fon"],["em","Emote"],["co","Kolleksiya"]];
 const ITEMS=[
  {id:"s_fire",slot:"sh",n:"Fire T-shirt",price:450,d:"Olovli dizayn"},
  {id:"s_ice",slot:"sh",n:"Ice T-shirt",price:450,d:"Muzli dizayn"},
@@ -2183,7 +2206,7 @@ const ITEMS=[
  {id:"m_blue",slot:"mk",n:"Blue Effect Mask",price:750,d:"Ko‘k effektli maska"},
  {id:"m_shadow",slot:"mk",n:"Shadow Mask",price:900,d:"Qora-binafsha qorong‘i effektli maska"}];
 const ITM=Object.fromEntries(ITEMS.map(i=>[i.id,i]));
-const priceOf=id=>ITM[id]?ITM[id].price:AVP[id];
+const priceOf=id=>CAT[id]?CAT[id].price:undefined;
 const eqCode=e=>{e=e||{};return SLOTK.map(k=>e[k]||"").join(",")};
 const eqDecode=c=>{const o={};if(!c)return o;String(c).split(",").forEach((id,i)=>{const k=SLOTK[i];if(k&&ITM[id]&&ITM[id].slot===k)o[k]=id});return o};
 const meKey=()=>S.gender+"|"+eqCode(S.eq);
@@ -2197,7 +2220,7 @@ function cone(g,m,r,h,x,y,z,rx,rz){const q=new THREE.Mesh(PK.con,m);q.scale.set(
 function bx(g,m,w,h,d,x,y,z,r,rx,rz){const q=new THREE.Mesh(rbox(w,h,d,r||.05),m);q.position.set(x,y,z);q.rotation.x=rx||0;q.rotation.z=rz||0;g.add(q);return q}
 function ball(g,m,r,x,y,z,sy){const q=new THREE.Mesh(PK.sph,m);q.scale.set(r,sy?r*sy:r,r);q.position.set(x,y,z);g.add(q);return q}
 function addFx(g,o){const u=g.userData;u.fx=u.fx||[];for(let i=0;i<o.n;i++){const m=new THREE.Mesh(PK.sph,PB(o.cols?o.cols[i%o.cols.length]:o.col));m.scale.setScalar(o.size);(o.par||g).add(m);u.fx.push({m,ph:i/o.n,a:i*2.399,w:o.w||1.2,spd:o.spd||.5,r:o.r,h:o.h,ox:o.ox||0,oy:o.oy||0,oz:o.oz||0,size:o.size})}}
-function tickFx(g,t){const f=g.userData.fx;if(!f)return;for(const p of f){const k=(t*p.spd+p.ph)%1,a=p.a+t*p.w,rr=p.r*(.4+k*.6);p.m.position.set(p.ox+Math.cos(a)*rr,p.oy+k*p.h,p.oz+Math.sin(a)*rr);p.m.scale.setScalar(Math.max(.001,p.size*(1-k*.75)))}}
+function tickFx(g,t){const u=g.userData;if(u.fx)for(const p of u.fx){const k=(t*p.spd+p.ph)%1,a=p.a+t*p.w,rr=p.r*(.4+k*.6);p.m.position.set(p.ox+Math.cos(a)*rr,p.oy+k*p.h,p.oz+Math.sin(a)*rr);p.m.scale.setScalar(Math.max(.001,p.size*(1-k*.75)))}if(u.anim)for(const f of u.anim)f(t,g);if(u.ftr)footTrail(g,t)}
 const RBC=["#ef4444","#f97316","#facc15","#22c55e","#3b82f6","#8b5cf6"],RBH=[0xef4444,0xf97316,0xfacc15,0x22c55e,0x3b82f6,0xa855f7];
 const stripesH=(x,w,h,cols)=>{const n=cols.length;cols.forEach((c,i)=>{x.fillStyle=c;x.fillRect(0,i*h/n,w,h/n+1)})};
 const stripesV=(x,w,h,cols)=>{const n=cols.length;cols.forEach((c,i)=>{x.fillStyle=c;x.fillRect(i*w/n,0,w/n+1,h)})};
@@ -2262,6 +2285,7 @@ function dressChar(g,id,eq){
   if(k==="m_gojo"){bx(g,PM(0x0a0810),.8,.12,.78,0,1.53,0,.05);bx(g,PM(0x0a0810),.7,.14,.5,0,1.5,.02,.04)}
   if(k==="m_blue")addFx(g,{n:6,col:0x67e8f9,size:.045,r:.42,h:.5,oy:1.6,spd:.5});
   if(k==="m_shadow")addFx(g,{n:7,cols:[0x7c3aed,0x3b0764],size:.07,r:.42,h:.6,oy:1.55,spd:.4})}
+ for(const k of ["hd","bk","au","ob","sd","ft"])if(eq[k]&&ACCB[eq[k]])ACCB[eq[k]](g);
  return g}
 
 /* ---- soch turmaklari ---- */
@@ -2314,7 +2338,7 @@ function makeSpecial(id){const T=THREE;ensureAssets();let r;
   addFx(g,{n:14,cols:RBH,size:.06,r:.75,h:2.3,oy:.1,spd:.35});return g}}
 
 /* ---- personajni yig'ish: asosiy model + kiyimlar ---- */
-function makeChar(id,eq){const g=makeCharBase(AVALL.includes(id)?id:"boy"),M=PK.cm;
+function makeChar(id,eq,opt){const g=makeCharBase(AVALL.includes(id)?id:"boy"),M=PK.cm;g.userData.preview=!!(opt&&opt.preview);
  g.children.forEach(m=>{if(m.material===M.hr||m.material===M.hf||m.material===M.hl)m.userData.hair=1});
  return dressChar(g,id,eq||{})}
 
@@ -2328,50 +2352,46 @@ const thAttr=(id,eq,v)=>`data-thv="${v}|${id}|${eqCode(eq)}"`;
 function thApply(){document.querySelectorAll("img[data-thv]").forEach(im=>{const [v,id,c]=im.getAttribute("data-thv").split("|"),k=v+"|"+id+"|"+c;if(TH.cache[k]&&im.getAttribute("src")!==TH.cache[k])im.src=TH.cache[k]})}
 async function thRun(){if(TH.busy)return;TH.busy=true;
  try{await loadThree();ensureAssets();const T=THREE;
-  if(!TH.r){const c=document.createElement("canvas");c.width=220;c.height=260;TH.r=new T.WebGLRenderer({canvas:c,antialias:true,alpha:true,preserveDrawingBuffer:true});TH.r.setSize(220,260,false);TH.s=new T.Scene();TH.s.add(new T.HemisphereLight(0xffffff,0x8899cc,1.05));const dl=new T.DirectionalLight(0xffffff,.9);dl.position.set(3,6,5);TH.s.add(dl);TH.cam=new T.PerspectiveCamera(32,220/260,.1,60)}
+  thEnsure();
   while(TH.q.length){const j=TH.q.shift();
-   try{const m=makeChar(j.id,j.eq);tickFx(m,.35);TH.s.add(m);const V=TH.V[j.v]||TH.V.full,yaw=j.v==="tile"?.28:.5;TH.cam.position.set(Math.sin(yaw)*V[1],V[0]+.25,Math.cos(yaw)*V[1]);TH.cam.lookAt(0,V[0],0);TH.r.render(TH.s,TH.cam);TH.cache[j.k]=TH.r.domElement.toDataURL("image/png");TH.s.remove(m)}catch(e){TH.cache[j.k]=""}
+   try{const m=makeChar(j.id,j.eq,{preview:true});tickFx(m,.35);TH.s.add(m);const V=TH.V[j.v]||TH.V.full,yaw=j.v==="tile"?.28:.5;TH.cam.position.set(Math.sin(yaw)*V[1],V[0]+.25,Math.cos(yaw)*V[1]);TH.cam.lookAt(0,V[0],0);TH.r.render(TH.s,TH.cam);TH.cache[j.k]=TH.r.domElement.toDataURL("image/png");TH.s.remove(m)}catch(e){TH.cache[j.k]=""}
    await new Promise(r=>setTimeout(r,0))}
   thApply()}catch(e){TH.q.length=0}
  TH.busy=false}
 
 /* ---- DO'KON ---- */
-const owns=id=>S.avOwned.includes(id);
+const owns=id=>S.avOwned.includes(id)||(CAT[id]&&CAT[id].price===0);
 const priceHTML=id=>owns(id)?`<span class="pr own">Sizniki</span>`:`<span class="pr">${ic("crystal",18)} ${priceOf(id)===null?"narx keyin":priceOf(id)+" CL"}</span>`;
 const equipped=it=>S.eq&&S.eq[it.slot]===it.id;
 const avCard=a=>`<div class="avc ${a.don?"don":""} ${S.gender===a.id?"sel":""}" onclick="avatarView('${a.id}')">${a.new?`<span class="crn">${ic("premium",20)}</span>`:""}<div class="avi"><img ${thAttr(a.id,{},"tile")} src="${thSrc(a.id,{},"tile",CI[a.id].full)}" alt=""></div><b>${a.n}</b>${priceHTML(a.id)}<small>${S.gender===a.id?"Jihozlangan":owns(a.id)?"EQUIP":"Ko‘rish"}</small></div>`;
 const FOC={sh:"torso",pn:"legs",fw:"feet",hr:"head",mk:"head"};
-const itemCard=i=>{const e=equipped(i),eq={[i.slot]:i.id};return `<div class="avc ${e?"sel":""}" onclick="itemView('${i.id}')"><div class="avi"><img ${thAttr("boy",eq,FOC[i.slot])} src="${thSrc("boy",eq,FOC[i.slot])}" alt=""></div><b>${i.n}</b>${priceHTML(i.id)}<small>${e?"Jihozlangan":owns(i.id)?"EQUIP":"Ko‘rish"}</small></div>`};
+const itemCard=i=>{const e=equipped(i),eq={[i.slot]:i.id};return `<div class="avc ${e?"sel":""}" onclick="itemView('${i.id}')"><div class="avi"><img ${thAttr("boy",eq,FOC[i.slot])} src="${thSrc("boy",eq,FOC[i.slot])}" alt=""></div><b>${i.n}</b>${i.col?`<em class="colb c-${i.col}">${COLS[i.col]}</em>`:""}${priceHTML(i.id)}<small>${e?"Jihozlangan":owns(i.id)?"EQUIP":"Ko‘rish"}</small></div>`};
 function shopSheet(tab="av"){loadLocal();let body="";
  if(tab==="av")body=`<div class="avg">${AVL.map(avCard).join("")}</div>`;
- else if(tab==="pt")body=`<p>Petlar Egg Pack orqali olinadi. 3 tagacha pet bir vaqtda jihozlanadi va o‘yinchiga ergashadi.</p>${petsBody("shop")}`;
  else if(SLOTK.includes(tab))body=`<div class="avg">${ITEMS.filter(i=>i.slot===tab).map(itemCard).join("")}</div>`;
- else body=`<p>Bu bo‘lim tayyor. Buyumlar va CL narxlari keyingi bosqichda belgilanadi.</p><div class="avg">${["Yulduz effekti","Profil ramkasi","Raqs emote"].map(n=>`<div class="avc soon"><div class="avi sm">${ic("shop",44)}</div><b>${n}</b><span class="pr">${ic("crystal",18)} narx keyin</span><small>Tez orada</small></div>`).join("")}</div>`;
- sheet(`<div class="shh"><h3>Do‘kon</h3><span class="clb">${ic("crystal",20)} ${S.gems} CL</span></div><div class="chips shc">${SHOPT.map(([k,l])=>`<button class="chip ${tab===k?"on":""}" onclick="shopSheet('${k}')">${l}</button>`).join("")}</div>${body}<button class="btn sec" onclick="closeM()">Yopish</button>`);thApply()}
+ else if(tab==="bg")body=`<div class="avg">${BGS.map(bgCard).join("")}</div>`;
+ else if(tab==="em")body=emoShopBody();
+ else if(tab==="co")body=Object.keys(COLS).map(k=>`<h4 class="shn">${COLS[k]} kolleksiyasi</h4><div class="avg">${ITEMS.filter(i=>i.col===k).map(itemCard).join("")}</div>`).join("");
+ sheet(`<div class="shh"><h3>Do‘kon</h3><span class="clb">${ic("crystal",20)} ${S.gems} CL</span></div><div class="chips shc">${SHOPT.map(([k,l])=>`<button class="chip ${tab===k?"on":""}" onclick="shopSheet('${k}')">${l}</button>`).join("")}</div>${body}<button class="btn sec" onclick="closeM()">Yopish</button>`);thApply();emoApply()}
 function avActions(id,p,has,fn){return has?(S.gender===id?`<button class="btn" disabled>Jihozlangan</button>`:`<button class="btn" onclick="equipAv('${id}')">TANLASH / EQUIP</button>`):p===null?`<button class="btn" disabled>Narx tez orada</button>`:`<button class="btn" ${S.gems>=p?"":"disabled"} onclick="buyAv('${id}')">Sotib olish: ${p} CL</button>${S.gems>=p?"":`<small class="note">CL yetmaydi: yana ${p-S.gems} CL kerak.</small>`}`}
 function avatarView(id){const a=AVL.find(x=>x.id===id),p=AVP[id],has=owns(id);
  sheet(`<div class="avv"><div class="pvw"><canvas id="pvc" width="300" height="340"></canvas><div class="pvb">${[["Old",0,.15],["Orqa",3.1416,.15],["Chap",1.5708,.15],["O‘ng",-1.5708,.15],["Tepa",0,1.35],["Past",0,-.9]].map(([l,y,pt])=>`<button onclick="pvView(${y},${pt})">${l}</button>`).join("")}</div></div><div class="avx"><h3>${a.n}</h3>${priceHTML(id)}<p>Barmoq bilan aylantiring yoki tugmalar bilan burchakni tanlang. Kiyimlaringiz ham ko‘rinadi.</p>${avActions(id,p,has)}<button class="btn sec" onclick="shopSheet('av')">Orqaga</button></div></div>`);
  pvStart(id,S.eq,{ly:1.15,d:7.4})}
 function itemView(id){const it=ITM[id],has=owns(id),eqd=equipped(it),try_={...(S.eq||{}),[it.slot]:id};
- const act=has?(eqd?`<button class="btn" onclick="unequipItem('${id}')">UNEQUIP (yechish)</button>`:`<button class="btn" onclick="equipItem('${id}')">EQUIP (kiyish)</button>`):`<button class="btn" ${S.gems>=it.price?"":"disabled"} onclick="buyItem('${id}')">Sotib olish: ${it.price} CL</button>${S.gems>=it.price?"":`<small class="note">CL yetmaydi: yana ${it.price-S.gems} CL kerak.</small>`}`;
+ const act=has?(eqd?`<button class="btn" onclick="unequipItem('${id}')">UNEQUIP (yechish)</button>`:`<button class="btn" onclick="equipItem('${id}')">EQUIP (kiyish)</button>`):`<button class="btn" ${S.gems>=it.price?"":"disabled"} onclick="buyShopItem('${id}')">Sotib olish: ${it.price} CL</button>${S.gems>=it.price?"":`<small class="note">CL yetmaydi: yana ${it.price-S.gems} CL kerak.</small>`}`;
  sheet(`<div class="avv"><div class="pvw"><canvas id="pvc" width="300" height="340"></canvas><div class="pvb"><button onclick="pvView(0,.15)">Old</button><button onclick="pvView(3.1416,.15)">Orqa</button><button onclick="pvView(1.5708,.15)">Chap</button><button onclick="pvView(-1.5708,.15)">O‘ng</button><button onclick="pvZoom(1.15,7.4)">Butun</button><button onclick="pvZoom(...pvFoc('${it.slot}'))">Yaqin</button></div></div><div class="avx"><h3>${it.n}</h3>${priceHTML(id)}<p>${it.d}. Avatarda kiyib ko‘rishingiz mumkin, sotib olishdan oldin ham.</p>${act}<button class="btn sec" onclick="shopSheet('${it.slot}')">Orqaga</button></div></div>`);
  pvStart(S.gender,try_,{...pvFoc2(it.slot)})}
 const pvFoc=s=>({hr:[1.95,4.3],mk:[1.85,3.8],sh:[1.25,5],pn:[.6,5.4],fw:[.25,4]})[s]||[1.15,7.4];
 const pvFoc2=s=>{const f=pvFoc(s);return{ly:f[0],d:f[1]}};
 function pvZoom(ly,d){PV.ly=ly;PV.d=d}
 function afterEq(){save();if(PK.built&&PK.on)PK.meG="";render();if(PV.on&&PV.m){PV.rebuild&&PV.rebuild()}}
-function equipItem(id){const it=ITM[id];if(!it||!owns(id))return;S.eq=S.eq||{};S.eq[it.slot]=id;save();render();itemView(id)}
-function unequipItem(id){const it=ITM[id];if(!it)return;S.eq=S.eq||{};S.eq[it.slot]="";save();render();itemView(id)}
-function buyItem(id){const it=ITM[id];if(!it||owns(id)||S.gems<it.price||!spendCL(it.price,"av:"+id))return;S.avOwned.push(id);S.eq=S.eq||{};S.eq[it.slot]=id;save();render();itemView(id);appToast(it.n+" sotib olindi va kiyildi")}
-function equipAv(id){S.gender=id;save();render();avatarView(id)}
-function buyAv(id){const p=AVP[id];if(p===null||S.gems<p||owns(id)||!spendCL(p,"av:"+id))return;S.avOwned.push(id);S.gender=id;save();render();avatarView(id);appToast(AVL.find(a=>a.id===id).n+" sotib olindi")}
 const PV={on:false,ly:1.15,d:7.4};
 async function pvStart(id,eq,foc){PV.id=id;PV.eq=eq||{};PV.ly=(foc&&foc.ly)||1.15;PV.d=(foc&&foc.d)||7.4;
  try{await loadThree()}catch(e){const c=$("#pvc");if(c)c.outerHTML=`<img src="${CI[id].full}" alt="" style="height:300px">`;return}
  const c=$("#pvc");if(!c)return;ensureAssets();const T=THREE;
  PV.r=new T.WebGLRenderer({canvas:c,antialias:true,alpha:true});PV.r.setPixelRatio(Math.min(devicePixelRatio||1,2));PV.r.setSize(300,340,false);
  PV.s=new T.Scene();PV.s.add(new T.HemisphereLight(0xffffff,0x8899cc,1.0));const dl=new T.DirectionalLight(0xffffff,.9);dl.position.set(3,6,5);PV.s.add(dl);
- PV.cam=new T.PerspectiveCamera(34,300/340,.1,60);PV.m=makeChar(id,PV.eq);PV.s.add(PV.m);
+ PV.cam=new T.PerspectiveCamera(34,300/340,.1,60);PV.m=makeChar(id,PV.eq,{preview:true});PV.s.add(PV.m);
  PV.yaw=.5;PV.pit=.15;PV.ty=.5;PV.tp=.15;PV.auto=true;PV.on=true;let drag=null,last=performance.now();
  c.style.touchAction="none";c.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY};PV.auto=false;try{c.setPointerCapture(e.pointerId)}catch(_){}};
  c.onpointermove=e=>{if(!drag)return;PV.ty-=(e.clientX-drag.x)*.01;PV.tp=clamp(PV.tp+(e.clientY-drag.y)*.008,-1.2,1.45);drag={x:e.clientX,y:e.clientY};PV.yaw=PV.ty;PV.pit=PV.tp};
@@ -2380,6 +2400,320 @@ async function pvStart(id,eq,foc){PV.id=id;PV.eq=eq||{};PV.ly=(foc&&foc.ly)||1.1
   if(PV.auto){PV.ty+=dt*.6;PV.yaw=PV.ty}else if(!drag){PV.yaw+=(PV.ty-PV.yaw)*Math.min(1,8*dt);PV.pit+=(PV.tp-PV.pit)*Math.min(1,8*dt)}
   tickFx(PV.m,t/1000);const cp=Math.cos(PV.pit),d=PV.d;PV.cam.position.set(Math.sin(PV.yaw)*cp*d,PV.ly+Math.sin(PV.pit)*d,Math.cos(PV.yaw)*cp*d);PV.cam.lookAt(0,PV.ly,0);PV.r.render(PV.s,PV.cam)};
  PV.raf=requestAnimationFrame(loop)}
+
+/* ===== KATALOG 2: bezaklar, profil fonlari, emotelar, gilamlar (hammasi CL, narxlari server bilan tekshiriladi) ===== */
+const ACCS=[
+ {id:"hd_phones",slot:"hd",n:"Neon Headphones",price:220,col:"galaxy",d:"Neon quloqchinlar"},
+ {id:"hd_horns",slot:"hd",n:"Shadow Horns",price:480,col:"shadow",d:"Qora-qizil shoxlar"},
+ {id:"hd_halo",slot:"hd",n:"Golden Halo",price:950,col:"galaxy",d:"Boshingiz ustida nurli halqa"},
+ {id:"hd_crown",slot:"hd",n:"Royal Crown",price:1400,col:"",d:"Qimmatbaho gavharli oltin toj"},
+ {id:"bk_neon",slot:"bk",n:"Neon Wings",price:1250,col:"galaxy",d:"Neon nurli qanotlar"},
+ {id:"bk_fire",slot:"bk",n:"Fire Wings",price:1800,col:"fire",d:"Olov qanotlari"},
+ {id:"bk_ice",slot:"bk",n:"Ice Wings",price:1800,col:"ice",d:"Muz qanotlari"},
+ {id:"bk_rainbow",slot:"bk",n:"Rainbow Wings",price:2300,col:"rainbow",d:"Rang-barang qanotlar"},
+ {id:"au_bolt",slot:"au",n:"Lightning Aura",price:1600,col:"galaxy",d:"Atrofingizda chaqmoq"},
+ {id:"au_fire",slot:"au",n:"Fire Aura",price:1900,col:"fire",d:"Olovli aura"},
+ {id:"au_ice",slot:"au",n:"Ice Aura",price:1900,col:"ice",d:"Muzli aura"},
+ {id:"au_shadow",slot:"au",n:"Shadow Aura",price:2100,col:"shadow",d:"Qorong‘i tutunli aura"},
+ {id:"au_rainbow",slot:"au",n:"Rainbow Aura",price:2600,col:"rainbow",d:"Rang-barang aura"},
+ {id:"ob_orbs",slot:"ob",n:"Glow Orbs",price:700,col:"galaxy",d:"Aylanuvchi yorqin sharlar"},
+ {id:"ob_stars",slot:"ob",n:"Orbiting Stars",price:1050,col:"galaxy",d:"Atrofda aylanuvchi yulduzlar"},
+ {id:"ob_crystal",slot:"ob",n:"Orbiting Crystals",price:1350,col:"galaxy",d:"Atrofda aylanuvchi kristallar"},
+ {id:"sd_cat",slot:"sd",n:"Kitten",price:900,col:"nature",d:"Yelkangizdagi mushukcha"},
+ {id:"sd_robot",slot:"sd",n:"Mini Robot",price:1250,col:"",d:"Yelkangizdagi mini robot"},
+ {id:"sd_dragon",slot:"sd",n:"Mini Dragon",price:2400,col:"fire",d:"Yelkangizdagi mini ajdar"},
+ {id:"ft_ice",slot:"ft",n:"Ice Footprints",price:600,col:"ice",d:"Muzli oyoq izlari"},
+ {id:"ft_fire",slot:"ft",n:"Fire Footprints",price:750,col:"fire",d:"Olovli oyoq izlari"},
+ {id:"ft_rainbow",slot:"ft",n:"Rainbow Footprints",price:980,col:"rainbow",d:"Rang-barang oyoq izlari"},
+ {id:"ft_bolt",slot:"ft",n:"Lightning Footprints",price:1150,col:"galaxy",d:"Chaqmoqli oyoq izlari"}];
+const ICOL={s_fire:"fire",s_ice:"ice",s_rainbow:"rainbow",f_ice:"ice",f_rainbow:"rainbow",f_smoke:"nature",h_rainbow:"rainbow",h_blue:"ice",h_half:"shadow",m_blue:"ice",m_green:"nature",m_rainbow:"rainbow",m_shadow:"shadow",p_green:"nature",p_rainbow:"rainbow"};
+ITEMS.forEach(i=>{i.col=ICOL[i.id]||""});
+ITEMS.push(...ACCS);ITEMS.forEach(i=>{ITM[i.id]=i});
+Object.assign(FOC,{hd:"head",bk:"torso",au:"full",ob:"full",sd:"torso",ft:"full"});
+/* kolleksiya nomlari, buyum nomlari original (mashhur personajlar nusxasi emas) */
+const COLS={fire:"Fire",ice:"Ice",rainbow:"Rainbow",shadow:"Shadow",galaxy:"Galaxy",nature:"Nature"};
+Object.assign(ITM.h_gojo,{n:"Snow Spike Hair",d:"Oq tikanak anime uslubidagi soch"});Object.assign(ITM.m_gojo,{n:"Black Gaiter Mask",d:"Qora niqob, yuzning pastki qismini yopadi"});Object.assign(ITM.m_obanai,{n:"Serpent Mask",d:"Ilon naqshidan ilhomlangan original niqob"});Object.assign(ITM.f_white,{d:"Oq oddiy krossovka (logotipsiz)"});
+const BGS=[
+ {id:"bg_dark",n:"Dark Black",price:180,c:"dark",d:"Qora premium fon"},
+ {id:"bg_ice",n:"Ice",price:640,c:"ice",d:"Qorli muzli fon"},
+ {id:"bg_fire",n:"Fire",price:720,c:"fire",d:"Alangali fon"},
+ {id:"bg_rainbow",n:"Rainbow",price:1150,c:"rainbow",d:"Harakatlanuvchi rang-barang fon"},
+ {id:"bg_forest",n:"Magic Forest",price:1320,c:"forest",d:"Sehrli o‘rmon va uchqunlar"},
+ {id:"bg_neon",n:"Neon City",price:1480,c:"neon",d:"Neon shahar siluetlari"},
+ {id:"bg_crystal",n:"Crystal",price:1960,c:"crystal",d:"Yaltiroq kristall fon"},
+ {id:"bg_galaxy",n:"Galaxy",price:2350,c:"galaxy",d:"Yulduzli galaktika"}];
+const EMS=[
+ {id:"em_wave",n:"Wave",k:"game",price:0,d:"Qo‘l silkitish"},
+ {id:"em_laugh",n:"Laugh",k:"game",price:0,d:"Kulish"},
+ {id:"em_dance",n:"Dance",k:"game",price:0,d:"Raqs"},
+ {id:"em_clap",n:"Clap",k:"game",price:0,d:"Qarsak chalish"},
+ {id:"em_victory",n:"Victory",k:"game",price:0,d:"G‘alaba pozasi"},
+ {id:"em_crazy",n:"Crazy Laugh",k:"game",price:699,d:"Tiz cho‘kib, qornini ushlab qah-qah"},
+ {id:"em_cry",n:"Sad Cry",k:"game",price:699,d:"Tiz cho‘kib, yig‘lash"},
+ {id:"em_salute",n:"Salute",k:"game",price:249,d:"Harbiy salom"},
+ {id:"em_shrug",n:"Shrug",k:"game",price:349,d:"Yelka qisish"},
+ {id:"em_flex",n:"Flex",k:"game",price:560,d:"Mushak ko‘rsatish"},
+ {id:"em_spin",n:"Spin Jump",k:"game",price:880,d:"Sakrab aylanish"},
+ {id:"em_sit",n:"Chill Sit",k:"game",price:1100,d:"Cho‘kib dam olish"},
+ {id:"em_flip",n:"Backflip",k:"game",price:1480,d:"Orqaga salto"},
+ {id:"pe_sky",n:"Sky Look",k:"profile",price:3199,d:"Havoda muallaq turib osmonga qarash"},
+ {id:"pe_hero",n:"Hero Landing",k:"profile",price:3499,d:"Yugurib, sakrab, qahramonona qo‘nish"},
+ {id:"pe_throne",n:"Flame Throne",k:"profile",price:2799,d:"Qizil olovli taxtga o‘tirish"}];
+const EMI=Object.fromEntries(EMS.map(e=>[e.id,e]));
+const CARP=[{id:"cp_1",min:1,price:59},{id:"cp_3",min:3,price:119},{id:"cp_5",min:5,price:199}];
+const CAT={};
+AVL.forEach(a=>{CAT[a.id]={id:a.id,price:AVP[a.id],kind:"av"}});
+ITEMS.forEach(i=>{CAT[i.id]={id:i.id,price:i.price,kind:"it"}});
+BGS.forEach(b=>{CAT[b.id]={id:b.id,price:b.price,kind:"bg"}});
+EMS.forEach(e=>{CAT[e.id]={id:e.id,price:e.price,kind:e.k==="game"?"eg":"ep"}});
+CARP.forEach(c=>{CAT[c.id]={id:c.id,price:c.price,kind:"cp"}});
+
+/* ---- BEZAKLAR (3D) ---- */
+const ANIMF=(g,f)=>{const u=g.userData;(u.anim=u.anim||[]).push(f)};
+function wingSet(g,o){const T=THREE,ws=[];
+ for(const s of [-1,1]){const w=new T.Group();w.position.set(s*.14,1.45,-.3);g.add(w);
+  o.cols.forEach((c,i)=>{const a=.2+i*.33,L=1.7-i*.22,q=cone(w,o.basic?PB(c):o.glass?PLs(c,.84):PM(c),.2,L,s*Math.cos(a)*L/2,Math.sin(a)*L/2,0,0,s*(a-Math.PI/2));q.scale.z=.07});ws.push([w,s])}
+ if(o.fx)addFx(g,{n:8,cols:o.fx,size:.05,r:.9,h:1.3,oy:1.0,spd:.4,oz:-.4});
+ ANIMF(g,t=>{ws.forEach(([w,s])=>{w.rotation.z=s*(.16+.34*(.5+.5*Math.sin(t*2.6)))})})}
+function auraSet(g,o){const T=THREE,sh=[],rings=[];
+ for(let k=0;k<(o.rings||1);k++){const r=new T.Mesh(new T.TorusGeometry(.8+k*.12,.045,6,40),new T.MeshBasicMaterial({color:o.rcols?o.rcols[k%o.rcols.length]:o.ring,transparent:true,opacity:.75}));r.rotation.x=Math.PI/2+(o.tilt?k*.5:0);r.position.y=.06+(o.tilt?.9:0);g.add(r);rings.push(r)}
+ if(o.cones)for(let i=0;i<8;i++){const a=i/8*6.283,q=cone(g,PLs(o.cones[i%o.cones.length],.78),.13,.7,Math.cos(a)*.62,.4,Math.sin(a)*.62);q.userData.ph=i;sh.push(q)}
+ const bolts=[];if(o.bolt)for(let i=0;i<4;i++){const b=new T.Group(),a=i/4*6.283;b.position.set(Math.cos(a)*.85,.05,Math.sin(a)*.85);b.rotation.y=-a;g.add(b);
+  [[0,.55,.15,.25],[.14,1.05,-.1,-.3],[-.04,1.55,.12,.3],[.1,2.05,-.08,-.25]].forEach(([x,y,z,r])=>{const m=bx(b,PB(i%2?0xfde047:0xffffff),.05,.55,.05,x,y,z,.01);m.rotation.z=r});bolts.push(b)}
+ addFx(g,{n:o.n||14,cols:o.cols,size:o.size||.07,r:.8,h:2.4,oy:.05,spd:.3});
+ ANIMF(g,t=>{rings.forEach((r,k)=>{r.scale.setScalar(1+.08*Math.sin(t*3+k));if(o.tilt)r.rotation.z=t*(1+k*.4)});
+  sh.forEach(q=>{const h=.7*(.8+.35*Math.sin(t*6+q.userData.ph*1.7));q.scale.y=h;q.position.y=h/2});
+  bolts.forEach((b,i)=>{b.visible=Math.sin(t*23+i*7)>-.15})})}
+function orbitSet(g,kind){const T=THREE,og=new T.Group(),n=kind==="ob_orbs"?5:6,items=[];og.position.y=1.15;g.add(og);
+ for(let i=0;i<n;i++){let m;
+  if(kind==="ob_crystal"){m=new T.Mesh(new T.OctahedronGeometry(1),PLs(i%2?0x67e8f9:0xc084fc,.92));m.scale.set(.13,.27,.13)}
+  else if(kind==="ob_stars"){m=new T.Group();[0,Math.PI/2].forEach(ry=>{const s=new T.Mesh(PK.starG,PB(i%2?0xfde047:0xffffff));s.scale.set(.55,.55,.55);s.rotation.y=ry;m.add(s)})}
+  else{m=new T.Mesh(PK.sph,PB(RBH[i%6]));m.scale.setScalar(.12)}
+  og.add(m);items.push(m)}
+ ANIMF(g,t=>{og.rotation.y=t*1.5;items.forEach((m,i)=>{const a=i/n*6.283;m.position.set(Math.cos(a)*.95,Math.sin(t*2+i)*.22+(i%2)*.25-.1,Math.sin(a)*.95);m.rotation.y=t*2})})}
+function shoulderSet(g,kind){const T=THREE,u=new T.Group();u.position.set(.62,1.72,.02);g.add(u);
+ if(kind==="sd_robot"){bx(u,PM(0x9aa4b2),.24,.2,.2,0,.1,0,.03);bx(u,PM(0x6b7280),.2,.16,.18,0,.29,0,.03);ball(u,PB(0x22d3ee),.035,-.045,.3,.1);ball(u,PB(0x22d3ee),.035,.045,.3,.1);bx(u,PM(0x374151),.02,.12,.02,0,.42,0,.01);ball(u,PB(0xef4444),.03,0,.5,0);bx(u,PM(0x6b7280),.05,.1,.05,-.14,.1,0,.01);bx(u,PM(0x6b7280),.05,.1,.05,.14,.1,0,.01)}
+ else if(kind==="sd_cat"){ball(u,PM(0xf59e0b),.13,0,.11,0,.8);ball(u,PM(0xf59e0b),.1,0,.25,.1);cone(u,PM(0xf59e0b),.035,.09,-.06,.34,.1);cone(u,PM(0xf59e0b),.035,.09,.06,.34,.1);ball(u,PM(0x111111),.018,-.035,.26,.18);ball(u,PM(0x111111),.018,.035,.26,.18);ball(u,PM(0xfda4af),.015,0,.235,.195);const tl=bx(u,PM(0xf59e0b),.04,.04,.2,0,.16,-.17,.02);tl.rotation.x=.6;u.userData.tail=tl}
+ else{ball(u,PM(0x22c55e),.13,0,.11,0,.8);ball(u,PM(0x4ade80),.1,0,.25,.12);ball(u,PM(0xfef08a),.07,0,.09,.07,.7);cone(u,PM(0xfde047),.025,.08,-.045,.35,.1);cone(u,PM(0xfde047),.025,.08,.045,.35,.1);ball(u,PB(0xfde047),.02,-.04,.27,.2);ball(u,PB(0xfde047),.02,.04,.27,.2);const w1=cone(u,PM(0x16a34a),.08,.22,-.14,.2,-.04,0,.9),w2=cone(u,PM(0x16a34a),.08,.22,.14,.2,-.04,0,-.9);w1.scale.z=w2.scale.z=.06;u.userData.w=[w1,w2];const tl=cone(u,PM(0x22c55e),.04,.22,0,.1,-.2,-1.2,0);u.userData.tail=tl}
+ ANIMF(g,t=>{u.position.y=1.72+Math.sin(t*3)*.015;u.rotation.y=Math.sin(t*1.5)*.2;const w=u.userData.w;if(w){w[0].rotation.z=.9+Math.sin(t*9)*.3;w[1].rotation.z=-.9-Math.sin(t*9)*.3}})}
+const ftDisc=(c,s)=>{const T=THREE,m=new T.Mesh(new T.PlaneGeometry(1,1),new T.MeshBasicMaterial({color:c,transparent:true,opacity:.9,side:T.DoubleSide,depthWrite:false}));m.rotation.x=-Math.PI/2;m.scale.set(s*.34,s*.5,1);return m};
+function ftSet(g,cols){const u=g.userData;u.ftr={cols,list:[],last:null,side:1,n:0};
+ if(u.preview)for(let i=0;i<4;i++){const m=ftDisc(cols[i%cols.length],.9);m.position.set(i%2?.2:-.2,.03,-.75-i*.62);m.material.opacity=.95-i*.15;g.add(m)}}
+function footTrail(g,t){const u=g.userData,f=u.ftr;if(!f||!g.parent||u.preview)return;const p=g.position;if(!f.last)f.last={x:p.x,z:p.z};
+ const moved=Math.hypot(p.x-f.last.x,p.z-f.last.z);
+ if(moved>.75&&!u.air){f.last={x:p.x,z:p.z};f.side*=-1;const m=ftDisc(f.cols[(f.n=f.n+1)%f.cols.length],1),ry=g.rotation.y;m.position.set(p.x+Math.cos(ry)*.2*f.side,p.y+.06,p.z-Math.sin(ry)*.2*f.side);m.rotation.z=ry;g.parent.add(m);f.list.push({m,b:t})}
+ for(let i=f.list.length-1;i>=0;i--){const q=f.list[i],a=(t-q.b)/1.7;if(a>=1||a<0){g.parent.remove(q.m);f.list.splice(i,1)}else q.m.material.opacity=.9*(1-a)}}
+const ACCB={
+ hd_crown:g=>{const G=PM(0xfbbf24),T=THREE,r=new T.Mesh(PK.cyl,G);r.scale.set(.36,.1,.36);r.position.set(0,2.32,0);g.add(r);for(let i=0;i<5;i++){const a=i/5*6.283;cone(g,G,.07,.22,Math.cos(a)*.3,2.48,Math.sin(a)*.3);ball(g,PB(i%2?0xef4444:0x38bdf8),.04,Math.cos(a)*.3,2.62,Math.sin(a)*.3)}ball(g,PB(0x38bdf8),.05,0,2.34,.37)},
+ hd_halo:g=>{const T=THREE,h=new T.Mesh(new T.TorusGeometry(.34,.05,8,32),new T.MeshBasicMaterial({color:0xfde68a}));h.rotation.x=Math.PI/2;h.position.y=2.68;g.add(h);ANIMF(g,t=>{h.position.y=2.68+Math.sin(t*2)*.04;h.rotation.z=t})},
+ hd_horns:g=>{const A=PM(0x7f1d1d),B=PM(0x1f2937);[-1,1].forEach(s=>{cone(g,A,.1,.42,s*.27,2.42,0,0,-s*.5);cone(g,B,.06,.2,s*.4,2.64,0,0,-s*.95)})},
+ hd_phones:g=>{const T=THREE,b=new T.Mesh(new T.TorusGeometry(.4,.04,8,24,Math.PI),PM(0x334155));b.position.set(0,1.95,0);g.add(b);[-1,1].forEach(s=>{bx(g,PM(0x1e293b),.12,.26,.22,s*.4,1.95,0,.04);bx(g,PB(0x22d3ee),.03,.2,.16,s*.47,1.95,0,.01)})},
+ bk_neon:g=>wingSet(g,{cols:[0x22d3ee,0xe879f9,0x22d3ee,0xe879f9],basic:true,fx:[0x22d3ee,0xe879f9]}),
+ bk_fire:g=>wingSet(g,{cols:[0xff3d00,0xff6a00,0xff9500,0xffc400],fx:[0xf97316,0xfbbf24]}),
+ bk_ice:g=>wingSet(g,{cols:[0xc9efff,0x9bdcff,0x6cc3ff,0xe6f7ff],glass:true,fx:[0xbdeaff,0xffffff]}),
+ bk_rainbow:g=>wingSet(g,{cols:[0xef4444,0xf97316,0xfacc15,0x22c55e,0x3b82f6],fx:RBH}),
+ au_fire:g=>auraSet(g,{ring:0xf97316,cones:[0xff3d00,0xff9500,0xffc400],cols:[0xf97316,0xfbbf24,0xef4444]}),
+ au_ice:g=>auraSet(g,{ring:0x7dd3fc,cones:[0xbdeaff,0x7dd3fc],cols:[0xffffff,0xbdeaff]}),
+ au_rainbow:g=>auraSet(g,{rings:3,rcols:[0xef4444,0x22c55e,0x3b82f6],tilt:true,cols:RBH}),
+ au_shadow:g=>auraSet(g,{ring:0x7c3aed,cols:[0x1e1033,0x3b0764,0x6d28d9],size:.14,n:12}),
+ au_bolt:g=>auraSet(g,{ring:0xfde047,bolt:true,cols:[0xfde047,0xffffff],n:8}),
+ ob_orbs:g=>orbitSet(g,"ob_orbs"),ob_stars:g=>orbitSet(g,"ob_stars"),ob_crystal:g=>orbitSet(g,"ob_crystal"),
+ sd_robot:g=>shoulderSet(g,"sd_robot"),sd_cat:g=>shoulderSet(g,"sd_cat"),sd_dragon:g=>shoulderSet(g,"sd_dragon"),
+ ft_ice:g=>ftSet(g,[0x7dd3fc,0xe6f7ff]),ft_fire:g=>ftSet(g,[0xf97316,0xfbbf24]),ft_rainbow:g=>ftSet(g,RBH),ft_bolt:g=>ftSet(g,[0xfde047,0xffffff])};
+
+/* ---- EMOTELAR: haqiqiy animatsiyalar (oyoq-qo'l va tana harakati) ---- */
+const sn=Math.sin,ab=Math.abs;
+const EMO={
+ em_wave:{dur:3.2,pv:1.4,f:(P,t)=>{P.ra=[-2.75+.4*sn(t*9),.35];P.la=[.05,.08];P.ry=.12*sn(t*2)}},
+ em_laugh:{dur:3,pv:1,f:(P,t)=>{P.y=.07*ab(sn(t*14));P.rx=-.18+.07*sn(t*14);P.la=[-.85,-.4];P.ra=[-.85,-.4]}},
+ em_dance:{dur:4,pv:1.5,f:(P,t)=>{const s=sn(t*8);P.ry=.55*sn(t*4);P.y=.1*ab(s);P.la=[-1.4+.9*s,.5];P.ra=[-1.4-.9*s,.5];P.ll=.5*s;P.rl=-.5*s}},
+ em_clap:{dur:3,pv:.8,f:(P,t)=>{const z=.12-.42*ab(sn(t*10));P.la=[-1.45,z];P.ra=[-1.45,z];P.rx=.05}},
+ em_victory:{dur:3.2,pv:1.2,ly:1.25,d:7.8,f:(P,t)=>{P.la=[-3.0,.2];P.ra=[-3.0,.2];P.y=.28*ab(sn(t*5));P.ll=.15;P.rl=-.15}},
+ em_crazy:{dur:3.6,pv:1,f:(P,t)=>{P.y=-.55+.03*sn(t*16);P.ll=1.45;P.rl=1.45;P.rx=-.42+.08*sn(t*16);P.la=[-.75,-.32];P.ra=[-.75,-.32]}},
+ em_cry:{dur:3.6,pv:1.2,f:(P,t)=>{P.y=-.55;P.ll=1.45;P.rl=1.45;P.rx=.38;P.rz=.04*sn(t*20);P.la=[-2.3,-.5+.08*sn(t*6)];P.ra=[-2.3,-.5-.08*sn(t*6)]}},
+ em_salute:{dur:2.6,pv:1.5,f:(P,t)=>{const u=Math.min(1,t*3);P.ra=[-2.3*u,-.15*u];P.la=[.05,.05];P.rx=-.05}},
+ em_shrug:{dur:2.6,pv:1.2,f:(P,t)=>{const u=.5+.5*sn(t*5);P.la=[-.35,.95+.1*u];P.ra=[-.35,.95+.1*u];P.y=.04*u}},
+ em_flex:{dur:3,pv:1.2,f:(P,t)=>{const u=.5+.5*sn(t*6);P.la=[-.5,1.5+.1*u];P.ra=[-.5,1.5+.1*u];P.y=.05*u;P.ll=.1;P.rl=-.1}},
+ em_spin:{dur:1.3,pv:1.3,ly:1.35,d:8.6,f:(P,t)=>{const u=Math.min(1,t/1.0);P.ry=u*6.283;P.y=.55*sn(Math.PI*u);P.la=[-.3,1.1];P.ra=[-.3,1.1]}},
+ em_sit:{dur:4,pv:1.5,f:(P,t)=>{P.y=-.5;P.ll=-1.5;P.rl=-1.5;P.rx=-.08;P.la=[-.5,.25];P.ra=[-.5,.25+.08*sn(t*2)]}},
+ em_flip:{dur:1.2,pv:1.2,ly:1.5,d:9.6,f:(P,t)=>{const u=Math.min(1,t/1.0);P.rx=-6.283*u;P.y=1.0*sn(Math.PI*u);P.la=[-2.6,.1];P.ra=[-2.6,.1];P.ll=-.4*sn(Math.PI*u);P.rl=-.4*sn(Math.PI*u)}},
+ pe_sky:{dur:5,pv:3.2,ly:1.4,d:8.2,f:(P,t)=>{const u=Math.min(1,t*1.3);P.y=.75*u+.08*sn(t*1.7);P.rx=-.3*u;P.la=[-.1,.4*u];P.ra=[-.1,.4*u];P.ll=.18*u;P.rl=-.08*u;P.ry=.3*sn(t*.7)}},
+ pe_hero:{dur:5.2,pv:5.2,ly:1.65,d:10.5,f:(P,t)=>{
+   if(t<1.4){const s=sn(t*11)*.95;P.ll=s;P.rl=-s;P.la=[-s*.9,.1];P.ra=[s*.9,.1];P.rx=.2;P.y=.05*ab(sn(t*11))}
+   else if(t<2.2){const u=(t-1.4)/.8;P.y=1.5*sn(Math.PI*u);P.la=[-2.7,.9];P.ra=[-2.7,.9];P.ll=-.7;P.rl=.3;P.rx=-.15}
+   else{const u=Math.min(1,(t-2.2)/.25);P.y=-.5*u;P.ll=-1.2*u;P.rl=1.35*u;P.rx=.5*u;P.ra=[-.9*u,.05];P.la=[.7*u,.3*u];P.ry=0}}},
+ pe_throne:{dur:6,pv:3,d:9,ly:1.2,f:(P,t,E,g)=>{const u=Math.min(1,t*1.4);P.y=-.42*u;P.ll=-1.5*u;P.rl=-1.25*u;P.rlz=-.4*u;P.la=[-.7*u,.45*u];P.ra=[-.7*u,.45*u];P.rx=-.06*u;
+   const th=g.userData.throne;if(th){th.visible=true;th.scale.setScalar(Math.min(1,t*1.8)+.001)}}}};
+function throneOf(g){const u=g.userData;if(u.throne)return u.throne;const T=THREE,th=new T.Group();th.visible=false;th.position.set(0,0,-.5);g.add(th);
+ const R=PM(0x7f1d1d),R2=PM(0xb91c1c);bx(th,R,1.6,.35,1.1,0,.18,0,.05);bx(th,R2,1.4,1.7,.3,0,1.05,-.45,.06);bx(th,R,.3,.7,1,-.75,.65,0,.05);bx(th,R,.3,.7,1,.75,.65,0,.05);bx(th,R,.5,.5,.3,-.5,2.0,-.45,.05);bx(th,R,.5,.5,.3,.5,2.0,-.45,.05);
+ for(let i=0;i<9;i++){const a=i/9*3.14159,q=cone(th,PLs(i%3?0xff6a00:0xffc400,.85),.14,.7,Math.cos(a)*.9-0,1.2+Math.sin(a)*.8,-.62,0,0);q.userData.ph=i;u.tfl=(u.tfl||[]);u.tfl.push(q)}
+ ANIMF(g,t=>{(u.tfl||[]).forEach(q=>{const h=.6+.35*sn(t*7+q.userData.ph*1.3);q.scale.y=h})});return u.throne=th}
+function emoteStart(g,id,t0){const E=EMO[id];if(!E)return false;const u=g.userData;if(id==="pe_throne")throneOf(g);u.em={id,t0,by:g.position.y,bz:g.position.z,bx:g.position.x,ry:g.rotation.y};return true}
+function emoteStop(g){const u=g.userData,e=u.em;if(!e)return;u.em=null;g.position.y=e.by;g.rotation.x=0;g.rotation.z=0;g.rotation.y=e.ry;[u.la,u.ra,u.ll,u.rl].forEach(l=>{if(l)l.rotation.set(0,0,0)});if(u.throne)u.throne.visible=false}
+function emoteTick(g,t){const u=g.userData,e=u.em;if(!e)return false;const E=EMO[e.id],k=t-e.t0;if(k>E.dur){emoteStop(g);return true}
+ const P={la:[0,0],ra:[0,0],ll:0,rl:0,y:0,rx:0,ry:0,rz:0,rlz:0};E.f(P,k,E,g);
+ u.la.rotation.set(P.la[0],0,-P.la[1]);u.ra.rotation.set(P.ra[0],0,P.ra[1]);u.ll.rotation.set(P.ll,0,0);u.rl.rotation.set(P.rl,0,P.rlz);
+ g.position.y=e.by+P.y+(P.rx&&Math.abs(P.rx)>1?1.1*(1-Math.cos(P.rx)):0);g.rotation.x=P.rx;g.rotation.z=P.rz;g.rotation.y=e.ry+P.ry;return true}
+
+/* ===== PROFIL / DO'KON / EMOTE / CHAT / GILAM / CL YUBORISH ===== */
+const gsSec=()=>gsId("gs_sec",32);
+const shopCall=(op,x)=>gsCall("shop",{op,uid:gsUid(),secret:gsSec(),...x});
+const SVGI={
+ smile:'<svg viewBox="0 0 48 48" width="30" height="30"><circle cx="24" cy="24" r="20" fill="#fde047" stroke="#b45309" stroke-width="2.5"/><circle cx="17" cy="20" r="3" fill="#78350f"/><circle cx="31" cy="20" r="3" fill="#78350f"/><path d="M14 29c3 7 17 7 20 0" fill="none" stroke="#78350f" stroke-width="3" stroke-linecap="round"/></svg>',
+ chat:'<svg viewBox="0 0 48 48" width="28" height="28"><path d="M8 10h32a4 4 0 014 4v18a4 4 0 01-4 4H22l-9 8v-8H8a4 4 0 01-4-4V14a4 4 0 014-4z" fill="#38bdf8" stroke="#075985" stroke-width="2.5" stroke-linejoin="round"/><circle cx="16" cy="23" r="2.6" fill="#fff"/><circle cx="24" cy="23" r="2.6" fill="#fff"/><circle cx="32" cy="23" r="2.6" fill="#fff"/></svg>',
+ gear:'<svg viewBox="0 0 48 48" width="26" height="26"><path d="M24 15a9 9 0 100 18 9 9 0 000-18zm0-9l3 5 6-1 2 6 6 2-1 6 5 3-5 3 1 6-6 2-2 6-6-1-3 5-3-5-6 1-2-6-6-2 1-6-5-3 5-3-1-6 6-2 2-6 6 1z" fill="#a78bfa" stroke="#4c1d95" stroke-width="2"/></svg>',
+ send:'<svg viewBox="0 0 48 48" width="24" height="24"><path d="M6 24L42 8 30 42l-7-14z" fill="#22d3ee" stroke="#0e7490" stroke-width="2.5" stroke-linejoin="round"/></svg>'};
+const fmtMS=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+const gsID=()=>{const p=String(SV.playerId||"");if(!/^\d+$/.test(p))return p||"ID berilmoqda…";const n=+p;return "GS-"+String(n>=100000?n-100000:n).padStart(6,"0")};
+
+/* ---- xarid (server narxni va balansni tekshiradi) ---- */
+async function buyCat(id){const c=CAT[id];if(!c)return false;if(owns(id))return true;if(!SV.ok){appToast("Server bilan ulanmagan. Birozdan keyin urinib ko‘ring");return false}
+ if(S.gems<c.price){appToast("CL yetmaydi");return false}
+ try{const j=await shopCall("buy",{id});SV.led.push({id:j.lid,uid:SV.uid,type:"spend",cur:"cl",amt:c.price,ref:"av:"+id,by:SV.uid,t:Date.now()});svCalc();if(!S.avOwned.includes(id))S.avOwned.push(id);save();return true}
+ catch(e){appToast(e.message||"Xarid amalga oshmadi");return false}}
+async function buyShopItem(id){const it=ITM[id];if(!it||owns(id))return;if(!(await buyCat(id)))return;S.eq=S.eq||{};S.eq[it.slot]=id;save();custSave();render();itemView(id);appToast(it.n+" sotib olindi va kiyildi")}
+async function buyAv(id){const a=AVL.find(x=>x.id===id);if(!a||owns(id))return;if(!(await buyCat(id)))return;S.gender=id;save();custSave();render();avatarView(id);appToast(a.n+" sotib olindi")}
+function equipItem(id){const it=ITM[id];if(!it||!owns(id))return;S.eq=S.eq||{};S.eq[it.slot]=id;save();custSave();render();itemView(id)}
+function unequipItem(id){const it=ITM[id];if(!it)return;S.eq=S.eq||{};S.eq[it.slot]="";save();custSave();render();itemView(id)}
+function equipAv(id){S.gender=id;save();custSave();render();avatarView(id)}
+
+/* ---- profil sozlamalari serverda saqlanadi (boshqa qurilmadan kirganda ham ko'rinadi) ---- */
+let custTm;
+function custSave(){S.custT=Date.now();save();clearTimeout(custTm);custTm=setTimeout(async()=>{try{await shopCall("cust_set",{g:S.gender,eq:eqCode(S.eq),bg:S.bg||"",pem:S.pem||"",gem:S.gem})}catch(e){}},700)}
+async function custLoad(){try{const j=await shopCall("cust_get",{target:gsUid()}),c=j.cust;
+ if(c&&(!S.custT||c.t>S.custT)){S.eq=eqDecode(c.eq);S.bg=c.bg||"";S.pem=c.pem||"";if(Array.isArray(c.gem)&&c.gem.length===5)S.gem=c.gem;if(c.g&&AVALL.includes(c.g))S.gender=c.g;S.custT=c.t;save();render()}
+ else if(!c)custSave()}catch(e){}}
+
+/* ---- fonlar ---- */
+const bgCard=b=>{const on=S.bg===b.id;return `<div class="avc ${on?"sel":""}" onclick="bgView('${b.id}')"><div class="bgp pbg-${b.c}"></div><b>${b.n}</b>${priceHTML(b.id)}<small>${on?"Qo‘llangan":owns(b.id)?"Qo‘llash":"Ko‘rish"}</small></div>`};
+function bgView(id){const b=BGS.find(x=>x.id===id),has=owns(id),on=S.bg===id;
+ sheet(`<div class="ctr"><div class="bgp big pbg-${b.c}"></div><h3>${b.n}</h3>${priceHTML(id)}<p>${b.d}. Profil sahifangizda ko‘rinadi.</p>${has?(on?`<button class="btn" onclick="bgSet('')">Olib tashlash</button>`:`<button class="btn" onclick="bgSet('${id}')">Qo‘llash</button>`):`<button class="btn" ${S.gems>=b.price?"":"disabled"} onclick="bgBuy('${id}')">Sotib olish: ${b.price} CL</button>${S.gems>=b.price?"":`<small class="note">Yana ${b.price-S.gems} CL kerak</small>`}`}<button class="btn sec" onclick="shopSheet('bg')">Orqaga</button></div>`)}
+function bgSet(id){S.bg=id;save();custSave();render();bgView(id||S.bg||BGS[0].id)}
+async function bgBuy(id){if(!(await buyCat(id)))return;S.bg=id;save();custSave();render();bgView(id);appToast("Fon sotib olindi va qo‘llandi")}
+
+/* ---- emote do'koni ---- */
+const emoCv=(id,cls="")=>`<canvas class="emc ${cls}" width="120" height="150" data-emo="${id}"></canvas>`;
+const EMG={img:{},fr:0};
+function emoWant(ids){ids.forEach(id=>{emoGen(id)})}
+function emoApply(){document.querySelectorAll("canvas[data-emo]").forEach(cv=>{const id=cv.getAttribute("data-emo"),k="emo|"+id+"|"+meKey(),u=TH.cache[k];if(!u)return;
+ let im=EMG.img[k];if(!im){im=EMG.img[k]=new Image();im.src=u}cv._im=im})}
+setInterval(()=>{EMG.fr=(EMG.fr+1)%8;document.querySelectorAll("canvas[data-emo]").forEach(cv=>{const im=cv._im;if(!im||!im.complete||!im.naturalWidth){emoApply();return}const x=cv.getContext("2d");x.clearRect(0,0,120,150);x.drawImage(im,EMG.fr*120,0,120,150,0,0,120,150)})},120);
+function thEnsure(){if(TH.r)return;const T=THREE,c=document.createElement("canvas");c.width=220;c.height=260;TH.r=new T.WebGLRenderer({canvas:c,antialias:true,alpha:true,preserveDrawingBuffer:true});TH.r.setSize(220,260,false);TH.s=new T.Scene();TH.s.add(new T.HemisphereLight(0xffffff,0x8899cc,1.05));const dl=new T.DirectionalLight(0xffffff,.9);dl.position.set(3,6,5);TH.s.add(dl);TH.cam=new T.PerspectiveCamera(32,220/260,.1,60)}
+async function emoGen(id){const key="emo|"+id+"|"+meKey();if(TH.cache[key]!==undefined)return;TH.cache[key]="";
+ try{await loadThree();ensureAssets();thEnsure();const E=EMO[id],N=8,W=120,H=150,cv=document.createElement("canvas");cv.width=W*N;cv.height=H;const x=cv.getContext("2d");
+  const m=makeChar(S.gender,S.eq,{preview:true});TH.s.add(m);TH.r.setSize(W,H,false);TH.cam.aspect=W/H;TH.cam.updateProjectionMatrix();
+  const ly=E.ly||1.15,d=E.d||7.4;
+  for(let f=0;f<N;f++){const t=E.pv*f/N;m.position.set(0,0,0);m.rotation.set(0,0,0);emoteStart(m,id,0);emoteTick(m,t+.001);tickFx(m,t);
+   TH.cam.position.set(Math.sin(.3)*d,ly+.3,Math.cos(.3)*d);TH.cam.lookAt(0,ly,0);TH.r.render(TH.s,TH.cam);x.drawImage(TH.r.domElement,f*W,0)}
+  emoteStop(m);TH.s.remove(m);TH.r.setSize(220,260,false);TH.cam.aspect=220/260;TH.cam.updateProjectionMatrix();TH.cache[key]=cv.toDataURL("image/png");emoApply()}catch(e){TH.cache[key]=undefined}}
+const emoCard=e=>{const has=owns(e.id),eq=e.k==="profile"?S.pem===e.id:(S.gem||[]).includes(e.id);return `<div class="avc ${eq?"sel":""}" onclick="emoView('${e.id}')"><div class="avi">${emoCv(e.id)}</div><b>${e.n}</b>${priceHTML(e.id)}<small>${eq?(e.k==="profile"?"Jihozlangan":"Slotda"):has?"Sizniki":"Ko‘rish"}</small></div>`};
+function emoShopBody(){emoWant(EMS.map(e=>e.id));return `<h4 class="shn">Profil emotsa <small>faqat profil avatarida</small></h4><div class="avg">${EMS.filter(e=>e.k==="profile").map(emoCard).join("")}</div><h4 class="shn">O‘yin emotsa <small>faqat o‘yinlarda, 5 ta slot</small></h4><div class="avg">${EMS.filter(e=>e.k==="game").map(emoCard).join("")}</div><button class="btn sec" onclick="emoSlots()">Emote Settings (5 slot)</button>`}
+function emoView(id){const e=EMI[id],has=owns(id);let act;
+ if(!has)act=`<button class="btn" ${S.gems>=e.price?"":"disabled"} onclick="emoBuy('${id}')">Sotib olish: ${e.price} CL</button>${S.gems>=e.price?"":`<small class="note">Yana ${e.price-S.gems} CL kerak</small>`}`;
+ else if(e.k==="profile")act=S.pem===id?`<button class="btn" onclick="pemSet('')">Yechish (UNEQUIP)</button>`:`<button class="btn" onclick="pemSet('${id}')">Jihozlash (EQUIP)</button>`;
+ else act=`<button class="btn" onclick="emoSlots('${id}')">Slotga qo‘yish</button>`;
+ emoWant([id]);sheet(`<div class="ctr"><div style="width:170px;margin:0 auto">${emoCv(id,"big")}</div><h3>${e.n}</h3>${priceHTML(id)}<p>${e.d}. ${e.k==="profile"?"Faqat profil avatarida ishlaydi: profilingizga kirganlar avatarni bosganda ko‘radi.":"Faqat o‘yinlarda, Emote menyusida ishlaydi."}</p>${act}<button class="btn sec" onclick="shopSheet('em')">Orqaga</button></div>`)}
+async function emoBuy(id){if(!(await buyCat(id)))return;const e=EMI[id];if(e.k==="profile"){S.pem=id;save();custSave()}appToast(e.n+" sotib olindi");render();emoView(id)}
+function pemSet(id){S.pem=id;save();custSave();render();emoView(id||S.pem||"pe_sky")}
+function emoSlots(pick){const own=EMS.filter(e=>e.k==="game"&&owns(e.id));
+ sheet(`<h3>Emote Settings</h3><p>${pick?`<b>${EMI[pick].n}</b> uchun slotni tanlang.`:"Slotni bosing, so‘ng emote tanlang."} Bitta emote bitta slotda bo‘ladi, almashtirilgani inventarda saqlanadi.</p><div class="slr">${S.gem.map((id,i)=>`<button class="slt" onclick="${pick?`emoPut(${i},'${pick}')`:`emoPickSlot(${i})`}">${emoCv(id)}<b>${i+1}. ${EMI[id].n}</b></button>`).join("")}</div><button class="btn sec" onclick="shopSheet('em')">Yopish</button>`);emoWant(S.gem)}
+function emoPickSlot(i){const own=EMS.filter(e=>e.k==="game"&&owns(e.id));
+ sheet(`<h3>${i+1}-slot uchun emote</h3><div class="avg">${own.map(e=>`<div class="avc ${S.gem[i]===e.id?"sel":""}" onclick="emoPut(${i},'${e.id}')"><div class="avi">${emoCv(e.id)}</div><b>${e.n}</b><small>${S.gem.includes(e.id)?(S.gem[i]===e.id?"Shu slotda":(S.gem.indexOf(e.id)+1)+"-slotda"):"Inventarda"}</small></div>`).join("")}</div><button class="btn sec" onclick="emoSlots()">Orqaga</button>`);emoWant(own.map(e=>e.id))}
+function emoPut(i,id){if(!owns(id))return;const j=S.gem.indexOf(id),old=S.gem[i];if(j>=0&&j!==i)S.gem[j]=old;S.gem[i]=id;save();custSave();appToast(EMI[id].n+" "+(i+1)+"-slotga qo‘yildi");emoSlots()}
+
+/* ---- 3D avatar sahnasi (profil): bosilganda profil emotsasi ---- */
+const STG={};
+function stageStop(){if(STG.raf)cancelAnimationFrame(STG.raf);STG.raf=0;if(STG.r){try{STG.r.dispose()}catch(e){}}STG.r=null}
+async function stageMount(cv,gid,eq,pem){stageStop();if(!cv)return;
+ try{await loadThree()}catch(e){return}
+ if(!document.body.contains(cv))return;ensureAssets();const T=THREE,w=cv.clientWidth||240,h=cv.clientHeight||280,dpr=Math.min(devicePixelRatio||1,2);cv.width=w*dpr;cv.height=h*dpr;
+ const r=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});r.setSize(w*dpr,h*dpr,false);STG.r=r;const s=new T.Scene();s.add(new T.HemisphereLight(0xffffff,0x8899cc,1.05));const dl=new T.DirectionalLight(0xffffff,.9);dl.position.set(3,6,5);s.add(dl);
+ const cam=new T.PerspectiveCamera(32,w/h,.1,60),m=makeChar(gid,eq,{preview:true});s.add(m);STG.m=m;STG.pem=pem;
+ cv.onclick=()=>{if(STG.pem&&EMO[STG.pem]&&!m.userData.em){emoteStart(m,STG.pem,performance.now()/1000)}};
+ const loop=t=>{if(!STG.r||STG.r!==r||!document.body.contains(cv)){try{r.dispose()}catch(e){}return}STG.raf=requestAnimationFrame(loop);const ts=t/1000;
+  if(!m.userData.em){m.position.y=.015*Math.sin(ts*1.8);animChar(m,ts,false,false);m.rotation.y=.3+.12*Math.sin(ts*.6)}else animChar(m,ts,false,false);
+  const em=m.userData.em,E=em&&EMO[em.id],ly=(E&&E.ly)||1.15,d=(E&&E.d)||7.6;cam.position.set(Math.sin(.2)*d,ly+.35,Math.cos(.2)*d);cam.lookAt(0,ly,0);r.render(s,cam)};
+ STG.raf=requestAnimationFrame(loop)}
+
+/* ---- PROFIL sahifasi ---- */
+const bgCls=id=>{const b=BGS.find(x=>x.id===id);return b?"pbg-"+b.c:"pbg-galaxy"};
+function viewProfile(){setTimeout(()=>stageMount($("#pstage"),S.gender,S.eq,S.pem),30);const nTotal=Object.keys(CAT).filter(k=>owns(k)&&CAT[k].price>0).length;return `
+<div class="phero ${bgCls(S.bg)} rv"><canvas id="pstage"></canvas>${S.pem?`<span class="phint">Avatarni bosing: ${EMI[S.pem].n}</span>`:`<span class="phint">Emote Shop da profil emotsa oling</span>`}
+ <div class="pnm"><b>${esc(S.name)}</b> ${S.premium?ic("premium",22):""}${isAdmin()?'<em>ADMIN</em>':""}</div><div class="pid">${esc(gsID())}</div></div>
+<div class="pcl rv"><span class="cl">${ic("crystal",46)}</span><div><b>${S.gems} CL</b><small>CL Crystal · ${nTotal} ta sotib olingan buyum</small></div><button class="btn sm" onclick="gemShop()" ${typeof gemShop==="function"?"":"hidden"}>+ CL</button></div>
+<div class="pgrid rv">
+ <button onclick="shopSheet('av')">${ic("shop",34)}<b>Avatar Shop</b></button>
+ <button onclick="shopSheet('em')">${SVGI.smile}<b>Emote Shop</b></button>
+ <button onclick="shopSheet('bg')">${ic("inventory",34)}<b>Profil fonlari</b></button>
+ <button onclick="shopSheet('hd')">${ic("premium",34)}<b>Bezaklar</b></button>
+ <button onclick="invSheet()">${ic("inventory",34)}<b>Inventar</b></button>
+ <button onclick="xferSheet()">${ic("crystal",34)}<b>CL tarixi</b></button></div>
+<div class="hero ${S.premium?"":"dk"} rv" onclick="premiumPage()"><b class="fl">${ic("premium",32)} ${S.premium?"Premium faol · "+fmtD(SV.premEnd)+" gacha":"Premium olish"}</b><p style="margin-top:4px;opacity:.85;color:inherit">${S.premium?"O‘yin yaratish ochiq.":"O‘yin yaratishni oching."}</p></div>
+<div class="st rv">Do‘stlar</div>${FRIENDS.length?FRIENDS.map(userRow).join(""):'<p class="empty">'+(SO.ok?"Hali do‘stlar yo‘q.":"Do‘stlar yuklanmoqda…")+'</p>'}
+<button class="btn sec rv" onclick="addFriendSheet()">Do‘st qo‘shish</button>
+<button class="btn sec rv" onclick="accountSheet()">${gsUn()?"Akkaunt: "+esc(gsUn()):"Akkaunt yaratish / Kirish"}</button>
+<div class="st rv">${ic("settings",28)} Sozlamalar</div>
+${[["priv","Yopiq profil"],["notif","Bildirishnomalar"],["blurimg","Notanishlardan rasmlarni xiralashtirish"]].map(([k,l])=>`<div class="sw rv">${l}<button class="tg ${S.set[k]?"on":""}" onclick="S.set.${k}=!S.set.${k};save();render();layoutApp()"></button></div>`).join("")}
+${canCreate()?`<button class="btn big rv" onclick="creator()">${ic("create",36)} O‘yin yaratish +</button>`:""}
+${adminProfileBtn()}<p style="color:var(--mut);font-size:12px;margin-top:12px;word-break:break-all">${SV.ok?"GAMESET ID: <b style=\"color:var(--cy)\">"+esc(gsID())+"</b><br>Akkaunt ID: "+esc(SV.uid)+"<br>":"GAMESET ID: serverga kirgach beriladi.<br>"}</p>`}
+function invSheet(){const groups=[["av","Avatarlar",AVL.map(a=>a.id)],...SLOTK.map(k=>[k,(SHOPT.find(x=>x[0]===k)||[k,k])[1],ITEMS.filter(i=>i.slot===k).map(i=>i.id)]),["bg","Fonlar",BGS.map(b=>b.id)],["em","Emotelar",EMS.map(e=>e.id)],["cp","Gilamlar",CARP.map(c=>c.id)]];
+ const rows=groups.map(([k,l,ids])=>{const o=ids.filter(id=>owns(id));if(!o.length)return"";return `<h4 class="shn">${l}</h4><div class="chips shc">${o.map(id=>`<button class="chip" onclick="invOpen('${id}')">${(CAT[id].kind==="it"?ITM[id].n:CAT[id].kind==="av"?AVL.find(a=>a.id===id).n:CAT[id].kind==="bg"?BGS.find(b=>b.id===id).n:CAT[id].kind==="cp"?"Gilam "+CARP.find(c=>c.id===id).min+" daq":EMI[id].n)}</button>`).join("")}</div>`}).join("");
+ sheet(`<h3>Inventar</h3>${rows||"<p>Hali buyum yo‘q.</p>"}<button class="btn sec" onclick="closeM()">Yopish</button>`)}
+function invOpen(id){const k=CAT[id].kind;if(k==="it")itemView(id);else if(k==="av")avatarView(id);else if(k==="bg")bgView(id);else if(k==="cp")shopWin("carpet");else emoView(id)}
+
+/* ---- do'st profili: 3D avatar, fon va profil emotsasi ---- */
+async function userSheet(id){const u=uFind(id);if(!u)return;let cu=null;
+ const st=u.fr?"friend":SO.out.includes(u.uid)?"sent":SO.req.some(r=>r.uid===u.uid)?"got":"none";
+ const draw=()=>{sheet(`<div class="phero small ${bgCls(cu&&cu.bg)}"><canvas id="ustage"></canvas>${cu&&cu.pem?`<span class="phint">Avatarni bosing</span>`:""}<div class="pnm"><b>${esc(u.n)}</b></div></div><div class="ctr"><p>@${esc(u.un||"")} · ${stat(u)} · ${u.fr?"Do‘st":"Do‘st emas"}</p></div>${st==="friend"?`<button class="btn" onclick="closeM();chatWith('${u.uid}')">Xabar yozish</button><button class="btn" onclick="clSendSheet('${u.uid}')">CL yuborish</button><button class="btn sec" onclick="frAct('remove','${u.uid}','Do‘stlikdan chiqarildi')">Do‘stlikdan chiqarish</button>`:st==="sent"?`<button class="btn sec" disabled>So‘rov yuborilgan</button>`:st==="got"?`<button class="btn" onclick="frAct('accept','${u.uid}','Do‘st qo‘shildi')">Qabul qilish</button>`:`<button class="btn" onclick="frAct('add','${u.uid}','So‘rov yuborildi')">Do‘st qo‘shish</button>`}<button class="btn sec" onclick="closeM()">Yopish</button>`);
+  stageMount($("#ustage"),AVALL.includes(u.g)?u.g:"boy",cu?eqDecode(cu.eq):{},cu&&cu.pem)};
+ draw();try{const j=await shopCall("cust_get",{target:u.uid});cu=j.cust;if(cu&&$("#ustage"))draw()}catch(e){}}
+
+/* ---- CL yuborish ---- */
+function clSendSheet(uid){const u=uFind(uid);if(!u)return;
+ sheet(`<h3>CL yuborish</h3><p>Qabul qiluvchi: <b>${esc(u.n)}</b><br>Sizda: <b>${S.gems} CL</b></p><input id="clamt" type="number" inputmode="numeric" min="1" max="${S.gems}" placeholder="Miqdor (CL)"><p id="clerr" style="color:#ff8a8a;min-height:18px;margin:4px 0"></p><button class="btn" id="clgo">Davom etish</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
+ $("#clgo").onclick=()=>{const n=Math.floor(+$("#clamt").value);if(!(n>=1))return $("#clerr").textContent="Miqdorni to‘g‘ri kiriting";if(n>S.gems)return $("#clerr").textContent="CL yetarli emas";
+  const key=rid("x");sheet(`<h3>Tasdiqlang</h3><p><b>${esc(u.n)}</b> ga <b>${n} CL</b> yuborilsinmi?<br>Bu amalni qaytarib bo‘lmaydi.</p><button class="btn" id="clok">Tasdiqlash</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
+  $("#clok").onclick=async()=>{$("#clok").disabled=true;try{await shopCall("send_cl",{to:uid,amt:n,key});await svLoadLedger();closeM();appToast(n+" CL yuborildi");render()}catch(e){closeM();info("Yuborilmadi",esc(e.message||"Xatolik"))}}}}
+async function xferSheet(){sheet(`<h3>CL tarixi</h3><p>Yuklanmoqda…</p>`);
+ try{const j=await shopCall("xfer_list",{}),me=SV.uid;sheet(`<h3>CL tarixi</h3>${j.list.length?j.list.map(x=>`<div class="plan" style="padding:9px 12px;margin-bottom:6px"><span>${x.from===me?"→ "+esc(x.tn||"?"):"← "+esc(x.fn||"?")}<br><small style="color:var(--mut)">${new Date(x.t).toLocaleString()}</small></span><b style="color:${x.from===me?"#fca5a5":"#6ee7b7"}">${x.from===me?"-":"+"}${x.amt} CL</b></div>`).join(""):"<p>Hali transfer yo‘q.</p>"}<button class="btn sec" onclick="closeM()">Yopish</button>`)}catch(e){info("Xatolik",esc(e.message||""))}}
+function recvNew(){const seen=+localStorage.getItem("gs_rcv_"+gsUid())||0;return SV.led.filter(r=>r.type==="grant"&&r.sys===1&&/^recv:/.test(r.ref||"")&&(r.t||0)>seen).sort((a,b)=>b.t-a.t)}
+function recvMark(){try{localStorage.setItem("gs_rcv_"+gsUid(),String(Date.now()))}catch(e){}}
+
+/* ---- Rainbow Parkour ichida: emote menyusi (radial) va chat ---- */
+function radialOpen(){const r=$("#pkrad");if(!r)return;if(!r.hidden){r.hidden=true;return}emoWant(S.gem);
+ r.innerHTML=`<div class="rdw">${S.gem.map((id,i)=>{const a=(-90+i*72)*Math.PI/180;return `<button class="rdb" style="--x:${Math.cos(a).toFixed(3)};--y:${Math.sin(a).toFixed(3)}" onclick="radialPick(${i})">${emoCv(id)}<b>${EMI[id].n}</b></button>`}).join("")}<button class="rdc" onclick="emoSlots()">${SVGI.gear}</button></div><button class="rdx" onclick="$('#pkrad').hidden=true" aria-label="Yopish">&times;</button>`;r.hidden=false;emoApply()}
+function radialPick(i){$("#pkrad").hidden=true;doEmote(S.gem[i])}
+function doEmote(id){if(!PK.me||!PK.on||PK.switching)return;const e=EMI[id];if(!e||e.k!=="game"||!owns(id))return;if(!PK.P.grounded)return appToast("Emote faqat yerda ishlaydi");
+ const u=PK.me.userData;if(u.em)emoteStop(PK.me);emoteStart(PK.me,id,PK.mt);PK.emoN=(PK.emoN%9999)+1;PK.emoId=id;if(PK.room)PK.room.presence({em:id+"."+PK.emoN}).catch(()=>{})}
+function cancelEmote(){if(!PK.me||!PK.me.userData.em)return;emoteStop(PK.me);PK.emoId="";if(PK.room)PK.room.presence({em:""}).catch(()=>{})}
+const CHAT={msgs:[],open:false,unread:0};
+function blkList(){try{return JSON.parse(localStorage.getItem("gs_blk")||"[]")}catch(e){return[]}}
+function chatToggle(){const p=$("#pkchp");if(!p)return;CHAT.open=!CHAT.open;p.hidden=!CHAT.open;if(CHAT.open){CHAT.unread=0;chatPaint();setTimeout(()=>{const i=$("#pkci");if(i)i.focus()},50)}chatBadge()}
+function chatBadge(){const b=$("#pkcn");if(b){b.hidden=!CHAT.unread;b.textContent=CHAT.unread>9?"9+":CHAT.unread}}
+function chatRecv(m){if(m.u&&blkList().includes(m.u))return;CHAT.msgs.push(m);if(CHAT.msgs.length>60)CHAT.msgs.shift();if(CHAT.open)chatPaint();else{CHAT.unread++;chatBadge()}}
+function chatPaint(){const l=$("#pkcl");if(!l)return;const near=l.scrollHeight-l.scrollTop-l.clientHeight<60;
+ l.innerHTML=CHAT.msgs.length?CHAT.msgs.map((m,i)=>`<div class="cm" onclick="pchatMenu(${i})">${avImg({g:m.g})}<div><b>${esc(m.n||"O‘yinchi")}</b><span>${esc(m.text)}</span></div></div>`).join(""):'<p class="empty">Bu xonadagi o‘yinchilar bilan yozishing. Faqat shu serverdagi o‘yinchilar ko‘radi.</p>';
+ if(near||true)l.scrollTop=l.scrollHeight}
+function chatSend(){const i=$("#pkci");if(!i)return;const t=i.value.trim();if(!t)return;if(!PK.room||!PK.room.chat)return appToast("Multiplayer serverga ulanmagan. Chat ishlamayapti");
+ const now=Date.now();if(CHAT.last&&now-CHAT.last<1200)return appToast("Juda tez yozyapsiz");CHAT.last=now;PK.room.chat(t.slice(0,120));i.value=""}
+function pchatMenu(i){const m=CHAT.msgs[i];if(!m)return;const mine=m.u&&m.u===gsUid();
+ sheet(`<h3>${esc(m.n||"O‘yinchi")}</h3><p style="word-break:break-word">${esc(m.text)}</p>${mine||!m.u?"":`<button class="btn sec" onclick="chatBlock('${m.u}')">Bloklash</button><button class="btn sec" onclick="chatReport(${i})">Shikoyat qilish</button>`}<button class="btn sec" onclick="closeM()">Yopish</button>`)}
+function chatBlock(u){const b=blkList();if(!b.includes(u)){b.push(u);try{localStorage.setItem("gs_blk",JSON.stringify(b.slice(-200)))}catch(e){}}CHAT.msgs=CHAT.msgs.filter(m=>m.u!==u);closeM();chatPaint();appToast("Foydalanuvchi bloklandi")}
+async function chatReport(i){const m=CHAT.msgs[i];if(!m)return;closeM();try{await shopCall("report",{target:m.u||"",text:String(m.text).slice(0,120),room:PK.shard||0});appToast("Shikoyat yuborildi")}catch(e){appToast(e.message||"Shikoyat yuborilmadi")}}
+
+/* ---- Rainbow Parkour SHOP: Flying Carpet ---- */
+const carpOwned=id=>owns(id);
+function carpetSec(){const on=carpetOn(),left=on?Math.max(0,Math.ceil((PK.carpetUntil-Date.now())/1000)):0;
+ return `<div class="shs" id="sh-carpet"><h4>FLYING CARPET</h4>${on?`<p class="note">Faol gilam: <b style="color:#fde047">${fmtMS(left)}</b> qoldi</p>`:""}<div class="spg">${CARP.map((c,i)=>{const own=carpOwned(c.id),can=S.gems>=c.price;
+  return `<div class="spc ${own?"own":""}"><div class="cpi" style="--h:${[0,35,-40][i]}deg"><img src="${CARPET_ART}" alt="Flying Carpet"><i>${c.min} daq</i></div><b class="spx">${c.min} daqiqalik gilam</b><div class="pr">${ic("crystal",20)} ${c.price} CL</div><span class="stc ${own?"mid":""}">${own?"Inventarda":"Sotib olinmagan"}</span>
+  ${own?`<button class="btn sm go" ${on?"disabled":""} onclick="carpetUse('${c.id}')">${on?"Faol":"START / USE"}</button>`:`<button class="btn sm" ${can?"":"disabled"} onclick="carpetBuy('${c.id}')">${can?"Sotib olish":"CL yetmaydi"}</button>`}</div>`}).join("")}</div><small class="note">Sotib olingan gilam inventarda qoladi va qayta-qayta ishlatiladi. Bir vaqtda bitta gilam ishlaydi. Gilam bilan uchganda natija reytingga yozilmaydi.</small></div>`}
+async function carpetBuy(id){if(!(await buyCat(id)))return;appToast("Gilam inventarga qo‘shildi");shopRefresh()}
+function carpetUse(id){const c=CARP.find(x=>x.id===id);if(!c||!owns(id))return;if(carpetOn())return appToast("Gilam allaqachon ishlayapti");
+ PK.carpetUntil=Date.now()+c.min*60000;closeM();toast(c.min+" daqiqalik Flying Carpet boshlandi!");navigator.vibrate&&navigator.vibrate(30)}
+
+function soLed(){SO.n=(SO.n||0)+1;if(SV.ok&&SO.n%8===1){svLoadLedger().then(()=>{const n=recvNew();if(n.length&&SO.rn!==n[0].t){SO.rn=n[0].t;appToast("+"+n[0].amt+" CL: "+(n[0].nk||"do‘st")+" yubordi")}bellPaint()}).catch(()=>{})}}
+function reqSheet(){const rv=SV.led?recvNew():[];
+ sheet(`<h3>Bildirishnomalar</h3>${rv.length?rv.map(r=>`<div class="plan" style="padding:9px 12px;margin-bottom:6px"><span>${ic("crystal",22)} <b>${esc(r.nk||"Do‘st")}</b> sizga CL yubordi</span><b style="color:#6ee7b7">+${r.amt} CL</b></div>`).join(""):""}${SO.req.length?SO.req.map(u=>`<div class="row">${avBox(u,44)}<div class="g"><b>${esc(u.n)}</b><small>Do‘st bo‘lishni so‘rayapti</small></div><button class="btn sm" onclick="frAct('accept','${u.uid}','Do‘st qo‘shildi')">Qabul</button><button class="btn sm sec" onclick="frAct('decline','${u.uid}')">Rad</button></div>`).join(""):""}${!rv.length&&!SO.req.length?"<p>Yangi bildirishnoma yo‘q.</p>":""}<button class="btn sec" onclick="closeM()">Yopish</button>`);recvMark();setTimeout(bellPaint,50)}
 
 function pvView(y,p){PV.auto=false;PV.ty=y;PV.tp=p}
 function pvStop(){PV.on=false;cancelAnimationFrame(PV.raf);if(PV.r){try{PV.r.dispose();PV.r.forceContextLoss&&PV.r.forceContextLoss()}catch(e){}PV.r=null}}
@@ -2444,13 +2778,13 @@ function svPaint(){const e=$("#clv");if(e)e.textContent=S.gems;
 
 /* ---- ledger: balance is calculated from server records, never typed by the user ---- */
 function calcLedger(rows,adminUid){let cl=0,pe=0;
- const l=rows.filter(r=>r.type==="spend"||(r.type==="grant"&&adminUid&&r.by===adminUid)).sort((a,b)=>(a.t||0)-(b.t||0));
+ const l=rows.filter(r=>r.type==="spend"||(r.type==="grant"&&((adminUid&&r.by===adminUid)||r.sys===1))).sort((a,b)=>(a.t||0)-(b.t||0));
  for(const r of l){if(r.cur==="cl")cl+=(r.type==="grant"?1:-1)*(+r.amt||0);
   else if(r.cur==="prem"&&r.type==="grant"){pe=addMonths(Math.max(pe,r.t||0),+r.months||0)}}
  return{cl:Math.max(0,Math.round(cl)),pe}}
 async function ledgerOf(uid){const s=await svc("ledger").where("uid","==",uid).get();return s.docs.map(d=>({id:d.id,...d.data()}))}
 async function svLoadLedger(){SV.led=await ledgerOf(SV.uid);svCalc()}
-function svCalc(){const c=calcLedger(SV.led,SV.adminUid);SV.led.forEach(r=>{if(r.type==="spend"&&/^av:/.test(r.ref||"")){const id=String(r.ref).slice(3);if((ITM[id]||AVP[id]!==undefined)&&!S.avOwned.includes(id))S.avOwned.push(id)}});S.gems=c.cl;SV.premEnd=c.pe;S.premium=c.pe>Date.now();svPaint()}
+function svCalc(){const c=calcLedger(SV.led,SV.adminUid);SV.led.forEach(r=>{if(r.type==="spend"&&/^av:/.test(r.ref||"")){const id=String(r.ref).slice(3);if(CAT[id]&&!S.avOwned.includes(id))S.avOwned.push(id)}});S.gems=c.cl;SV.premEnd=c.pe;S.premium=c.pe>Date.now();svPaint()}
 function spendCL(n,ref){
  if(!SV.ok||!(n>=0)||S.gems<n)return false;
  const id=rid("s"),r={uid:SV.uid,type:"spend",cur:"cl",amt:n,ref:ref||"",by:SV.uid,t:Date.now()};
@@ -2745,7 +3079,7 @@ function wheelHud(){
  const P=PK.P;if(!P)return;const d=Math.hypot(P.x-WHL.x,P.z-WHL.z),near=d<8.5&&!WSP.on,b=$("#pkwheel");
  if(b){if(PK._nw!==near){PK._nw=near;b.hidden=!near}
   if(near){const rem=wheelRemain(),t=!SV.ok?"BARABAN · server yo‘q":rem>0?"BARABAN · "+fmtHMS(rem):"BARABAN · BEPUL";if(PK._wt!==t){PK._wt=t;b.lastChild.textContent=t}}}
- const c=$("#pkcarpet");if(c){const on=carpetOn();if(on){const s=Math.max(0,Math.ceil((PK.carpetUntil-Date.now())/1000));c.hidden=false;const t="Uchar gilam · 0:"+String(s).padStart(2,"0");if(PK._ct!==t){PK._ct=t;c.lastChild.textContent=t}PK._cwas=1}else{if(!c.hidden)c.hidden=true;if(PK._cwas){PK._cwas=0;toast("Uchar gilam tugadi")}}}}
+ const c=$("#pkcarpet");if(c){const on=carpetOn();if(on){const s=Math.max(0,Math.ceil((PK.carpetUntil-Date.now())/1000));c.hidden=false;const t="Uchar gilam · "+fmtMS(s);if(PK._ct!==t){PK._ct=t;c.lastChild.textContent=t}PK._cwas=1}else{if(!c.hidden)c.hidden=true;if(PK._cwas){PK._cwas=0;toast("Uchar gilam tugadi")}}}}
 const fmtHMS=ms=>{const s=Math.max(0,Math.ceil(ms/1000)),p=n=>String(n).padStart(2,"0");return p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60)};
 const wheelRemain=()=>SV.wheel&&SV.wheel.last?Math.max(0,SV.wheel.last+WCD-Date.now()):0;
 async function wheelLoad(){const d=await svc("wheel").doc(SV.uid).get();SV.wheel=d.exists?d.data():{last:0};
@@ -2797,7 +3131,7 @@ function soBuild(){const me=gsUid();CHATS.length=0;
  FRIENDS.forEach(f=>{const pair=[me,f.uid].sort().join("_"),ms=SO.msgs.filter(m=>m.pair===pair);
   CHATS.push({id:f.uid,n:f.n,grp:0,m:ms.map(m=>[m.text,m.a===me?1:0,"",m.t]),t:ms.length?ms[ms.length-1].t:0})});
  CHATS.sort((x,y)=>y.t-x.t)}
-function bellPaint(){const b=$("#bell");if(!b)return;b.style.position="relative";b.innerHTML=ic("bell",28)+(SO.req.length?'<span class="rd" style="position:absolute;top:5px;right:5px;margin:0"></span>':"")}
+function bellPaint(){const b=$("#bell");if(!b)return;b.style.position="relative";b.innerHTML=ic("bell",28)+(SO.req.length||(SV.led&&recvNew().length)?'<span class="rd" style="position:absolute;top:5px;right:5px;margin:0"></span>':"")}
 function soPaint(){
  bellPaint();
  if(S.tab==="chat"&&typeof S.chat==="string"){
@@ -2815,7 +3149,7 @@ async function soSync(){
   const fs=new Set(FRIENDS.map(f=>f.uid));
   SO.online=j.online.map(p=>soUser({...p,on:1,fr:fs.has(p.uid)}));
   USERS.length=0;[...FRIENDS,...SO.online.filter(u=>!u.fr)].forEach(u=>USERS.push(u));
-  SO.req=j.req.map(p=>soUser(p));SO.out=j.out||[];SO.msgs=j.msgs||[];soBuild();SO.ok=true;SO.err=false;try{localStorage.setItem("gs_so_"+gsUid(),JSON.stringify({f:j.friends,r:j.req,o:j.out||[],m:(j.msgs||[]).slice(-200)}))}catch(e){}
+  SO.req=j.req.map(p=>soUser(p));SO.out=j.out||[];SO.msgs=j.msgs||[];soBuild();soLed();SO.ok=true;SO.err=false;try{localStorage.setItem("gs_so_"+gsUid(),JSON.stringify({f:j.friends,r:j.req,o:j.out||[],m:(j.msgs||[]).slice(-200)}))}catch(e){}
   const sig=JSON.stringify([FRIENDS.map(f=>f.uid+f.on),SO.online.map(u=>u.uid),SO.req.map(u=>u.uid),SO.out,SO.msgs.length]);
   if(sig!==SO.sig){SO.sig=sig;soPaint()}
  }catch(e){console.warn("soSync",e);SO.err=true;if(!SO.warned){SO.warned=1;appToast("Server bilan aloqa yo‘q. Do‘stlar saqlangan nusxadan ko‘rsatilmoqda")}}
@@ -2824,7 +3158,6 @@ function soFind(v){clearTimeout(SO.st);const q=v.trim().toLowerCase();
  if(q.length<2||!/^[a-z0-9_]+$/.test(q)){SO.res=[];return}
  SO.st=setTimeout(async()=>{try{const j=await soCall("search",{q});SO.res=j.users.map(soUser);const e=$("#sr");if(e&&S.q.trim().toLowerCase()===q)e.innerHTML=searchHTML()}catch(e){}},350)}
 async function frAct(op,id,msg){try{await soCall(op,{to:id});closeM();if(msg)appToast(msg);SO.sig="";SO.busy=false;await soSync();if(!$("#modal").innerHTML.trim())render()}catch(e){info("Xatolik",esc(e.message||"Xatolik"))}}
-function reqSheet(){sheet(`<h3>Bildirishnomalar</h3>${SO.req.length?SO.req.map(u=>`<div class="row">${avBox(u,44)}<div class="g"><b>${esc(u.n)}</b><small>Do‘st bo‘lishni so‘rayapti</small></div><button class="btn sm" onclick="frAct('accept','${u.uid}','Do‘st qo‘shildi')">Qabul</button><button class="btn sm sec" onclick="frAct('decline','${u.uid}')">Rad</button></div>`).join(""):`<p>Yangi bildirishnoma yo‘q.</p>`}<button class="btn sec" onclick="closeM()">Yopish</button>`)}
 function frRows(list){return list.length?list.map(u=>`<div class="row">${avBox(u,44)}<div class="g"><b>${esc(u.n)}</b><small>@${esc(u.un)}</small></div>${u.st==="friend"?`<button class="btn sm sec" disabled>Do‘st</button>`:u.st==="sent"?`<button class="btn sm sec" disabled>Yuborildi</button>`:u.st==="got"?`<button class="btn sm" onclick="frAct('accept','${u.uid}','Do‘st qo‘shildi')">Qabul</button>`:`<button class="btn sm" onclick="frAct('add','${u.uid}','So‘rov yuborildi')">Qo‘shish</button>`}</div>`).join(""):`<p class="empty">Topilmadi.</p>`}
 function addFriendSheet(){sheet(`<h3>Do‘st qo‘shish</h3><p>Do‘stingizning foydalanuvchi nomini yozing.</p><input id="fq" maxlength="16" autocapitalize="none" autocomplete="off" placeholder="Foydalanuvchi nomi"><div id="frs" style="max-height:38vh;overflow:auto;margin-top:8px"></div><button class="btn sec" onclick="closeM()">Yopish</button>`);
  let t;$("#fq").oninput=e=>{clearTimeout(t);const v=e.target.value.trim().toLowerCase();t=setTimeout(async()=>{const box=$("#frs");if(!box)return;if(v.length<2||!/^[a-z0-9_]+$/.test(v)){box.innerHTML="";return}
@@ -2949,7 +3282,7 @@ loadLocal();render(true);layoutApp();addEventListener("resize",layoutApp);addEve
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("/sw.js").catch(()=>{});
 if(!gsUn()){showGate("new")}
 else{
- svInit().then(()=>{if(S.tab==="profile"||S.tab==="chat")render();return soSync()});
+ svInit().then(()=>{if(S.tab==="profile"||S.tab==="chat")render();custLoad();return soSync()});
  setInterval(soSync,4000);loadUserGames();
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)soSync()});
 }

@@ -506,6 +506,112 @@ async function unpublishGame(body) {
   return [200, { ok: true }];
 }
 
+
+// ---------- DO'KON: server narxni tekshiradi, profil sozlamalari, CL yuborish, shikoyat ----------
+const CATALOG = {"boy":0,"dgirl":0,"dboy":119,"girl":99,"evil":799,"ice":1099,"rainbow":1499,"s_fire":450,"s_ice":450,"s_rainbow":600,"s_torn":250,"s_gset":350,"s_hood":700,"p_classic":150,"p_shorts":200,"p_bb":400,"p_rainbow":550,"p_green":600,"f_black":150,"f_white":300,"f_rainbow":500,"f_smoke":800,"f_ice":1000,"h_gojo":277,"h_pink":250,"h_trash":200,"h_half":350,"h_rainbow":400,"h_blue":700,"m_gojo":117,"m_green":250,"m_mouth":300,"m_obanai":450,"m_rainbow":500,"m_blue":750,"m_shadow":900,"hd_phones":220,"hd_horns":480,"hd_halo":950,"hd_crown":1400,"bk_neon":1250,"bk_fire":1800,"bk_ice":1800,"bk_rainbow":2300,"au_bolt":1600,"au_fire":1900,"au_ice":1900,"au_shadow":2100,"au_rainbow":2600,"ob_orbs":700,"ob_stars":1050,"ob_crystal":1350,"sd_cat":900,"sd_robot":1250,"sd_dragon":2400,"ft_ice":600,"ft_fire":750,"ft_rainbow":980,"ft_bolt":1150,"bg_dark":180,"bg_ice":640,"bg_fire":720,"bg_rainbow":1150,"bg_forest":1320,"bg_neon":1480,"bg_crystal":1960,"bg_galaxy":2350,"em_wave":0,"em_laugh":0,"em_dance":0,"em_clap":0,"em_victory":0,"em_crazy":699,"em_cry":699,"em_salute":249,"em_shrug":349,"em_flex":560,"em_spin":880,"em_sit":1100,"em_flip":1480,"pe_sky":3199,"pe_hero":3499,"pe_throne":2799,"cp_1":59,"cp_3":119,"cp_5":199};
+const AVATARS = ["boy", "dgirl", "dboy", "girl", "evil", "ice", "rainbow"];
+const EQ_PREFIX = ["s_", "p_", "f_", "h_", "m_", "hd_", "bk_", "au_", "ob_", "sd_", "ft_"];
+const ledgerOf = async (uid) => (await rowsBy("ledger", "uid", uid, 5000)).map((r) => ({ id: r.id, ...r.data }));
+const ownedOf = (rows) => { const o = new Set(); for (const r of rows) if (r.type === "spend" && /^av:/.test(r.ref || "")) o.add(String(r.ref).slice(3)); return o; };
+const canUse = (id, owned) => CATALOG[id] !== undefined && (CATALOG[id] === 0 || owned.has(id));
+async function nickOf(uid) { const u = (await getDoc("users", uid)) || {}, n = (await getDoc("uname", uid)) || {}; return str(u.nick || n.un || "Player", 16); }
+
+async function shopApi(b) {
+  const uid = String(b.uid || "");
+  if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
+  if (!(await getDoc("uname", uid))) return [403, { error: "Avval akkaunt yarating" }];
+  const op = String(b.op || "");
+
+  if (op === "cust_get") {
+    const t = String(b.target || uid);
+    if (!UID_RE.test(t)) return bad("foydalanuvchi");
+    const c = await getDoc("cust", t);
+    if (!c) return [200, { cust: null }];
+    const o = { eq: c.eq || "", bg: c.bg || "", pem: c.pem || "", g: c.g || "boy", t: c.t || 0 };
+    if (t === uid) o.gem = c.gem || null;
+    return [200, { cust: o }];
+  }
+
+  if (op === "cust_set") {
+    const rows = await ledgerOf(uid), owned = ownedOf(rows), out = {};
+    const codes = String(b.eq || "").split(",").slice(0, 11);
+    out.eq = EQ_PREFIX.map((pre, i) => { const id = (codes[i] || "").replace(/[^a-z0-9_]/g, ""); return id && id.startsWith(pre) && canUse(id, owned) ? id : ""; }).join(",");
+    const g = String(b.g || "boy"); out.g = AVATARS.includes(g) && canUse(g, owned) ? g : "boy";
+    const bg = String(b.bg || ""); out.bg = bg.startsWith("bg_") && canUse(bg, owned) ? bg : "";
+    const pem = String(b.pem || ""); out.pem = pem.startsWith("pe_") && canUse(pem, owned) ? pem : "";
+    const gem = Array.isArray(b.gem) ? b.gem.slice(0, 5).map((x) => String(x)) : [];
+    const free = ["em_wave", "em_laugh", "em_dance", "em_clap", "em_victory"], seen = new Set();
+    out.gem = [0, 1, 2, 3, 4].map((i) => { let id = gem[i]; if (!id || !id.startsWith("em_") || !canUse(id, owned) || seen.has(id)) id = free.find((f) => !seen.has(f) && !gem.includes(f)) || free.find((f) => !seen.has(f)); seen.add(id); return id; });
+    out.t = Date.now();
+    await putDoc("cust", uid, out);
+    const u = (await getDoc("users", uid)) || {};
+    if (u.g !== out.g) await putDoc("users", uid, { ...u, g: out.g });
+    return [200, { ok: true, cust: out }];
+  }
+
+  if (op === "buy") {
+    const id = String(b.id || "");
+    if (!/^[a-z0-9_]{2,24}$/.test(id) || CATALOG[id] === undefined) return bad("buyum topilmadi");
+    if (blocked("buy|" + uid, 60)) return [429, { error: "Juda ko'p so'rov" }];
+    addTry("buy|" + uid);
+    return serial(async () => {
+      const rows = await ledgerOf(uid), lid = "buy_" + uid + "_" + id, price = CATALOG[id];
+      if (ownedOf(rows).has(id)) return [200, { ok: true, already: true, lid, price }];
+      if (price === 0) return [200, { ok: true, free: true, lid, price }];
+      if (calcBal(rows) < price) return [409, { error: "CL yetarli emas" }];
+      await putDoc("ledger", lid, { uid, type: "spend", cur: "cl", amt: price, ref: "av:" + id, by: uid, t: Date.now() });
+      return [200, { ok: true, lid, price }];
+    });
+  }
+
+  if (op === "send_cl") {
+    const to = String(b.to || ""), amt = Math.floor(+b.amt), key = String(b.key || "");
+    if (!UID_RE.test(to) || to === uid) return bad("qabul qiluvchi noto'g'ri");
+    if (!(amt >= 1 && amt <= 1000000)) return bad("miqdor noto'g'ri");
+    if (!/^[A-Za-z0-9_]{6,40}$/.test(key)) return bad("kalit noto'g'ri");
+    if (blocked("tx|" + uid, 20)) return [429, { error: "Juda ko'p transfer, birozdan keyin urinib ko'ring" }];
+    return serial(async () => {
+      if (!(await getDoc("uname", to))) return [404, { error: "Qabul qiluvchi topilmadi" }];
+      const sid = "xs_" + uid + "_" + key, rid2 = "xr_" + uid + "_" + key, xid = "x_" + uid + "_" + key;
+      const had = await getDoc("ledger", sid);
+      if (!had) {
+        const rows = await ledgerOf(uid);
+        if (calcBal(rows) < amt) return [409, { error: "CL yetarli emas" }];
+        addTry("tx|" + uid);
+        await putDoc("ledger", sid, { uid, type: "spend", cur: "cl", amt, ref: "send:" + to, by: uid, t: Date.now() });
+      }
+      const fn = await nickOf(uid), tn = await nickOf(to), now = Date.now();
+      if (!(await getDoc("ledger", rid2))) await putDoc("ledger", rid2, { uid: to, type: "grant", cur: "cl", amt, ref: "recv:" + uid, by: "sys", sys: 1, nk: fn, t: now });
+      if (!(await getDoc("xfer", xid))) await putDoc("xfer", xid, { from: uid, to, amt, fn, tn, t: now });
+      return [200, { ok: true, dup: !!had }];
+    });
+  }
+
+  if (op === "xfer_list") {
+    const r = await sb("docs?collection=eq.xfer&or=(data->>from.eq." + uid + ",data->>to.eq." + uid + ")&order=updated_at.desc&limit=30&select=id,data");
+    return [200, { list: r.map((x) => x.data).sort((p, q) => q.t - p.t) }];
+  }
+
+  if (op === "report") {
+    if (blocked("rep|" + uid, 10)) return [429, { error: "Juda ko'p shikoyat" }];
+    addTry("rep|" + uid);
+    const id = "r" + Date.now() + nodeCrypto.randomBytes(3).toString("hex");
+    await putDoc("rep", id, { from: uid, target: UID_RE.test(String(b.target || "")) ? String(b.target) : "", text: str(b.text, 120), room: str(b.room, 12), t: Date.now() });
+    return [200, { ok: true }];
+  }
+  return bad("op");
+}
+
+// ---------- chat: filtr va tezlik cheklovi ----------
+const BADW = ["fuck", "fucking", "shit", "bitch", "cunt", "dick", "pussy", "asshole", "nigga", "nigger", "porn", "sik", "siktir", "skay", "qotaq", "jalab", "blyat", "blya", "suka", "pidor", "xuy", "huy", "ebat"];
+const BADRE = new RegExp("(^|[^\\p{L}])(" + BADW.join("|") + ")(?=[^\\p{L}]|$)", "giu");
+function chatClean(t) {
+  t = String(t == null ? "" : t).replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
+  if (!t) return "";
+  t = t.replace(/https?:\/\/\S+|www\.\S+|\S+\.(com|net|org|uz|ru|me|io|ly|gg)\b\S*/gi, "***");
+  return t.replace(BADRE, (m, p) => p + "***");
+}
+
 async function api(name, body, ip) {
   if (!HAS_DB) return [503, { error: "baza ulanmagan" }];
   if (name === "register") return register(body);
@@ -513,6 +619,7 @@ async function api(name, body, ip) {
   if (name === "player") return playerApi(body);
   if (name === "db") return dbApi(body);
   if (name === "social") return social(body);
+  if (name === "shop") return shopApi(body);
   if (name === "publish") return publishGame(body);
   if (name === "games_list") return gamesList();
   if (name === "game") return gameGet(body);
@@ -602,7 +709,8 @@ function clean(p) {
   if ("n" in p) o.n = String(p.n).slice(0, 16);
   if ("g" in p) o.g = String(p.g).slice(0, 12);
   if ("pk" in p) o.pk = 1;
-  if ("e" in p) o.e = String(p.e).replace(/[^a-z0-9_,]/g, "").slice(0, 70);
+  if ("e" in p) o.e = String(p.e).replace(/[^a-z0-9_,]/g, "").slice(0, 150);
+  if ("em" in p) o.em = /^em_[a-z]{1,12}\.\d{1,5}$/.test(String(p.em)) ? String(p.em) : "";
   for (const k of ["x", "y", "z", "r"]) if (k in p) o[k] = num(p[k]);
   for (const k of ["m", "j"]) if (k in p) o[k] = p[k] ? 1 : 0;
   return o;
@@ -643,14 +751,27 @@ wss.on("connection", (ws) => {
       const r = rooms.get(code) || new Set();
       if (r.size >= MAX_PER_ROOM) return send(ws, { t: "full" });
       ws.p = clean(m.p);
+      ws.uid = "";
+      if (m.uid && m.secret && /^u[a-f0-9]{16}$/.test(String(m.uid))) checkAuth(String(m.uid), String(m.secret)).then((ok) => { if (ok) { ws.uid = String(m.uid); ws.p.u = ws.uid; } }).catch(() => {});
       ws.room = code;
       rooms.set(code, r);
       send(ws, { t: "joined", id: ws.id, peers: [...r].map((c) => ({ id: c.id, p: c.p })) });
       r.add(ws);
       broadcast(ws, { t: "pres", id: ws.id, p: ws.p });
     } else if (m.t === "pres" && ws.room) {
+      const u0 = ws.p.u;
       ws.p = Object.assign(ws.p, clean(m.p));
+      if (u0) ws.p.u = u0;
       broadcast(ws, { t: "pres", id: ws.id, p: ws.p });
+    } else if (m.t === "chat" && ws.room) {
+      if (!ws.uid) return send(ws, { t: "chat", id: 0, n: "GAMESET", text: "Chat uchun akkauntga kiring" });
+      const now = Date.now(), text = chatClean(m.text);
+      ws.ch = ws.ch || { last: 0, hist: [], txt: "", tt: 0 };
+      ws.ch.hist = ws.ch.hist.filter((x) => now - x < 30000);
+      if (!text || now - ws.ch.last < 900 || ws.ch.hist.length >= 12 || (text === ws.ch.txt && now - ws.ch.tt < 8000)) return;
+      ws.ch.last = now; ws.ch.hist.push(now); ws.ch.txt = text; ws.ch.tt = now;
+      const r = rooms.get(ws.room);
+      if (r) for (const c of r) send(c, { t: "chat", id: ws.id, u: ws.uid, n: ws.p.n, g: ws.p.g, text, ts: now });
     }
   });
 
