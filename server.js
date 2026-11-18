@@ -508,7 +508,8 @@ async function unpublishGame(body) {
 
 
 // ---------- DO'KON: server narxni tekshiradi, profil sozlamalari, CL yuborish, shikoyat ----------
-const CATALOG = {"boy":0,"dgirl":0,"dboy":119,"girl":99,"evil":799,"ice":1099,"rainbow":1499,"s_fire":450,"s_ice":450,"s_rainbow":600,"s_torn":250,"s_gset":350,"s_hood":700,"p_classic":150,"p_shorts":200,"p_bb":400,"p_rainbow":550,"p_green":600,"f_black":150,"f_white":300,"f_rainbow":500,"f_smoke":800,"f_ice":1000,"h_gojo":277,"h_pink":250,"h_trash":200,"h_half":350,"h_rainbow":400,"h_blue":700,"m_gojo":117,"m_green":250,"m_mouth":300,"m_obanai":450,"m_rainbow":500,"m_blue":750,"m_shadow":900,"hd_phones":220,"hd_horns":480,"hd_halo":950,"hd_crown":1400,"bk_neon":1250,"bk_fire":1800,"bk_ice":1800,"bk_rainbow":2300,"au_bolt":1600,"au_fire":1900,"au_ice":1900,"au_shadow":2100,"au_rainbow":2600,"ob_orbs":700,"ob_stars":1050,"ob_crystal":1350,"sd_cat":900,"sd_robot":1250,"sd_dragon":2400,"ft_ice":600,"ft_fire":750,"ft_rainbow":980,"ft_bolt":1150,"bg_dark":180,"bg_ice":640,"bg_fire":720,"bg_rainbow":1150,"bg_forest":1320,"bg_neon":1480,"bg_crystal":1960,"bg_galaxy":2350,"em_wave":0,"em_laugh":0,"em_dance":0,"em_clap":0,"em_victory":0,"em_crazy":699,"em_cry":699,"em_salute":249,"em_shrug":349,"em_flex":560,"em_spin":880,"em_sit":1100,"em_flip":1480,"pe_sky":3199,"pe_hero":3499,"pe_throne":2799,"cp_1":59,"cp_3":119,"cp_5":199};
+const CATALOG = {"boy":0,"dgirl":0,"dboy":119,"girl":99,"evil":799,"ice":1099,"rainbow":1499,"s_fire":450,"s_ice":450,"s_rainbow":600,"s_torn":250,"s_gset":350,"s_hood":700,"p_classic":150,"p_shorts":200,"p_bb":400,"p_rainbow":550,"p_green":600,"f_black":150,"f_white":300,"f_rainbow":500,"f_smoke":800,"f_ice":1000,"h_gojo":277,"h_pink":250,"h_trash":200,"h_half":350,"h_rainbow":400,"h_blue":700,"m_gojo":117,"m_green":250,"m_mouth":300,"m_obanai":450,"m_rainbow":500,"m_blue":750,"m_shadow":900,"hd_phones":220,"hd_horns":480,"hd_halo":950,"hd_crown":1400,"bk_neon":1250,"bk_fire":1800,"bk_ice":1800,"bk_rainbow":2300,"au_bolt":1600,"au_fire":1900,"au_ice":1900,"au_shadow":2100,"au_rainbow":2600,"ob_orbs":700,"ob_stars":1050,"ob_crystal":1350,"sd_cat":900,"sd_robot":1250,"sd_dragon":2400,"ft_ice":600,"ft_fire":750,"ft_rainbow":980,"ft_bolt":1150,"bg_dark":180,"bg_ice":640,"bg_fire":720,"bg_rainbow":1150,"bg_forest":1320,"bg_neon":1480,"bg_crystal":1960,"bg_galaxy":2350,"em_wave":0,"em_laugh":0,"em_dance":0,"em_clap":0,"em_victory":0,"em_crazy":699,"em_cry":699,"em_salute":249,"em_shrug":349,"em_flex":560,"em_spin":880,"em_sit":1100,"em_flip":1480,"pe_sky":3199,"pe_hero":3499,"pe_throne":2799};
+const CARPETS = { cp_1: { min: 1, price: 59 }, cp_3: { min: 3, price: 119 }, cp_5: { min: 5, price: 199 } };
 const AVATARS = ["boy", "dgirl", "dboy", "girl", "evil", "ice", "rainbow"];
 const EQ_PREFIX = ["s_", "p_", "f_", "h_", "m_", "hd_", "bk_", "au_", "ob_", "sd_", "ft_"];
 const ledgerOf = async (uid) => (await rowsBy("ledger", "uid", uid, 5000)).map((r) => ({ id: r.id, ...r.data }));
@@ -598,6 +599,41 @@ async function shopApi(b) {
     const id = "r" + Date.now() + nodeCrypto.randomBytes(3).toString("hex");
     await putDoc("rep", id, { from: uid, target: UID_RE.test(String(b.target || "")) ? String(b.target) : "", text: str(b.text, 120), room: str(b.room, 12), t: Date.now() });
     return [200, { ok: true }];
+  }
+
+  if (op === "carp_get") {
+    const d = (await getDoc("cpt", uid)) || {};
+    return [200, { cpn: { cp_1: d.cp_1 | 0, cp_3: d.cp_3 | 0, cp_5: d.cp_5 | 0 } }];
+  }
+  if (op === "carp_buy") {
+    const id = String(b.id || ""), key = String(b.key || ""), P = CARPETS[id];
+    if (!P) return bad("gilam topilmadi");
+    if (!/^[A-Za-z0-9_]{6,40}$/.test(key)) return bad("kalit noto'g'ri");
+    if (blocked("cb|" + uid, 40)) return [429, { error: "Juda ko'p so'rov" }];
+    return serial(async () => {
+      const lid = "cb_" + uid + "_" + key, cur = (await getDoc("cpt", uid)) || {};
+      const cpn = () => ({ cp_1: cur.cp_1 | 0, cp_3: cur.cp_3 | 0, cp_5: cur.cp_5 | 0 });
+      if (await getDoc("ledger", lid)) return [200, { ok: true, dup: true, lid, price: P.price, cpn: cpn() }];
+      const rows = await ledgerOf(uid);
+      if (calcBal(rows) < P.price) return [409, { error: "CL yetarli emas" }];
+      addTry("cb|" + uid);
+      await putDoc("ledger", lid, { uid, type: "spend", cur: "cl", amt: P.price, ref: "cp:" + id, by: uid, t: Date.now() });
+      cur[id] = (cur[id] | 0) + 1;
+      await putDoc("cpt", uid, { cp_1: cur.cp_1 | 0, cp_3: cur.cp_3 | 0, cp_5: cur.cp_5 | 0 });
+      return [200, { ok: true, lid, price: P.price, cpn: cpn() }];
+    });
+  }
+  if (op === "carp_use") {
+    const id = String(b.id || ""), P = CARPETS[id];
+    if (!P) return bad("gilam topilmadi");
+    return serial(async () => {
+      const cur = (await getDoc("cpt", uid)) || {};
+      if ((cur[id] | 0) < 1) return [409, { error: "Bu gilam inventarda yo'q, qayta sotib oling" }];
+      cur[id] = (cur[id] | 0) - 1;
+      const out = { cp_1: cur.cp_1 | 0, cp_3: cur.cp_3 | 0, cp_5: cur.cp_5 | 0 };
+      await putDoc("cpt", uid, out);
+      return [200, { ok: true, min: P.min, cpn: out }];
+    });
   }
   return bad("op");
 }
