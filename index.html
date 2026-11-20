@@ -538,6 +538,14 @@ textarea{width:100%;background:var(--card);color:var(--tx);border:1px solid var(
 #pkchp{top:calc(66px + env(safe-area-inset-top,0px));bottom:auto;max-height:70%}
 .gi{width:38px;height:38px;border-radius:10px;object-fit:cover}
 body.nohint #pkhint{display:none!important}
+.srow{display:flex;align-items:center;gap:10px;margin-top:4px}.srow .sb{flex:1;min-width:0;margin-top:0}
+.setb{flex:0 0 50px;width:50px;height:50px;border:0;padding:0;background:none;border-radius:14px;box-shadow:0 4px 14px #0007}.setb img{display:block;width:100%;height:100%;border-radius:14px;object-fit:cover}
+.srow .sb input{font-size:15px}
+.wcard{display:flex;align-items:center;gap:12px;padding:14px;border-radius:20px;margin-bottom:10px;background:linear-gradient(120deg,#0e7490,#6d28d9 60%,#be185d);border:1px solid #ffffff44;box-shadow:0 8px 24px #0006;cursor:pointer}
+.wcard .wic{width:46px;height:46px;border-radius:14px;background:#0b1030aa;display:flex;align-items:center;justify-content:center}.wcard small{display:block;color:#e0e7ff;font-size:12px}.wcard b{font-size:24px;color:#fff}.wtx{flex:1;min-width:0}
+.wplus{width:44px;height:44px;border-radius:14px;border:0;background:#fff;color:#4c1d95;font-size:30px;font-weight:900;line-height:1;padding:0}
+.wbig{padding:16px;border-radius:18px;background:linear-gradient(120deg,#0e7490,#6d28d9);margin-bottom:10px;text-align:center}.wbig small{display:block;color:#e0e7ff}.wbig b{font-size:30px}
+.pgrid .gi{width:44px;height:44px;object-fit:contain}
 </style>
 </head>
 <body>
@@ -564,7 +572,7 @@ body.nohint #pkhint{display:none!important}
  <button id="pkegg" hidden onclick="eggSheet(PK._ne)"><span data-x="star" data-s="22"></span>EGG</button>
  <button id="pkportal" hidden onclick="portalGo()"><span style="font-size:22px">🌀</span><span id="pkpt">PORTAL</span></button>
  <div id="pktrb"><b id="pktrb2">0 🏆</b></div>
- <button id="pkemo" onclick="radialOpen()" aria-label="Emote"></button><button id="pkset" onclick="settingsSheet()" aria-label="Sozlamalar"></button><div id="pkrad" hidden></div>
+ <button id="pkemo" onclick="radialOpen()" aria-label="Emote"></button><div id="pkrad" hidden></div>
  <div id="pkchp" hidden><div id="pkcl"></div><div class="cin"><input id="pkci" maxlength="120" placeholder="Xabar yozing…" onkeydown="if(event.key==='Enter')chatSend()"><button onclick="chatSend()" aria-label="Yuborish"></button></div></div>
  <button id="pkwheel" hidden onclick="wheelSheet()"><span style="font-size:22px">🏆</span>BARABAN</button>
  <div id="pkcarpet" hidden><span data-x="jump" data-s="20"></span>Uchar gilam</div>
@@ -655,7 +663,7 @@ function paintAll(){const c=$("#chips"),a=$("#al");if(!c||!a)return;
 
 /* ===== HOME ===== */
 function viewHome(){return `
-<div class="sb rv">${ic("search",26)}<input id="q" value="${esc(S.q)}" placeholder="O‘yin yoki foydalanuvchi qidirish" oninput="onSearch(this.value)"></div>
+<div class="srow rv"><button class="setb" onclick="settingsSheet()" aria-label="Sozlamalar"><img src="${ICO.gear}" alt=""></button><div class="sb">${ic("search",26)}<input id="q" value="${esc(S.q)}" placeholder="O‘yin yoki o‘yinchi qidirish" oninput="onSearch(this.value)"></div></div>
 <div id="sr" ${S.q?"":"hidden"}>${searchHTML()}</div>
 <div id="hm" ${S.q?"hidden":""}>
  <div class="st rv">Do‘stlar</div>
@@ -2183,40 +2191,40 @@ async function openBoard(tab="tr"){
 /* ===== PROFILE SHOP: avatars (3D preview), clothes, hair, accessories, pets, other ===== */
 /* ===== AVATAR SHOP 2: 32 buyum + 3 yangi avatar (hammasi haqiqiy 3D, o'yindagi personaj bilan bir xil) ===== */
 const AVL=[{id:"boy",n:"O‘g‘il bola"},{id:"dgirl",n:"Qiz bola"},{id:"dboy",n:"Street Boy"},{id:"girl",n:"Street Girl"},{id:"evil",n:"Evil Avatar",new:1},{id:"ice",n:"Ice Avatar",new:1},{id:"rainbow",n:"Rainbow Avatar",new:1}];
-const AVP={boy:0,dgirl:0,dboy:119,girl:99,evil:799,ice:1099,rainbow:1499}; /* CL narxlari */
+const AVP={boy:0,dgirl:0,dboy:1499,girl:1499,evil:3999,ice:5499,rainbow:7499}; /* CL narxlari */
 const AVALL=AVL.map(a=>a.id);
 const SLOTK=["sh","pn","fw","hr","mk","hd","bk","au","ob","sd","ft"];
 const SHOPT=[["av","Avatar"],["sh","Futbolka"],["pn","Shim"],["fw","Oyoq kiyim"],["hr","Soch"],["mk","Maska"],["hd","Bosh"],["bk","Qanot"],["au","Aura"],["ob","Aylanuvchi"],["sd","Yelka"],["ft","Izlar"],["bg","Fon"],["em","Emote"],["co","Kolleksiya"]];
 const ITEMS=[
- {id:"s_fire",slot:"sh",n:"Fire T-shirt",price:450,d:"Olovli dizayn"},
- {id:"s_ice",slot:"sh",n:"Ice T-shirt",price:450,d:"Muzli dizayn"},
- {id:"s_rainbow",slot:"sh",n:"Rainbow T-shirt",price:600,d:"Rang-barang dizayn"},
- {id:"s_torn",slot:"sh",n:"Torn T-shirt",price:250,d:"O‘rtasi yirtilgan kiyim"},
- {id:"s_gset",slot:"sh",n:"GAMESET Black T-shirt",price:350,d:"Ko‘kragida GAMESET logosi"},
- {id:"s_hood",slot:"sh",n:"White Hoodie",price:700,d:"Kapyushonli oq kiyim"},
- {id:"p_classic",slot:"pn",n:"Classic Pants",price:150,d:"Och jigarrang oddiy shim"},
- {id:"p_shorts",slot:"pn",n:"Black Shorts",price:200,d:"Qora shortik"},
- {id:"p_bb",slot:"pn",n:"Blue Black Pants",price:400,d:"Ko‘k va qora aralash shim"},
- {id:"p_rainbow",slot:"pn",n:"Rainbow Pants",price:550,d:"Rang-barang shim"},
- {id:"p_green",slot:"pn",n:"Green Effect Pants",price:600,d:"Yashil effektli shim"},
- {id:"f_black",slot:"fw",n:"Black Sneakers",price:150,d:"Oddiy qora krossovka"},
- {id:"f_white",slot:"fw",n:"White Sport Sneakers",price:300,d:"Oq sport krossovka"},
- {id:"f_rainbow",slot:"fw",n:"Rainbow Sneakers",price:500,d:"Rang-barang krossovka"},
- {id:"f_smoke",slot:"fw",n:"Green Smoke Shoes",price:800,d:"Yashil tutun chiqaradi"},
- {id:"f_ice",slot:"fw",n:"Ice Shoes",price:1000,d:"Ko‘k muz effekti chiqaradi"},
+ {id:"s_fire",slot:"sh",n:"Fire T-shirt",price:999,d:"Olovli dizayn"},
+ {id:"s_ice",slot:"sh",n:"Ice T-shirt",price:999,d:"Muzli dizayn"},
+ {id:"s_rainbow",slot:"sh",n:"Rainbow T-shirt",price:1299,d:"Rang-barang dizayn"},
+ {id:"s_torn",slot:"sh",n:"Torn T-shirt",price:699,d:"O‘rtasi yirtilgan kiyim"},
+ {id:"s_gset",slot:"sh",n:"GAMESET Black T-shirt",price:899,d:"Ko‘kragida GAMESET logosi"},
+ {id:"s_hood",slot:"sh",n:"White Hoodie",price:1499,d:"Kapyushonli oq kiyim"},
+ {id:"p_classic",slot:"pn",n:"Classic Pants",price:499,d:"Och jigarrang oddiy shim"},
+ {id:"p_shorts",slot:"pn",n:"Black Shorts",price:599,d:"Qora shortik"},
+ {id:"p_bb",slot:"pn",n:"Blue Black Pants",price:999,d:"Ko‘k va qora aralash shim"},
+ {id:"p_rainbow",slot:"pn",n:"Rainbow Pants",price:1199,d:"Rang-barang shim"},
+ {id:"p_green",slot:"pn",n:"Green Effect Pants",price:1299,d:"Yashil effektli shim"},
+ {id:"f_black",slot:"fw",n:"Black Sneakers",price:499,d:"Oddiy qora krossovka"},
+ {id:"f_white",slot:"fw",n:"White Sport Sneakers",price:799,d:"Oq sport krossovka"},
+ {id:"f_rainbow",slot:"fw",n:"Rainbow Sneakers",price:1099,d:"Rang-barang krossovka"},
+ {id:"f_smoke",slot:"fw",n:"Green Smoke Shoes",price:1699,d:"Yashil tutun chiqaradi"},
+ {id:"f_ice",slot:"fw",n:"Ice Shoes",price:2099,d:"Ko‘k muz effekti chiqaradi"},
  {id:"h_gojo",slot:"hr",n:"Gojo Hair",price:277,d:"Oq tikanak Gojo sochi"},
- {id:"h_pink",slot:"hr",n:"Pink Hair",price:250,d:"Pushti soch"},
- {id:"h_trash",slot:"hr",n:"Trash Headwear",price:200,d:"Axlat qutisi shaklidagi kulgili bosh kiyim"},
- {id:"h_half",slot:"hr",n:"Half Black Half White Hair",price:350,d:"Yarmi qora, yarmi oq soch"},
- {id:"h_rainbow",slot:"hr",n:"Rainbow Hair",price:400,d:"Rang-barang soch"},
- {id:"h_blue",slot:"hr",n:"Blue Effect Hair",price:700,d:"Ko‘k effektli soch"},
+ {id:"h_pink",slot:"hr",n:"Pink Hair",price:699,d:"Pushti soch"},
+ {id:"h_trash",slot:"hr",n:"Trash Headwear",price:599,d:"Axlat qutisi shaklidagi kulgili bosh kiyim"},
+ {id:"h_half",slot:"hr",n:"Half Black Half White Hair",price:899,d:"Yarmi qora, yarmi oq soch"},
+ {id:"h_rainbow",slot:"hr",n:"Rainbow Hair",price:999,d:"Rang-barang soch"},
+ {id:"h_blue",slot:"hr",n:"Blue Effect Hair",price:1499,d:"Ko‘k effektli soch"},
  {id:"m_gojo",slot:"mk",n:"Gojo Mask",price:117,d:"Qora Gojo maskasi"},
- {id:"m_green",slot:"mk",n:"Green Mask",price:250,d:"Yashil maska"},
- {id:"m_mouth",slot:"mk",n:"Mouth Mask",price:300,d:"O‘rtasida odam og‘zi bor maska"},
- {id:"m_obanai",slot:"mk",n:"Obanai Mask",price:450,d:"Obanai uslubidagi maska"},
- {id:"m_rainbow",slot:"mk",n:"Rainbow Mask",price:500,d:"Rang-barang maska"},
- {id:"m_blue",slot:"mk",n:"Blue Effect Mask",price:750,d:"Ko‘k effektli maska"},
- {id:"m_shadow",slot:"mk",n:"Shadow Mask",price:900,d:"Qora-binafsha qorong‘i effektli maska"}];
+ {id:"m_green",slot:"mk",n:"Green Mask",price:699,d:"Yashil maska"},
+ {id:"m_mouth",slot:"mk",n:"Mouth Mask",price:799,d:"O‘rtasida odam og‘zi bor maska"},
+ {id:"m_obanai",slot:"mk",n:"Obanai Mask",price:999,d:"Obanai uslubidagi maska"},
+ {id:"m_rainbow",slot:"mk",n:"Rainbow Mask",price:1099,d:"Rang-barang maska"},
+ {id:"m_blue",slot:"mk",n:"Blue Effect Mask",price:1599,d:"Ko‘k effektli maska"},
+ {id:"m_shadow",slot:"mk",n:"Shadow Mask",price:1899,d:"Qora-binafsha qorong‘i effektli maska"}];
 const ITM=Object.fromEntries(ITEMS.map(i=>[i.id,i]));
 const priceOf=id=>CAT[id]?CAT[id].price:undefined;
 const eqCode=e=>{e=e||{};return SLOTK.map(k=>e[k]||"").join(",")};
@@ -2415,29 +2423,29 @@ async function pvStart(id,eq,foc){PV.id=id;PV.eq=eq||{};PV.ly=(foc&&foc.ly)||1.1
 
 /* ===== KATALOG 2: bezaklar, profil fonlari, emotelar, gilamlar (hammasi CL, narxlari server bilan tekshiriladi) ===== */
 const ACCS=[
- {id:"hd_phones",slot:"hd",n:"Neon Headphones",price:220,col:"galaxy",d:"Neon quloqchinlar"},
- {id:"hd_horns",slot:"hd",n:"Shadow Horns",price:480,col:"shadow",d:"Qora-qizil shoxlar"},
- {id:"hd_halo",slot:"hd",n:"Golden Halo",price:950,col:"galaxy",d:"Boshingiz ustida nurli halqa"},
- {id:"hd_crown",slot:"hd",n:"Royal Crown",price:1400,col:"",d:"Qimmatbaho gavharli oltin toj"},
- {id:"bk_neon",slot:"bk",n:"Neon Wings",price:1250,col:"galaxy",d:"Neon nurli qanotlar"},
- {id:"bk_fire",slot:"bk",n:"Fire Wings",price:1800,col:"fire",d:"Olov qanotlari"},
- {id:"bk_ice",slot:"bk",n:"Ice Wings",price:1800,col:"ice",d:"Muz qanotlari"},
- {id:"bk_rainbow",slot:"bk",n:"Rainbow Wings",price:2300,col:"rainbow",d:"Rang-barang qanotlar"},
- {id:"au_bolt",slot:"au",n:"Lightning Aura",price:1600,col:"galaxy",d:"Atrofingizda chaqmoq"},
- {id:"au_fire",slot:"au",n:"Fire Aura",price:1900,col:"fire",d:"Olovli aura"},
- {id:"au_ice",slot:"au",n:"Ice Aura",price:1900,col:"ice",d:"Muzli aura"},
- {id:"au_shadow",slot:"au",n:"Shadow Aura",price:2100,col:"shadow",d:"Qorong‘i tutunli aura"},
- {id:"au_rainbow",slot:"au",n:"Rainbow Aura",price:2600,col:"rainbow",d:"Rang-barang aura"},
- {id:"ob_orbs",slot:"ob",n:"Glow Orbs",price:700,col:"galaxy",d:"Aylanuvchi yorqin sharlar"},
- {id:"ob_stars",slot:"ob",n:"Orbiting Stars",price:1050,col:"galaxy",d:"Atrofda aylanuvchi yulduzlar"},
- {id:"ob_crystal",slot:"ob",n:"Orbiting Crystals",price:1350,col:"galaxy",d:"Atrofda aylanuvchi kristallar"},
- {id:"sd_cat",slot:"sd",n:"Kitten",price:900,col:"nature",d:"Yelkangizdagi mushukcha"},
- {id:"sd_robot",slot:"sd",n:"Mini Robot",price:1250,col:"",d:"Yelkangizdagi mini robot"},
- {id:"sd_dragon",slot:"sd",n:"Mini Dragon",price:2400,col:"fire",d:"Yelkangizdagi mini ajdar"},
- {id:"ft_ice",slot:"ft",n:"Ice Footprints",price:600,col:"ice",d:"Muzli oyoq izlari"},
- {id:"ft_fire",slot:"ft",n:"Fire Footprints",price:750,col:"fire",d:"Olovli oyoq izlari"},
- {id:"ft_rainbow",slot:"ft",n:"Rainbow Footprints",price:980,col:"rainbow",d:"Rang-barang oyoq izlari"},
- {id:"ft_bolt",slot:"ft",n:"Lightning Footprints",price:1150,col:"galaxy",d:"Chaqmoqli oyoq izlari"}];
+ {id:"hd_phones",slot:"hd",n:"Neon Headphones",price:599,col:"galaxy",d:"Neon quloqchinlar"},
+ {id:"hd_horns",slot:"hd",n:"Shadow Horns",price:1099,col:"shadow",d:"Qora-qizil shoxlar"},
+ {id:"hd_halo",slot:"hd",n:"Golden Halo",price:1999,col:"galaxy",d:"Boshingiz ustida nurli halqa"},
+ {id:"hd_crown",slot:"hd",n:"Royal Crown",price:2799,col:"",d:"Qimmatbaho gavharli oltin toj"},
+ {id:"bk_neon",slot:"bk",n:"Neon Wings",price:2499,col:"galaxy",d:"Neon nurli qanotlar"},
+ {id:"bk_fire",slot:"bk",n:"Fire Wings",price:3499,col:"fire",d:"Olov qanotlari"},
+ {id:"bk_ice",slot:"bk",n:"Ice Wings",price:3499,col:"ice",d:"Muz qanotlari"},
+ {id:"bk_rainbow",slot:"bk",n:"Rainbow Wings",price:4399,col:"rainbow",d:"Rang-barang qanotlar"},
+ {id:"au_bolt",slot:"au",n:"Lightning Aura",price:3199,col:"galaxy",d:"Atrofingizda chaqmoq"},
+ {id:"au_fire",slot:"au",n:"Fire Aura",price:3699,col:"fire",d:"Olovli aura"},
+ {id:"au_ice",slot:"au",n:"Ice Aura",price:3699,col:"ice",d:"Muzli aura"},
+ {id:"au_shadow",slot:"au",n:"Shadow Aura",price:4099,col:"shadow",d:"Qorong‘i tutunli aura"},
+ {id:"au_rainbow",slot:"au",n:"Rainbow Aura",price:4990,col:"rainbow",d:"Rang-barang aura"},
+ {id:"ob_orbs",slot:"ob",n:"Glow Orbs",price:1499,col:"galaxy",d:"Aylanuvchi yorqin sharlar"},
+ {id:"ob_stars",slot:"ob",n:"Orbiting Stars",price:2099,col:"galaxy",d:"Atrofda aylanuvchi yulduzlar"},
+ {id:"ob_crystal",slot:"ob",n:"Orbiting Crystals",price:2699,col:"galaxy",d:"Atrofda aylanuvchi kristallar"},
+ {id:"sd_cat",slot:"sd",n:"Kitten",price:1899,col:"nature",d:"Yelkangizdagi mushukcha"},
+ {id:"sd_robot",slot:"sd",n:"Mini Robot",price:2499,col:"",d:"Yelkangizdagi mini robot"},
+ {id:"sd_dragon",slot:"sd",n:"Mini Dragon",price:4599,col:"fire",d:"Yelkangizdagi mini ajdar"},
+ {id:"ft_ice",slot:"ft",n:"Ice Footprints",price:1299,col:"ice",d:"Muzli oyoq izlari"},
+ {id:"ft_fire",slot:"ft",n:"Fire Footprints",price:1599,col:"fire",d:"Olovli oyoq izlari"},
+ {id:"ft_rainbow",slot:"ft",n:"Rainbow Footprints",price:1999,col:"rainbow",d:"Rang-barang oyoq izlari"},
+ {id:"ft_bolt",slot:"ft",n:"Lightning Footprints",price:2299,col:"galaxy",d:"Chaqmoqli oyoq izlari"}];
 const ICOL={s_fire:"fire",s_ice:"ice",s_rainbow:"rainbow",f_ice:"ice",f_rainbow:"rainbow",f_smoke:"nature",h_rainbow:"rainbow",h_blue:"ice",h_half:"shadow",m_blue:"ice",m_green:"nature",m_rainbow:"rainbow",m_shadow:"shadow",p_green:"nature",p_rainbow:"rainbow"};
 ITEMS.forEach(i=>{i.col=ICOL[i.id]||""});
 ITEMS.push(...ACCS);ITEMS.forEach(i=>{ITM[i.id]=i});
@@ -2462,15 +2470,15 @@ const EMS=[
  {id:"em_victory",n:"Victory",k:"game",price:0,d:"G‘alaba pozasi"},
  {id:"em_crazy",n:"Crazy Laugh",k:"game",price:699,d:"Tiz cho‘kib, qornini ushlab qah-qah"},
  {id:"em_cry",n:"Sad Cry",k:"game",price:699,d:"Tiz cho‘kib, yig‘lash"},
- {id:"em_salute",n:"Salute",k:"game",price:249,d:"Harbiy salom"},
+ {id:"em_salute",n:"Salute",k:"game",price:349,d:"Harbiy salom"},
  {id:"em_shrug",n:"Shrug",k:"game",price:349,d:"Yelka qisish"},
- {id:"em_flex",n:"Flex",k:"game",price:560,d:"Mushak ko‘rsatish"},
- {id:"em_spin",n:"Spin Jump",k:"game",price:880,d:"Sakrab aylanish"},
+ {id:"em_flex",n:"Flex",k:"game",price:599,d:"Mushak ko‘rsatish"},
+ {id:"em_spin",n:"Spin Jump",k:"game",price:899,d:"Sakrab aylanish"},
  {id:"em_sit",n:"Chill Sit",k:"game",price:1100,d:"Cho‘kib dam olish"},
- {id:"em_flip",n:"Backflip",k:"game",price:1480,d:"Orqaga salto"},
- {id:"pe_sky",n:"Sky Look",k:"profile",price:3199,d:"Havoda muallaq turib osmonga qarash"},
- {id:"pe_hero",n:"Hero Landing",k:"profile",price:3499,d:"Yugurib, sakrab, qahramonona qo‘nish"},
- {id:"pe_throne",n:"Flame Throne",k:"profile",price:2799,d:"Qizil olovli taxtga o‘tirish"}];
+ {id:"em_flip",n:"Backflip",k:"game",price:1299,d:"Orqaga salto"},
+ {id:"pe_sky",n:"Sky Look",k:"profile",price:4199,d:"Havoda muallaq turib osmonga qarash"},
+ {id:"pe_hero",n:"Hero Landing",k:"profile",price:5399,d:"Yugurib, sakrab, qahramonona qo‘nish"},
+ {id:"pe_throne",n:"Flame Throne",k:"profile",price:4799,d:"Qizil olovli taxtga o‘tirish"}];
 const EMI=Object.fromEntries(EMS.map(e=>[e.id,e]));
 const CARP=[{id:"cp_1",min:1,price:59},{id:"cp_3",min:3,price:119},{id:"cp_5",min:5,price:199}];
 const CAT={};
@@ -2653,6 +2661,7 @@ function viewProfile(){setTimeout(()=>stageMount($("#pstage"),S.gender,S.eq,S.pe
 <div class="phero ${bgCls(S.bg)} rv"><canvas id="pstage"></canvas>${S.pem?`<span class="phint">Avatarni bosing: ${EMI[S.pem].n}</span>`:`<span class="phint">Emote Shop da profil emotsa oling</span>`}
  <div class="pnm"><b>${esc(S.name)}</b> ${S.premium?ic("premium",22):""}${isAdmin()?'<em>ADMIN</em>':""}</div><div class="pid">${esc(gsID())}</div></div>
 <div class="pcl rv"><span class="cl">${ic("crystal",46)}</span><div><b>${S.gems} CL</b><small>CL Crystal · ${nTotal} ta sotib olingan buyum</small></div><button class="btn sm" onclick="gemShop()" ${typeof gemShop==="function"?"":"hidden"}>+ CL</button></div>
+${walletCard()}
 <div class="pgrid rv">
  <button onclick="shopSheet('av')">${ic("shop",34)}<b>Avatar Shop</b></button>
  <button onclick="shopSheet('em')"><img class="gi" src="${ICO.emote}" alt=""><b>Emote Shop</b></button>
@@ -2787,6 +2796,30 @@ function soLed(){SO.n=(SO.n||0)+1;if(SV.ok&&SO.n%8===1){svLoadLedger().then(()=>
 function reqSheet(){const rv=SV.led?recvNew():[];
  sheet(`<h3>Bildirishnomalar</h3>${rv.length?rv.map(r=>`<div class="plan" style="padding:9px 12px;margin-bottom:6px"><span>${ic("crystal",22)} <b>${esc(r.nk||"Do‘st")}</b> sizga CL yubordi</span><b style="color:#6ee7b7">+${r.amt} CL</b></div>`).join(""):""}${SO.req.length?SO.req.map(u=>`<div class="row">${avBox(u,44)}<div class="g"><b>${esc(u.n)}</b><small>Do‘st bo‘lishni so‘rayapti</small></div><button class="btn sm" onclick="frAct('accept','${u.uid}','Do‘st qo‘shildi')">Qabul</button><button class="btn sm sec" onclick="frAct('decline','${u.uid}')">Rad</button></div>`).join(""):""}${!rv.length&&!SO.req.length?"<p>Yangi bildirishnoma yo‘q.</p>":""}<button class="btn sec" onclick="closeM()">Yopish</button>`);recvMark();setTimeout(bellPaint,50)}
 
+
+/* ===== HAMYON (so'm): serverda saqlanadi, CL xaridi hamyondan yechiladi ===== */
+const walCall=(op,x)=>gsCall("wallet",{op,uid:gsUid(),secret:gsSec(),...x});
+const WAL={bal:null,list:[],busy:false};
+async function walLoad(){try{const j=await walCall("get",{});WAL.bal=j.bal;const e=$("#walbal");if(e)e.textContent=fmt(j.bal)}catch(e){}}
+function walletCard(){setTimeout(walLoad,60);return `<div class="wcard rv" onclick="walletSheet()"><div class="wic">${ic("shop",30)}</div><div class="wtx"><small>Hamyon · so‘m</small><b id="walbal">${WAL.bal===null?"…":fmt(WAL.bal)}</b></div><button class="wplus" onclick="event.stopPropagation();walTopup()" aria-label="Hamyonni to‘ldirish">+</button></div>`}
+async function walletSheet(){sheet(`<h3>Hamyon</h3><p>Yuklanmoqda…</p>`);
+ try{const j=await walCall("hist",{});WAL.bal=j.bal;WAL.list=j.list;
+  const ST={ok:["Bajarildi","#34d399"],pending:["Kutilmoqda","#fbbf24"],failed:["Muvaffaqiyatsiz","#f87171"]};
+  sheet(`<div class="wbig"><small>Joriy balans</small><b>${fmt(j.bal)}</b></div><button class="btn" onclick="walTopup()">Balansni to‘ldirish</button><h4 class="shn">Tarix</h4>${j.list.length?j.list.map(x=>{const st=ST[x.status]||[x.status,"#999"],pl=x.amt>0;return `<div class="plan" style="padding:9px 12px;margin-bottom:6px"><span><b>${x.type==="topup"?"To‘ldirish":x.type==="buycl"?"CL xaridi "+esc(x.item):esc(x.type)}</b><br><small style="color:var(--mut)">${new Date(x.t).toLocaleString()} · <span style="color:${st[1]}">${st[0]}</span><br>ID: ${esc(String(x.id).slice(0,26))}</small></span><b style="color:${pl?"#6ee7b7":"#fca5a5"}">${pl?"+":""}${fmt(x.amt)}</b></div>`}).join(""):"<p>Hali operatsiya yo‘q.</p>"}<small class="note">Tarixni faqat o‘zingiz ko‘rasiz.</small><button class="btn sec" onclick="closeM()">Yopish</button>`)}catch(e){info("Hamyon ochilmadi",esc(e.message||"Server bilan ulanib bo‘lmadi"))}}
+function walTopup(){sheet(`<h3>Balansni to‘ldirish</h3><p>Summani tanlang yoki kiriting (5 000 dan 5 000 000 so‘mgacha).</p><div class="chips shc">${[10000,25000,50000,100000,250000].map(n=>`<button class="chip" onclick="$('#wamt').value=${n}">${fmt(n)}</button>`).join("")}</div><input id="wamt" type="number" inputmode="numeric" min="5000" max="5000000" placeholder="Summa (so‘m)"><p id="wer" style="color:#ff8a8a;min-height:18px;margin:4px 0"></p>
+ <div class="plan" style="padding:10px 12px;font-size:12.5px;line-height:1.5">To‘lov hozircha <b>qo‘lda tasdiqlanadi</b>: kartaga o‘tkazib chek yuklaysiz, admin tasdiqlagach mablag‘ hamyonga tushadi. Avtomatik to‘lov provayderi ulanmagan.<br>Hamyonga komissiyadan keyin <b>haqiqatda kelgan sof summa</b> yaxlitlab tushadi: qoldiq 500 dan katta bo‘lsa yuqoriga, 500 yoki kam bo‘lsa pastga (48 600 → 49 000, 48 500 → 48 000).</div>
+ <button class="btn" id="wgo">Davom etish</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
+ $("#wgo").onclick=()=>{const n=Math.floor(+$("#wamt").value);if(!(n>=5000&&n<=5000000))return $("#wer").textContent="Summa 5 000 dan 5 000 000 gacha bo‘lsin";createOrder("wallet",n)}}
+function walBuyCl(i){const P=PACKS[i];if(!P)return;const bal=WAL.bal;
+ const go=async()=>{try{const j=await walCall("hist",{});WAL.bal=j.bal}catch(e){return info("Hamyon ochilmadi",esc(e.message||"Server bilan ulanib bo‘lmadi"))}
+  const need=P[1]-WAL.bal,ok=need<=0;
+  sheet(`<h3>${P[0]} CL sotib olish</h3><div class="plan" style="padding:10px 12px"><span>Narxi</span><b>${fmt(P[1])}</b></div><div class="plan" style="padding:10px 12px;margin-top:6px"><span>Hamyoningiz</span><b style="color:${ok?"#6ee7b7":"#fca5a5"}">${fmt(WAL.bal)}</b></div>${ok?`<p>Pul <b>hamyondan</b> yechiladi va CL balansingizga qo‘shiladi.</p><button class="btn" id="wbk">Hamyondan to‘lash</button>`:`<p style="color:#fca5a5">Hamyonda yetarli mablag‘ yo‘q: yana <b>${fmt(need)}</b> kerak. CL berilmaydi.</p><button class="btn" onclick="walTopup()">Hamyonni to‘ldirish</button>`}<button class="btn sec" onclick="gemShop()">Orqaga</button>`);
+  if(ok)$("#wbk").onclick=async()=>{if(WAL.busy)return;WAL.busy=true;$("#wbk").disabled=true;
+   try{const key=rid("w"),j=await walCall("buy_cl",{pack:i,key});WAL.bal=j.bal;await svLoadLedger();sfx("buy");closeM();toast("+"+P[0]+" CL hisobingizga qo‘shildi");render()}
+   catch(e){closeM();info("Xarid amalga oshmadi",esc(e.message||"Xatolik")+"<br>Hech qanday pul yechilmadi.")}
+   WAL.busy=false}};
+ go()}
+
 function pvView(y,p){PV.auto=false;PV.ty=y;PV.tp=p}
 function pvStop(){PV.on=false;cancelAnimationFrame(PV.raf);if(PV.r){try{PV.r.dispose();PV.r.forceContextLoss&&PV.r.forceContextLoss()}catch(e){}PV.r=null}}
 
@@ -2871,7 +2904,8 @@ async function createOrder(kind,key){
  if(!SV.ok)return info("Server ulanmagan",srvMsg);
  let item,price,amt;
  if(kind==="cl"){const k=PACKS[key];if(!k)return;item=k[0]+" CL";price=k[1];amt=k[0]}
- else{const p=PLANS.find(x=>x.id===key);if(!p)return;item="Premium · "+p.name;price=p.price;amt=PMONTHS[p.id]}
+ else if(kind==="wallet"){const n=Math.floor(+key);if(!(n>=5000&&n<=5000000))return;item="Hamyon to‘ldirish";price=n;amt=n}
+  else{const p=PLANS.find(x=>x.id===key);if(!p)return;item="Premium · "+p.name;price=p.price;amt=PMONTHS[p.id]}
  const id=rid("o"),no="GS-"+new Date().toISOString().slice(2,10).replace(/-/g,"")+"-"+Math.random().toString(36).slice(2,6).toUpperCase();
  const o={uid:SV.uid,nick:S.name,pid:SV.playerId||"",kind,item,amt,price,no,status:"new",t:Date.now(),upd:Date.now()};
  try{await svc("orders").doc(id).set(o);SV.orders.unshift({id,...o})}
@@ -2900,7 +2934,7 @@ async function payUpload(inp){const f=inp.files[0];inp.value="";if(!f||!PW.o)ret
  try{const d=await imgCompress(f);await orderMsg(PW.id,"u","",d);await svc("orders").doc(PW.id).update({status:"receipt",upd:Date.now()});
   const n={...PW.o,status:"receipt"},i=SV.orders.findIndex(x=>x.id===PW.id);if(i>=0)SV.orders[i]=n;pwPaint(n);appToast("Chek yuborildi")}
  catch(e){if(btn){btn.disabled=false;btn.textContent="📎 Chek yuklash"}appToast("Yuborilmadi, qayta urinib ko‘ring")}}
-const buyG=i=>createOrder("cl",i);
+const buyG=i=>walBuyCl(i);
 const buyP=id=>createOrder("prem",id);
 async function orderMsg(oid,from,text,img){
  await svc("omsgs").doc(rid("m")).set({oid,from,fromUid:SV.uid,text:text||"",img:img||"",t:Date.now()})}
@@ -3014,6 +3048,7 @@ async function doConfirm2(id,v){if(!await admGuard())return;
  try{const d=await svc("orders").doc(id).get();if(!d.exists)return;const o=d.data();
   if(o.status==="confirmed"){closeM();return info("Allaqachon yuborilgan","Bu buyurtma ikki marta tasdiqlanmaydi.")}
   if(o.status!=="receipt"){closeM();return info("Tasdiqlab bo‘lmaydi","Buyurtma holati o‘zgargan.")}
+  if(o.kind==="wallet"){const net=Math.floor(+(($("#cfnet")||{}).value||o.price));const j=await walCall("confirm_topup",{oid:id,net});await orderMsg(id,"s","To‘lov tasdiqlandi. Hamyonga "+fmt(j.credit)+" qo‘shildi.");closeM();return info("Tasdiqlandi","Hamyonga "+fmt(j.credit)+" tushdi (sof "+fmt(net)+", yaxlitlash farqi "+(j.credit-net)+" so‘m).")}
   const gid="g_"+id,g=await svc("ledger").doc(gid).get();
   if(!g.exists)await svc("ledger").doc(gid).set(v.kind==="cl"?{uid:o.uid,type:"grant",cur:"cl",amt:v.amt,by:SV.uid,ref:id,t:Date.now()}:{uid:o.uid,type:"grant",cur:"prem",months:v.amt,by:SV.uid,ref:id,t:Date.now()});
   await svc("orders").doc(id).update({status:"confirmed",upd:Date.now(),cBy:SV.uid,cAt:Date.now()});
@@ -3031,13 +3066,14 @@ async function admCardMsg(){if(!await admGuard())return;const o=ORM.o;if(!o)retu
 function admConfirm(){const o=ORM.o;if(!o)return;
  if(o.status==="confirmed")return info("Allaqachon tasdiqlangan","Bu buyurtma ikki marta tasdiqlanmaydi.");
  if(o.status!=="receipt")return info("Chek yo‘q","Tasdiqlash uchun foydalanuvchi chek rasmini yuborgan bo‘lishi kerak (holat: Chek yuborilgan).");
- sheet(`<h3>Buyurtmani tasdiqlash</h3><p><b>${esc(o.nick)}</b> hisobiga <b>${esc(o.item)}</b> qo‘shiladi.<br>To‘lov: ${fmt(o.price)}</p><button class="btn" id="cfok">Tasdiqlash</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
+ sheet(`<h3>Buyurtmani tasdiqlash</h3><p><b>${esc(o.nick)}</b> hisobiga <b>${esc(o.item)}</b> qo‘shiladi.<br>To‘lov: ${fmt(o.price)}</p>${o.kind==="wallet"?`<p>Komissiyadan keyin <b>haqiqatda kelgan sof summa</b> (so‘m):</p><input id="cfnet" type="number" inputmode="numeric" value="${o.price}"><small class="note">Hamyonga shu summa 1 000 so‘mga maxsus qoida bilan yaxlitlanib tushadi.</small>`:""}<button class="btn" id="cfok">Tasdiqlash</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
  $("#cfok").onclick=async()=>{if(AD.busy)return;AD.busy=true;try{await doConfirm(o.id)}finally{AD.busy=false}}}
 async function doConfirm(id){
  if(!await admGuard())return;
  try{const d=await svc("orders").doc(id).get();if(!d.exists)return;const o=d.data();                    /* fresh read: status decides, not the screen */
   if(o.status==="confirmed"){closeM();return info("Allaqachon tasdiqlangan","Bu buyurtma ikki marta tasdiqlanmaydi.")}
   if(o.status!=="receipt"){closeM();return info("Tasdiqlab bo‘lmaydi","Buyurtma holati o‘zgargan: "+(OST[o.status]||[o.status])[0])}
+  if(o.kind==="wallet"){const net=Math.floor(+(($("#cfnet")||{}).value||o.price));const j=await walCall("confirm_topup",{oid:id,net});await orderMsg(id,"s","To‘lov tasdiqlandi. Hamyonga "+fmt(j.credit)+" qo‘shildi.");closeM();return info("Tasdiqlandi","Hamyonga "+fmt(j.credit)+" tushdi (sof "+fmt(net)+", yaxlitlash farqi "+(j.credit-net)+" so‘m).")}
   const gid="g_"+id,g=await svc("ledger").doc(gid).get();                                               /* fixed grant id: can exist only once */
   if(!g.exists)await svc("ledger").doc(gid).set(o.kind==="cl"?{uid:o.uid,type:"grant",cur:"cl",amt:o.amt,by:SV.uid,ref:id,t:Date.now()}:{uid:o.uid,type:"grant",cur:"prem",months:o.amt,by:SV.uid,ref:id,t:Date.now()});
   await svc("orders").doc(id).update({status:"confirmed",upd:Date.now(),cBy:SV.uid,cAt:Date.now()});
