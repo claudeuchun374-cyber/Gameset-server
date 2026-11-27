@@ -285,13 +285,7 @@ async function dbApi(b) {
     if (col === "orders") {
       if (op === "set") {
         if (cur || d.uid !== uid) return [403, { error: "ruxsat yo'q" }];
-        let ok = false;
-        if (d.kind === "cl") ok = PACKS.some((p) => p[0] === d.amt && p[1] === d.price);
-        else if (d.kind === "prem") ok = Object.values(PLANS).some((p) => p[0] === d.amt && p[1] === d.price);
-        else if (d.kind === "wallet") ok = Number.isInteger(d.price) && d.price >= WAL_MIN && d.price <= WAL_MAX && d.amt === d.price;
-        if (!ok) return bad("buyurtma narxi noto'g'ri");
-        await putDoc("orders", id, { uid, nick: str(d.nick, 16), pid: /^\d{6,9}$/.test(String(d.pid)) ? String(d.pid) : "", kind: d.kind, item: str(d.item, 60), amt: d.amt, price: d.price, no: str(d.no, 32), status: "new", t: now, upd: now });
-        return [200, { ok: true }];
+        return [410, { error: "Buyurtma bo'limi o'chirilgan: to'lov avtomatik (Muzpin orqali)" }];
       }
       if (!cur) return [404, { error: "topilmadi" }];
       const keys = Object.keys(d);
@@ -518,8 +512,8 @@ async function unpublishGame(body) {
 
 
 // ---------- DO'KON: server narxni tekshiradi, profil sozlamalari, CL yuborish, shikoyat ----------
-const CATALOG = {"boy":0,"dgirl":0,"dboy":1499,"girl":1499,"evil":3999,"ice":5499,"rainbow":7499,"s_fire":999,"s_ice":999,"s_rainbow":1299,"s_torn":699,"s_gset":899,"s_hood":1499,"p_classic":499,"p_shorts":599,"p_bb":999,"p_rainbow":1199,"p_green":1299,"f_black":499,"f_white":799,"f_rainbow":1099,"f_smoke":1699,"f_ice":2099,"h_gojo":277,"h_pink":699,"h_trash":599,"h_half":899,"h_rainbow":999,"h_blue":1499,"m_gojo":117,"m_green":699,"m_mouth":799,"m_obanai":999,"m_rainbow":1099,"m_blue":1599,"m_shadow":1899,"hd_phones":599,"hd_horns":1099,"hd_halo":1999,"hd_crown":2799,"bk_neon":2499,"bk_fire":3499,"bk_ice":3499,"bk_rainbow":4399,"au_bolt":3199,"au_fire":3699,"au_ice":3699,"au_shadow":4099,"au_rainbow":4990,"ob_orbs":1499,"ob_stars":2099,"ob_crystal":2699,"sd_cat":1899,"sd_robot":2499,"sd_dragon":4599,"ft_ice":1299,"ft_fire":1599,"ft_rainbow":1999,"ft_bolt":2299,"bg_dark":180,"bg_ice":640,"bg_fire":720,"bg_rainbow":1150,"bg_forest":1320,"bg_neon":1480,"bg_crystal":1960,"bg_galaxy":2350,"em_wave":0,"em_laugh":0,"em_dance":0,"em_clap":0,"em_victory":0,"em_crazy":699,"em_cry":699,"em_salute":349,"em_shrug":349,"em_flex":599,"em_spin":899,"em_sit":1100,"em_flip":1299,"pe_sky":4199,"pe_hero":5399,"pe_throne":4799};
-const CARPETS = { cp_1: { min: 1, price: 59 }, cp_3: { min: 3, price: 119 }, cp_5: { min: 5, price: 199 } };
+const CATALOG = {"boy":0,"dgirl":0,"dboy":600,"girl":600,"evil":1600,"ice":2200,"rainbow":3000,"s_fire":549,"s_ice":549,"s_rainbow":714,"s_torn":384,"s_gset":494,"s_hood":824,"p_classic":274,"p_shorts":329,"p_bb":549,"p_rainbow":659,"p_green":714,"f_black":274,"f_white":439,"f_rainbow":604,"f_smoke":934,"f_ice":1154,"h_gojo":152,"h_pink":384,"h_trash":329,"h_half":494,"h_rainbow":549,"h_blue":824,"m_gojo":64,"m_green":384,"m_mouth":439,"m_obanai":549,"m_rainbow":604,"m_blue":879,"m_shadow":1044,"hd_phones":329,"hd_horns":604,"hd_halo":1099,"hd_crown":1539,"bk_neon":1374,"bk_fire":1924,"bk_ice":1924,"bk_rainbow":2419,"au_bolt":1759,"au_fire":2034,"au_ice":2034,"au_shadow":2254,"au_rainbow":2745,"ob_orbs":824,"ob_stars":1154,"ob_crystal":1484,"sd_cat":1044,"sd_robot":1374,"sd_dragon":2529,"ft_ice":714,"ft_fire":879,"ft_rainbow":1099,"ft_bolt":1264,"bg_dark":99,"bg_ice":352,"bg_fire":396,"bg_rainbow":633,"bg_forest":726,"bg_neon":814,"bg_crystal":1078,"bg_galaxy":1293,"em_wave":0,"em_laugh":0,"em_dance":0,"em_clap":0,"em_victory":0,"em_crazy":350,"em_cry":350,"em_salute":175,"em_shrug":175,"em_flex":300,"em_spin":450,"em_sit":550,"em_flip":650,"pe_sky":2309,"pe_hero":2969,"pe_throne":2639};
+const CARPETS = { cp_1: { min: 1, price: 32 }, cp_3: { min: 3, price: 65 }, cp_5: { min: 5, price: 109 } };
 const AVATARS = ["boy", "dgirl", "dboy", "girl", "evil", "ice", "rainbow"];
 const EQ_PREFIX = ["s_", "p_", "f_", "h_", "m_", "hd_", "bk_", "au_", "ob_", "sd_", "ft_"];
 const ledgerOf = async (uid) => (await rowsBy("ledger", "uid", uid, 5000)).map((r) => ({ id: r.id, ...r.data }));
@@ -650,104 +644,142 @@ async function shopApi(b) {
 
 
 // ---------- HAMYON (so'm): server hisoblaydi, har amal audit yoziladi ----------
-const WAL_MIN = 5000, WAL_MAX = 5000000;
-// maxsus yaxlitlash: qoldiq 500 dan KATTA bo'lsa yuqoriga, 500 yoki kam bo'lsa pastga (48 600 -> 49 000, 48 500 -> 48 000)
-const walRound = (net) => { net = Math.floor(+net); if (!(net > 0)) return 0; const r = net % 1000, b = net - r; return r > 500 ? b + 1000 : b; };
+// ---------- avtomatik to'lov: Muzpin (Telegram bot) orqali ----------
+// Oqim: o'yinchi paketni tanlaydi -> server buyurtma kodi yaratadi -> Muzpin botida tasdiqlanadi ->
+// Muzpin imzolangan signal yuboradi (/pay/webhook) -> CL (yoki Premium) avtomatik qo'shiladi.
+const MUZPIN_BOT = (process.env.MUZPIN_BOT || "Muzpin_bot").replace(/^@/, "");
+const PAY_TTL = 36e5; // buyurtma kodi 1 soat amal qiladi
+const WAL_RATE = 40 / 5000; // eski hamyon (so'm) -> CL: 5 000 so'm = 40 CL
+const safeId = (x) => String(x || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40);
+const fmtSum = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 const walRows = async (uid) => (await rowsBy("wal", "uid", uid, 5000)).map((r) => ({ id: r.id, ...r.data }));
 const walBal = (rows) => rows.reduce((s, r) => s + (r.status === "ok" ? r.amt : 0), 0);
-const safeId = (x) => String(x || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40);
-async function finTotals(add) {
-  const t = (await getDoc("wtot", "all")) || { n: 0, net: 0, credit: 0, diff: 0 };
-  t.n += 1; t.net += add.net; t.credit += add.credit; t.diff += add.diff; t.t = Date.now();
-  await putDoc("wtot", "all", t);
+function paySigOk(raw, sig) {
+  const secret = process.env.PAY_WEBHOOK_SECRET || "";
+  if (!secret) return false;
+  const calc = nodeCrypto.createHmac("sha256", secret).update(raw).digest("hex");
+  const a = Buffer.from(calc), b2 = Buffer.from(String(sig || ""));
+  return a.length === b2.length && nodeCrypto.timingSafeEqual(a, b2);
 }
-// to'lov tasdiqlangach hamyonga sof summani yaxlitlab yozish (idempotent: payId bo'yicha bir marta)
-async function creditTopup(o) {
-  return serial(async () => {
-    const wid = "wt_" + o.payId;
-    if (await getDoc("wal", wid)) return [200, { ok: true, dup: true, credit: (await getDoc("wal", wid)).amt }];
-    const net = Math.floor(+o.net), credit = walRound(net);
-    if (!(net >= 1 && credit >= 1000)) return bad("sof summa juda kichik");
-    const now = Date.now(), diff = credit - net;
-    await putDoc("wal", wid, { uid: o.uid, amt: credit, type: "topup", status: "ok", ref: o.payId, t: now });
-    await putDoc("wfin", "a_" + o.payId, { kind: "topup", uid: o.uid, gross: o.gross, fee: o.fee, net, credit, diff, payId: o.payId, src: o.src, by: o.by || "", t: now });
-    await finTotals({ net, credit, diff });
-    return [200, { ok: true, credit, diff, net }];
-  });
-}
-async function walletApi(b) {
+const PLAN_NAME = { m1: "1 oy", m3: "3 oy", y1: "1 yil" };
+
+async function payApi(b) {
   const uid = String(b.uid || "");
   if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
   if (!(await getDoc("uname", uid))) return [403, { error: "Avval akkaunt yarating" }];
   const op = String(b.op || ""), admin = (await adminUid()) === uid;
 
-  if (op === "get") { const rows = await walRows(uid); return [200, { bal: walBal(rows) }]; }
-
-  if (op === "hist") {
-    const rows = await walRows(uid), ords = await rowsBy("orders", "uid", uid, 200);
-    const list = rows.map((r) => ({ id: r.id, type: r.type, amt: r.amt, status: r.status, t: r.t, item: r.item || "", ref: r.ref || "" }));
-    for (const o of ords) if (o.data.kind === "wallet" && o.data.status !== "confirmed") list.push({ id: o.id, type: "topup", amt: o.data.price, status: o.data.status === "rejected" ? "failed" : "pending", t: o.data.t, item: "Hamyon to'ldirish", ref: o.data.no || "" });
-    list.sort((p, q) => q.t - p.t);
-    return [200, { bal: walBal(rows), list: list.slice(0, 60) }];
+  if (op === "start") {
+    if (!process.env.PAY_WEBHOOK_SECRET) return [503, { error: "To'lov tizimi hali ulanmagan" }];
+    let o;
+    if (b.kind === "prem") {
+      const pl = PLANS[String(b.plan || "")];
+      if (!pl) return bad("tarif topilmadi");
+      o = { kind: "prem", plan: String(b.plan), months: pl[0], cl: 0, sum: pl[1], item: "Premium · " + PLAN_NAME[b.plan] };
+    } else {
+      const P = PACKS[Math.floor(+b.pack)];
+      if (!P) return bad("paket topilmadi");
+      o = { kind: "cl", cl: P[0], sum: P[1], item: fmtSum(P[0]) + " CL" };
+    }
+    if (blocked("pstart|" + uid, 30)) return [429, { error: "Juda ko'p so'rov, birozdan keyin urinib ko'ring" }];
+    addTry("pstart|" + uid);
+    const code = "gs" + nodeCrypto.randomBytes(8).toString("hex");
+    await putDoc("payord", code, { uid, ...o, st: "pending", t: Date.now() });
+    return [200, { code, link: "https://t.me/" + MUZPIN_BOT + "?start=gs_" + code, item: o.item, sum: o.sum }];
   }
 
-  if (op === "buy_cl") {
-    const idx = Math.floor(+b.pack), P = PACKS[idx], key = String(b.key || "");
-    if (!P) return bad("paket topilmadi");
-    if (!/^[A-Za-z0-9_]{6,40}$/.test(key)) return bad("kalit noto'g'ri");
-    if (blocked("wbuy|" + uid, 40)) return [429, { error: "Juda ko'p so'rov" }];
+  if (op === "status") {
+    const code = safeId(b.code), o = code ? await getDoc("payord", code) : null;
+    if (!o || o.uid !== uid) return [404, { error: "topilmadi" }];
+    return [200, { st: o.st, item: o.item }];
+  }
+
+  if (!admin) return [403, { error: "faqat admin" }];
+
+  if (op === "list") {
+    const rows = await sb("docs?collection=eq.payord&order=updated_at.desc&limit=100&select=id,data");
+    const cache = {}, out = [];
+    for (const r of rows) {
+      const d = r.data || {};
+      if (!cache[d.uid]) { const u = (await getDoc("users", d.uid)) || {}; cache[d.uid] = { nick: str(u.nick || "?", 16), pid: str(u.playerId || "", 12) }; }
+      out.push({ code: r.id, item: d.item, sum: d.sum, st: d.st === "pending" && Date.now() - d.t > PAY_TTL ? "expired" : d.st, t: d.paidAt || d.t, nick: cache[d.uid].nick, pid: cache[d.uid].pid });
+    }
+    return [200, { list: out }];
+  }
+
+  if (op === "stats") {
+    const users = await sb("docs?collection=eq.users&select=id&limit=20000");
+    const rows = await sb("docs?collection=eq.payord&select=data&limit=20000");
+    const t0 = Math.floor((Date.now() + 5 * 36e5) / 864e5) * 864e5 - 5 * 36e5; // bugun 00:00 (Toshkent, UTC+5)
+    let paid = 0, sum = 0, tCnt = 0, tSum = 0, pend = 0;
+    for (const r of rows) {
+      const d = r.data || {};
+      if (d.st === "paid") { paid++; sum += d.sum || 0; if ((d.paidAt || 0) >= t0) { tCnt++; tSum += d.sum || 0; } }
+      else if (d.st === "pending" && Date.now() - d.t <= PAY_TTL) pend++;
+    }
+    return [200, { users: users.length, paid, sum, dayCnt: tCnt, daySum: tSum, pending: pend }];
+  }
+
+  // eski hamyon qoldiqlarini CL ga o'tkazish (bir martalik, takrorlansa ikki marta yozilmaydi)
+  if (op === "wal_migrate") {
+    const dry = b.dry !== false;
+    const all = await sb("docs?collection=eq.wal&select=id,data&limit=20000");
+    const by = {};
+    for (const r of all) { const d = r.data || {}; if (d.uid && d.status === "ok") by[d.uid] = (by[d.uid] || 0) + (+d.amt || 0); }
+    const todo = [];
+    for (const [u, bal] of Object.entries(by)) { const cl = Math.floor(bal * WAL_RATE); if (bal > 0 && cl >= 1) todo.push({ uid: u, bal, cl }); }
+    const tot = { users: todo.length, som: todo.reduce((s, x) => s + x.bal, 0), cl: todo.reduce((s, x) => s + x.cl, 0) };
+    if (dry) return [200, { dry: true, ...tot }];
     return serial(async () => {
-      const did = "wb_" + uid + "_" + key, gid = "wc_" + uid + "_" + key, now = Date.now();
-      const had = await getDoc("wal", did);
-      if (!had) {
-        const rows = await walRows(uid), bal = walBal(rows);
-        if (bal < P[1]) return [409, { error: "Hamyonda mablag' yetarli emas", need: P[1] - bal, bal }];
-        addTry("wbuy|" + uid);
-        await putDoc("wal", did, { uid, amt: -P[1], type: "buycl", status: "ok", ref: gid, item: P[0] + " CL", t: now });
+      let done = 0;
+      for (const x of todo) {
+        const lid = "wm_" + x.uid;
+        if (await getDoc("ledger", lid)) continue;
+        await putDoc("ledger", lid, { uid: x.uid, type: "grant", cur: "cl", amt: x.cl, by: "sys", sys: 1, ref: "walmig", t: Date.now() });
+        await putDoc("wal", "wz_" + x.uid, { uid: x.uid, amt: -x.bal, type: "migrate", status: "ok", ref: lid, t: Date.now() });
+        done++;
       }
-      if (!(await getDoc("ledger", gid))) await putDoc("ledger", gid, { uid, type: "grant", cur: "cl", amt: P[0], by: "sys", sys: 1, ref: "wallet:" + key, t: now });
-      if (!had) await putDoc("wfin", "a_" + did, { kind: "buy_cl", uid, cl: P[0], sum: P[1], payId: did, src: "wallet", t: now });
-      return [200, { ok: true, cl: P[0], sum: P[1], dup: !!had, bal: walBal(await walRows(uid)) }];
+      return [200, { dry: false, done, ...tot }];
     });
-  }
-
-  if (op === "confirm_topup") {
-    if (!admin) return [403, { error: "faqat admin" }];
-    const oid = String(b.oid || ""), o = await getDoc("orders", oid);
-    if (!o || o.kind !== "wallet") return [404, { error: "buyurtma topilmadi" }];
-    if (o.status === "confirmed") return [200, { ok: true, dup: true }];
-    if (o.status !== "receipt") return [409, { error: "Chek yuborilmagan" }];
-    const net = b.net === undefined ? o.price : Math.floor(+b.net);
-    if (!(net >= 1000 && net <= o.price)) return bad("sof summa noto'g'ri (1000 dan o'tkazilgan summagacha)");
-    const [c, out] = await creditTopup({ uid: o.uid, net, gross: o.price, fee: o.price - net, payId: "order_" + safeId(oid), src: "manual", by: uid });
-    if (c !== 200) return [c, out];
-    const now = Date.now();
-    await putDoc("orders", oid, { ...o, status: "confirmed", upd: now, cBy: uid, cAt: now, credit: out.credit });
-    return [200, out];
-  }
-
-  if (op === "fin_report") {
-    if (!admin) return [403, { error: "faqat admin" }];
-    const t = (await getDoc("wtot", "all")) || { n: 0, net: 0, credit: 0, diff: 0 };
-    const r = await sb("docs?collection=eq.wfin&order=updated_at.desc&limit=25&select=id,data");
-    return [200, { totals: t, recent: r.map((x) => x.data) }];
   }
   return bad("op");
 }
-// provayder webhooki: faqat imzo (HMAC-SHA256, PAY_WEBHOOK_SECRET) to'g'ri bo'lsa hamyon to'ldiriladi
-async function payWebhook(raw, sig) {
-  const secret = process.env.PAY_WEBHOOK_SECRET || "";
-  if (!secret) return [503, { error: "To'lov provayderi ulanmagan" }];
-  const calc = nodeCrypto.createHmac("sha256", secret).update(raw).digest("hex");
-  const a = Buffer.from(calc), b2 = Buffer.from(String(sig || ""));
-  if (a.length !== b2.length || !nodeCrypto.timingSafeEqual(a, b2)) return [401, { error: "imzo noto'g'ri" }];
+
+// Muzpin -> GameSet: buyurtma ma'lumotini so'rash (imzolangan)
+async function payOrderInfo(raw, sig) {
+  if (!paySigOk(raw, sig)) return [401, { error: "imzo noto'g'ri" }];
   let b; try { b = JSON.parse(raw); } catch { return bad("json"); }
-  const payId = safeId(b.payment_id), uid = String(b.uid || "");
-  if (!payId || !UID_RE.test(uid) || !(await getDoc("uname", uid))) return bad("payload");
-  if (b.status !== "success") { await putDoc("wfin", "f_" + payId, { kind: "failed", uid, payId, status: str(b.status, 20), t: Date.now() }); return [200, { ok: true, ignored: true }]; }
-  const gross = Math.floor(+b.gross), fee = Math.floor(+b.fee || 0), net = b.net !== undefined ? Math.floor(+b.net) : gross - fee;
-  if (!(gross >= WAL_MIN && gross <= WAL_MAX && net >= 1000 && net <= gross)) return bad("summa");
-  return creditTopup({ uid, net, gross, fee: gross - net, payId: "pay_" + payId, src: "provider" });
+  const code = safeId(b.code), o = code ? await getDoc("payord", code) : null;
+  if (!o) return [404, { ok: false, error: "topilmadi" }];
+  const u = (await getDoc("users", o.uid)) || {}, n = (await getDoc("uname", o.uid)) || {};
+  const st = o.st === "pending" && Date.now() - o.t > PAY_TTL ? "expired" : o.st;
+  return [200, { ok: true, code, st, item: o.item, cl: o.cl, sum: o.sum, nick: str(u.nick || n.un || "Player", 16), pid: str(u.playerId || "", 12) }];
+}
+
+// Muzpin -> GameSet: to'landi signali. Faqat imzo to'g'ri bo'lsa va summa mos kelsa CL qo'shiladi.
+async function payWebhook(raw, sig) {
+  if (!process.env.PAY_WEBHOOK_SECRET) return [503, { error: "To'lov tizimi ulanmagan" }];
+  if (!paySigOk(raw, sig)) return [401, { error: "imzo noto'g'ri" }];
+  let b; try { b = JSON.parse(raw); } catch { return bad("json"); }
+  const code = safeId(b.code);
+  if (!code) return bad("kod");
+  return serial(async () => {
+    const o = await getDoc("payord", code);
+    if (!o) return [404, { error: "buyurtma topilmadi" }];
+    if (o.st === "paid") return [200, { ok: true, dup: true }];
+    if (b.status !== "success") return [200, { ok: true, ignored: true }];
+    if (Math.floor(+b.amount) !== o.sum) {
+      await putDoc("wfin", "f_" + code, { kind: "mismatch", uid: o.uid, code, got: Math.floor(+b.amount) || 0, need: o.sum, t: Date.now() });
+      return bad("summa mos emas");
+    }
+    const now = Date.now();
+    const g = o.kind === "prem"
+      ? { uid: o.uid, type: "grant", cur: "prem", months: o.months, by: "sys", sys: 1, ref: "muzpin:" + code, t: now }
+      : { uid: o.uid, type: "grant", cur: "cl", amt: o.cl, by: "sys", sys: 1, ref: "muzpin:" + code, t: now };
+    await putDoc("ledger", "pay_" + code, g);
+    await putDoc("payord", code, { ...o, st: "paid", paidAt: now, mpid: str(b.payment_id, 40) });
+    return [200, { ok: true }];
+  });
 }
 
 // ---------- chat: filtr va tezlik cheklovi ----------
@@ -768,7 +800,7 @@ async function api(name, body, ip) {
   if (name === "db") return dbApi(body);
   if (name === "social") return social(body);
   if (name === "shop") return shopApi(body);
-  if (name === "wallet") return walletApi(body);
+  if (name === "pay") return payApi(body);
   if (name === "publish") return publishGame(body);
   if (name === "games_list") return gamesList();
   if (name === "game") return gameGet(body);
@@ -809,9 +841,9 @@ const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers
 const server = http.createServer(async (req, res) => {
   const url = req.url.split("?")[0];
   if (req.method === "OPTIONS") { res.writeHead(204, CORS); return res.end(); }
-  if (req.method === "POST" && url === "/pay/webhook") {
+  if (req.method === "POST" && (url === "/pay/webhook" || url === "/pay/order")) {
     try {
-      const [code, out] = await payWebhook(await readRaw(req), req.headers["x-signature"]);
+      const [code, out] = await (url === "/pay/order" ? payOrderInfo : payWebhook)(await readRaw(req), req.headers["x-signature"]);
       res.writeHead(code, { "Content-Type": "application/json", ...CORS });
       return res.end(JSON.stringify(out));
     } catch (e) { res.writeHead(500, { "Content-Type": "application/json", ...CORS }); return res.end(JSON.stringify({ error: "server xatosi" })); }
