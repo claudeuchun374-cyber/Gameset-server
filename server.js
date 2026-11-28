@@ -134,6 +134,7 @@ async function login(body, ip) {
   const ph = (await scrypt(pw, salt)).toString("hex");
   if (!rec || !same(rec.ph, ph)) { addTry(k1); addTry(k2); return [403, { error: "Nom yoki parol noto'g'ri" }]; }
   tries.delete(k1);
+  if (BANS.has(rec.uid)) return [403, { error: "Akkauntingiz bloklangan", banned: true }];
   const secret = nodeCrypto.randomBytes(16).toString("hex"); // shu qurilma uchun yangi kalit
   const cur = (await getDoc("auth", rec.uid)) || {};
   const hs = [...(Array.isArray(cur.hs) ? cur.hs : []), sha(secret)].slice(-5);
@@ -313,6 +314,7 @@ async function dbApi(b) {
     }
 
     if (col === "wheel") {
+      return [410, { error: "Tez orada" }];
       if (id !== uid) return [403, { error: "ruxsat yo'q" }];
       if (op === "set") {
         if (cur && cur.last && now - cur.last < WHEEL_CD) return [409, { error: "baraban hali tayyor emas" }];
@@ -609,6 +611,7 @@ async function shopApi(b) {
     const d = (await getDoc("cpt", uid)) || {};
     return [200, { cpn: { cp_1: d.cp_1 | 0, cp_3: d.cp_3 | 0, cp_5: d.cp_5 | 0 } }];
   }
+  if (op === "carp_buy" || op === "carp_use") return [410, { error: "Bu bo'lim o'chirilgan" }];
   if (op === "carp_buy") {
     const id = String(b.id || ""), key = String(b.key || ""), P = CARPETS[id];
     if (!P) return bad("gilam topilmadi");
@@ -745,6 +748,94 @@ async function payApi(b) {
   return bad("op");
 }
 
+// ---------- ilova: sozlamalar, parol, ban, statistika ----------
+const BANS = new Set();
+async function loadBans() {
+  try { const r = await sb("docs?collection=eq.ban&select=id&limit=20000"); BANS.clear(); r.forEach((x) => BANS.add(x.id)); } catch (e) { /* keyingi safar */ }
+}
+const HUD_KEYS = ["jump", "crouch", "prone", "run", "fire", "swap"];
+const numIn = (v, lo, hi, d) => { v = +v; return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+function cleanSettings(x) {
+  x = x && typeof x === "object" ? x : {};
+  const out = {
+    vol: numIn(x.vol, 0, 1, 0.7), sfx: x.sfx !== false, vib: x.vib !== false,
+    gfx: ["low", "std", "high"].includes(x.gfx) ? x.gfx : "std", fps: +x.fps === 30 ? 30 : 60, shadow: x.shadow !== false,
+    camS: numIn(x.camS, 0.4, 2.5, 1), joyS: numIn(x.joyS, 0.4, 2.5, 1), hud: +x.hud === 2 ? 2 : 1, hudl: {},
+  };
+  if (x.hudl && typeof x.hudl === "object") for (const k of HUD_KEYS) { const h = x.hudl[k]; if (h && typeof h === "object") out.hudl[k] = { x: numIn(h.x, 0, 100, 50), y: numIn(h.y, 0, 100, 50), s: numIn(h.s, 0.6, 1.6, 1), o: numIn(h.o, 0.2, 1, 1) }; }
+  return out;
+}
+
+async function appApi(b, ip) {
+  const op = String(b.op || "");
+  if (op === "install") { // autentifikatsiyasiz: o'rnatilgan qurilmani sanash
+    const d = String(b.dev || "").replace(/[^A-Za-z0-9]/g, "").slice(0, 40);
+    if (d.length < 8 || blocked("inst|" + ip, 20)) return [200, { ok: true }];
+    addTry("inst|" + ip);
+    if (!(await getDoc("inst", d))) await putDoc("inst", d, { t: Date.now() });
+    return [200, { ok: true }];
+  }
+  const uid = String(b.uid || "");
+  if (!(await checkAuth(uid, String(b.secret || "")))) return [403, { error: "akkaunt tasdiqlanmadi" }];
+  if (BANS.has(uid)) return [403, { error: "Akkauntingiz bloklangan", banned: true }];
+  const admin = (await adminUid()) === uid;
+
+  if (op === "me") {
+    const [xp, us, au] = await Promise.all([getDoc("xp", uid), getDoc("uset", uid), getDoc("auth", uid)]);
+    const dev = au ? Math.max(1, (au.h ? 1 : 0) + (Array.isArray(au.hs) ? au.hs.length : 0)) : 1;
+    return [200, { xp: Math.max(0, Math.floor(+(xp && xp.v) || 0)), set: us || null, dev, admin }];
+  }
+  if (op === "set_save") { await putDoc("uset", uid, cleanSettings(b.set)); return [200, { ok: true }]; }
+
+  if (op === "pw_change") {
+    const old = String(b.old || ""), nw = String(b.new || "");
+    if (nw.length < 6 || nw.length > 64) return bad("Yangi parol 6-64 belgi bo'lsin");
+    if (blocked("pw|" + uid, 6)) return [429, { error: "Juda ko'p urinish. 10 daqiqadan keyin qayta urinib ko'ring" }];
+    const un = await getDoc("uname", uid), key = un ? String(un.un).toLowerCase() : "", rec = key ? await getDoc("login", key) : null;
+    if (!rec || rec.uid !== uid) return bad("Akkaunt topilmadi");
+    if (!same(rec.ph, (await scrypt(old, rec.salt)).toString("hex"))) { addTry("pw|" + uid); return [403, { error: "Eski parol noto'g'ri" }]; }
+    const salt = nodeCrypto.randomBytes(16).toString("hex");
+    await putDoc("login", key, { uid, salt, ph: (await scrypt(nw, salt)).toString("hex") });
+    const cur = (await getDoc("auth", uid)) || {}, mine = sha(String(b.secret)); // boshqa qurilmalar chiqib ketadi
+    await putDoc("auth", uid, { h: cur.h === mine ? mine : "", hs: [mine] });
+    return [200, { ok: true }];
+  }
+
+  if (!admin) return [403, { error: "faqat admin" }];
+
+  if (op === "ban") {
+    const t = String(b.target || "");
+    if (!/^u[a-f0-9]{16}$/.test(t) || t === uid) return bad("noto'g'ri akkaunt");
+    await putDoc("ban", t, { by: uid, why: str(b.why, 80), t: Date.now() });
+    BANS.add(t);
+    return [200, { ok: true }];
+  }
+  if (op === "unban") {
+    const t = String(b.target || "");
+    if (!/^u[a-f0-9]{16}$/.test(t)) return bad("noto'g'ri akkaunt");
+    await sb("docs?collection=eq.ban&id=eq." + enc(t), { method: "DELETE", headers: { Prefer: "return=minimal" } });
+    BANS.delete(t);
+    return [200, { ok: true }];
+  }
+  if (op === "ban_list") {
+    const rows = await sb("docs?collection=eq.ban&order=updated_at.desc&limit=200&select=id,data");
+    const out = [];
+    for (const r of rows) { const u = (await getDoc("users", r.id)) || {}; out.push({ uid: r.id, nick: str(u.nick || "?", 16), pid: str(u.playerId || "", 12), why: str((r.data || {}).why, 80), t: (r.data || {}).t || 0 }); }
+    return [200, { list: out }];
+  }
+  if (op === "panel_stats") {
+    const nowT = Date.now(), live = (r) => nowT - (+(r.data && r.data.t) || 0) < 45000; // 45 soniya ichida signal bergan = online
+    const t0 = Math.floor((Date.now() + 5 * 36e5) / 864e5) * 864e5 - 5 * 36e5; // bugun 00:00 (Toshkent)
+    const [un, pr, ins] = await Promise.all([
+      sb("docs?collection=eq.uname&select=id,updated_at&limit=50000"),
+      sb("docs?collection=eq.pres&select=id,data&limit=50000"),
+      sb("docs?collection=eq.inst&select=id&limit=50000"),
+    ]);
+    return [200, { accounts: un.length, newToday: un.filter((r) => Date.parse(r.updated_at) >= t0).length, online: pr.filter(live).length, today: pr.filter((r) => ((r.data || {}).t || 0) >= t0).length, installs: ins.length, banned: BANS.size }];
+  }
+  return bad("op");
+}
+
 // Muzpin -> GameSet: buyurtma ma'lumotini so'rash (imzolangan)
 async function payOrderInfo(raw, sig) {
   if (!paySigOk(raw, sig)) return [401, { error: "imzo noto'g'ri" }];
@@ -796,6 +887,8 @@ async function api(name, body, ip) {
   if (!HAS_DB) return [503, { error: "baza ulanmagan" }];
   if (name === "register") return register(body);
   if (name === "login") return login(body, ip);
+  if (name === "app") return appApi(body, ip);
+  if (body && body.uid && BANS.has(String(body.uid))) return [403, { error: "Akkauntingiz bloklangan", banned: true }];
   if (name === "player") return playerApi(body);
   if (name === "db") return dbApi(body);
   if (name === "social") return social(body);
@@ -864,6 +957,21 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify({ ok: true, db: HAS_DB, rooms: rooms.size, players: wss.clients.size }));
   }
   const STATIC = { "/manifest.json": ["manifest.json", "application/manifest+json"], "/sw.js": ["sw.js", "text/javascript"], "/icon-192.png": ["icon-192.png", "image/png"], "/icon-512.png": ["icon-512.png", "image/png"], "/.well-known/assetlinks.json": ["assetlinks.json", "application/json"] };
+  if (url === "/intro.mp4") {
+    const f = path.join(__dirname, "intro.mp4");
+    return fs.stat(f, (err, st) => {
+      if (err) { res.writeHead(404); return res.end("Topilmadi"); }
+      const m = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || ""), h = { "Content-Type": "video/mp4", "Accept-Ranges": "bytes", "Cache-Control": "public, max-age=86400" };
+      if (m && (m[1] || m[2])) {
+        let a = m[1] ? +m[1] : Math.max(0, st.size - +m[2]), z = m[1] && m[2] ? Math.min(+m[2], st.size - 1) : st.size - 1;
+        if (a > z || a >= st.size) { res.writeHead(416, { "Content-Range": "bytes */" + st.size }); return res.end(); }
+        res.writeHead(206, { ...h, "Content-Range": "bytes " + a + "-" + z + "/" + st.size, "Content-Length": z - a + 1 });
+        return fs.createReadStream(f, { start: a, end: z }).pipe(res);
+      }
+      res.writeHead(200, { ...h, "Content-Length": st.size });
+      fs.createReadStream(f).pipe(res);
+    });
+  }
   if (STATIC[url]) {
     return fs.readFile(path.join(__dirname, STATIC[url][0]), (err, data) => {
       if (err) { res.writeHead(404); return res.end("Topilmadi"); }
@@ -968,3 +1076,4 @@ wss.on("connection", (ws) => {
 });
 
 server.listen(PORT, () => console.log("GAMESET server port " + PORT));
+if (HAS_DB) { loadBans(); setInterval(loadBans, 120000); }

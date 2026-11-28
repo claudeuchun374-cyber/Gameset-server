@@ -448,6 +448,86 @@ textarea{width:100%;background:var(--card);color:var(--tx);border:1px solid var(
 .rcimg{width:100%;max-height:44vh;object-fit:contain;border-radius:12px;background:#0006;margin:8px 0;display:block}
 .aot{display:flex;align-items:center;gap:8px}.aot small{color:var(--mut)}
 .astat{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}.ac{background:linear-gradient(135deg,#1b2260,#2a1d68);border:1px solid var(--line);border-radius:18px;padding:14px}.ac small{display:block;color:var(--mut);font-size:12px;font-weight:700}.ac b{display:block;font-size:19px;margin:4px 0 2px}.ac em{font-style:normal;color:var(--grn);font-size:12px}
+/* ===== LOBBY (gorizontal) ===== */
+#app:not(.pnl){display:none!important}
+#app.pnl{background:linear-gradient(180deg,#0b0f33,#0a0b2a);overflow:hidden}
+#app.pnl nav{display:none}
+#app.pnl #view{width:100%;max-width:760px;margin:0 auto;flex:1;min-height:0;overflow:auto}
+#pback{display:none}
+#app.pnl #pback{display:inline-flex}
+#lobby,#splash{color:#fff;user-select:none;-webkit-user-select:none;overflow:hidden;background:#0a0b2a}
+#lobby[hidden],#splash[hidden]{display:none}
+#lobby .lyr{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden}
+#lobby button{font-family:inherit}
+.lbg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 92%,#7c3aedaa 0,transparent 52%),radial-gradient(ellipse at 15% 8%,#22d3ee33,transparent 48%),radial-gradient(ellipse at 90% 20%,#a855f733,transparent 45%),linear-gradient(180deg,#0b0f33,#1a1250 62%,#0a0b2a)}
+.lbg::before{content:"";position:absolute;left:8%;right:8%;bottom:-40px;height:150px;border-radius:50%;background:radial-gradient(ellipse,#a855f777 0,#22d3ee22 45%,transparent 70%);filter:blur(2px)}
+.lbg::after{content:"";position:absolute;inset:0;background-image:radial-gradient(#ffffff55 1px,transparent 1.5px);background-size:46px 46px;opacity:.12}
+.lcard{position:absolute;left:12px;top:10px;width:212px}
+.lbn{position:relative;height:60px;border-radius:14px 14px 0 0;display:flex;align-items:center;gap:9px;padding:0 10px;overflow:hidden;border:1px solid #ffffff33;border-bottom:0}
+.lbn.b1{background:linear-gradient(110deg,#6d28d9 0%,#2563eb 55%,#22d3ee 100%)}
+.lbn.b1::before{content:"GAMESET";position:absolute;right:-4px;bottom:-9px;font:900 34px/1 system-ui;letter-spacing:2px;color:#ffffff22}
+.lfc{position:relative;width:46px;height:46px;border-radius:50%;border:2px solid #fff;overflow:hidden;background:#1e1b4b;display:flex;align-items:center;justify-content:center;flex:none;font-weight:900;font-size:20px}
+.lfc img{width:100%;height:100%;object-fit:cover;object-position:top}
+.lnm{position:relative;min-width:0}.lnm b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}.lnm small{font-size:10.5px;opacity:.9}
+.llv{background:#0b0f33dd;padding:6px 9px;display:flex;align-items:center;gap:7px;border:1px solid #ffffff22;border-top:0;border-bottom:0}
+.llv b{font-size:12px;color:#fde047;white-space:nowrap}.lxb{flex:1;height:6px;background:#ffffff22;border-radius:4px;overflow:hidden}.lxb u{display:block;height:100%;background:linear-gradient(90deg,#22d3ee,#a855f7)}.llv small{font-size:9px;opacity:.85;white-space:nowrap}
+.lcl{display:flex;align-items:center;gap:7px;background:#0b0f33dd;border:1px solid #ffffff22;border-radius:0 0 12px 12px;padding:5px 9px;color:#fff;width:100%;text-align:left}
+.lcl .cl{display:flex}.lcl b{font-size:15px;flex:1}.lcl i{font-style:normal;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#22d3ee,#a855f7);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#07102e}
+.ltr{position:absolute;right:12px;top:10px;display:flex;gap:8px}
+.lib{position:relative;width:38px;height:38px;border-radius:12px;background:#0b0f33dd;border:1px solid #ffffff33;color:#fff;display:flex;align-items:center;justify-content:center}
+.ldot{position:absolute;right:5px;top:5px;width:9px;height:9px;border-radius:50%;background:#fb7185;border:1px solid #fff}
+.lmn{position:absolute;left:12px;top:146px;display:flex;flex-direction:column;gap:7px}
+.lmb{display:flex;align-items:center;gap:9px;width:130px;height:36px;padding:0 11px;border-radius:11px;background:linear-gradient(90deg,#1b2260dd,#1b226088);border:1px solid #ffffff2e;border-left:3px solid #22d3ee;color:#fff;font-size:13px;font-weight:800;text-align:left}
+.lmb svg{flex:none}
+#lstage{position:absolute;left:50%;top:6px;transform:translateX(-50%);width:270px;height:344px}
+.lteam{position:absolute;right:12px;top:56px;display:flex;flex-direction:column;gap:6px}
+.lsl{width:42px;height:42px;border-radius:50%;border:2px solid #ffffff55;background:#0b0f33cc;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:300;overflow:hidden;padding:0}
+.lsl.me{border-color:#fde047;font-size:18px;font-weight:900}.lsl img{width:100%;height:100%;object-fit:cover;object-position:top}
+.lsl.add{border-style:dashed}
+.lmode{position:absolute;right:14px;bottom:70px;width:176px;height:34px;border-radius:10px;background:#0b0f33dd;border:1px solid #ffffff44;color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
+.lmode small{font-size:9.5px;color:#fde047;font-weight:700}
+.lstart{position:absolute;right:14px;bottom:14px;width:176px;height:50px;border-radius:11px;background:linear-gradient(180deg,#fde047,#f59e0b);color:#3b2a00;font:900 23px system-ui;letter-spacing:3px;border:2px solid #fff7;box-shadow:0 0 20px #f59e0b99}
+.lov{position:absolute;inset:0;background:#070b24;z-index:3;display:flex;flex-direction:column}
+.lovh{height:46px;flex:none;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid #ffffff22}
+.lovh b{font-size:15px;letter-spacing:.5px}
+.lback{width:34px;height:34px;border-radius:10px;background:#ffffff14;border:1px solid #ffffff2e;color:#fff;font-size:20px;line-height:1;padding:0}
+.lovb{flex:1;display:flex;min-height:0}
+.lovt{width:150px;flex:none;padding:10px;display:flex;flex-direction:column;gap:6px;border-right:1px solid #ffffff1a;overflow:auto}
+.lt{padding:10px;border-radius:10px;background:#ffffff0f;border:0;color:#cbd5ff;text-align:left;font-size:13px;font-weight:800}
+.lt.on{background:linear-gradient(90deg,#6d28d9,#2563eb);color:#fff}
+.lt.go{margin-top:auto;background:linear-gradient(90deg,#b45309,#f59e0b);color:#2b1a00}
+.lovc{flex:1;min-width:0;padding:12px 18px 18px;overflow:auto;font-size:13px}
+.lovc h4{margin:2px 0 10px;font-size:13px;letter-spacing:.8px;text-transform:uppercase;color:#a5b4fc}
+.lsub{font-size:12px;color:#94a3d8;margin:10px 0 6px;font-weight:800}
+.lrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #ffffff14;font-size:13px}
+.lrow input[type=range]{width:190px;accent-color:#22d3ee}.lrow small{color:#94a3d8;display:block;font-size:11px;margin-top:2px}
+.lrow .lv{min-width:38px;text-align:right;font-weight:800;color:#fde047}
+.lopt{display:flex;gap:6px}.lopt button{padding:7px 13px;border-radius:9px;background:#ffffff12;border:1px solid #ffffff2a;color:#cbd5ff;font-size:12.5px;font-weight:800}.lopt button.on{background:linear-gradient(90deg,#6d28d9,#2563eb);color:#fff;border-color:transparent}
+.lmute{color:#94a3d8;font-size:12.5px;margin:6px 0}
+.lgrid{display:flex;flex-wrap:wrap;gap:10px}
+.lc2{width:92px;padding:8px 6px;border-radius:14px;background:#ffffff0f;border:2px solid #ffffff22;color:#fff;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;font-weight:800}
+.lc2.on{border-color:#22d3ee;background:#22d3ee1f}.lc2 .lfc{width:56px;height:56px}
+.lbn.big{width:230px;border-radius:14px;border-bottom:1px solid #ffffff33}
+.lsoon{height:100%;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;color:#cbd5ff}.lsoon b{font-size:22px;color:#fff}
+.lsave{position:sticky;bottom:0;display:flex;justify-content:flex-end;gap:8px;padding-top:12px;background:linear-gradient(0deg,#070b24 70%,transparent)}
+.lsave .btn{width:auto;padding:10px 26px}
+.lpw{display:flex;flex-direction:column;gap:8px;max-width:300px;margin:6px 0 10px}
+.lpw input{background:#ffffff12;border:1px solid #ffffff2a;border-radius:10px;padding:10px 12px;color:#fff;height:auto;flex:none;font-size:13px}
+.l4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px}
+.l4 .ac{padding:10px}.l4 .ac b{font-size:17px}
+.lhda{position:absolute;left:12px;right:196px;top:54px;bottom:12px;border:1px dashed #ffffff66;border-radius:14px;background:#0008;overflow:hidden}
+.lhdp{position:absolute;right:12px;top:54px;width:172px;display:flex;flex-direction:column;gap:9px}
+.hbtn{position:absolute;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:#ffffff26;border:2px solid #ffffffaa;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;text-align:center;touch-action:none;padding:0;line-height:1.1}
+.hbtn.sel{border-color:#fde047;box-shadow:0 0 14px #fde047aa}
+#splash{display:flex;align-items:center;justify-content:center;background:#000}
+#splash video{width:100%;height:100%;object-fit:contain;background:#000}
+.spgo{position:absolute;left:50%;bottom:9%;transform:translateX(-50%);padding:14px 34px;border-radius:99px;background:linear-gradient(180deg,#fde047,#f59e0b);color:#3b2a00;font:900 18px system-ui;border:0;box-shadow:0 0 24px #f59e0b99;animation:lpl 1.4s infinite}
+.spsk{position:absolute;right:16px;bottom:14px;padding:8px 16px;border-radius:99px;background:#0009;border:1px solid #ffffff55;color:#fff;font-weight:800;font-size:13px}
+@keyframes lpl{50%{transform:translateX(-50%) scale(1.06)}}
+#lban{position:fixed;inset:0;z-index:99999;background:#0a0b2a;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px}
+#lban b{font-size:22px}
+
+.abk{display:none}
 </style>
 <style id="v6">
 #pkjump{right:max(124px,env(safe-area-inset-right,0px));bottom:96px;width:80px;height:80px}
@@ -555,10 +635,11 @@ body.nohint #pkhint{display:none!important}
 <linearGradient id="lb" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".32"/></linearGradient>
 </defs></svg>
 <div id="app">
-  <header><div class="logo">GAMESET</div><div class="hr"><button class="clp" onclick="gemShop()"><span class="cl" id="clic"></span><b id="clv">0</b><i>+</i></button><button class="bell" id="bell" onclick="reqSheet()"></button></div></header>
+  <header><button class="chip" id="pback" onclick="lBack()">‹ Lobi</button><div class="logo">GAMESET</div><div class="hr"><button class="clp" onclick="gemShop()"><span class="cl" id="clic"></span><b id="clv">0</b><i>+</i></button><button class="bell" id="bell" onclick="reqSheet()"></button></div></header>
   <main id="view"></main>
   <nav id="nav"></nav>
 </div>
+<div id="lobby" hidden></div><div id="splash" hidden></div>
 <div id="pk" hidden>
  <div id="pkc"></div>
  <div class="hud">
@@ -1012,7 +1093,7 @@ function viewChat(){
  if(typeof S.chat==="string"&&S.chat.startsWith("o:"))return orderRoomHTML(false);
  if(S.chat)return chatRoom(CHATS.find(c=>c.id===S.chat));
  return `<h2 class="rv">Chat</h2>${ordersChatList()}${CHATS.map(c=>`<div class="row rv" onclick="openChat('${c.id}')">${chatAv(c)}<div class="g"><b>${esc(c.n)}${c.grp?" · guruh":""}</b><small>${S.blocked[c.id]?"Bloklangan":c.m.length?esc(c.m[c.m.length-1][0]||"Rasm"):"Yangi suhbat"}</small></div></div>`).join("")}
-${CHATS.length?"":'<p class="empty rv">Chat uchun avval do‘st qo‘shing (Profil → Do‘st qo‘shish).</p>'}
+${CHATS.length?"":'<p class="empty rv">Chat uchun avval Lobidagi “Do‘stlar” bo‘limidan do‘st qo‘shing.</p>'}
 <p class="rv" style="color:var(--mut);font-size:12px;margin-top:12px">Faqat do‘stlar bilan matnli chat. Ovozli yoki video qo‘ng‘iroq yo‘q.</p>`}
 function msgsHTML(c){return c.m.length?c.m.map(m=>`<div class="m ${m[1]?"me":""}">${esc(m[0])}<i>${soTime(m[3])}</i></div>`).join(""):`<p class="empty">Hali xabar yo‘q. Birinchi bo‘lib yozing.</p>`}
 function chatRoom(c){if(!c)return `<div class="chat"><div class="bar"><button class="back" onclick="S.chat=null;render()">&larr; Orqaga</button></div><p class="empty">Suhbat topilmadi.</p></div>`;
@@ -1077,7 +1158,7 @@ function render(a){
  $("#clv").textContent=S.gems;
  const m=$("#view");m.className="";
  if(S.tab!=="chat"&&S.tab!=="admin"&&typeof orderStop==="function")orderStop();
- m.innerHTML={home:viewHome,games:viewGames,team:viewTeam,chat:viewChat,admin:viewAdmin,profile:viewProfile}[S.tab]();
+ m.innerHTML={lobby:()=>"",friends:viewFriends,home:viewHome,games:viewGames,team:viewTeam,chat:viewChat,admin:viewAdmin,profile:viewProfile}[S.tab]();
  if(S.tab==="home"||S.tab==="games")paintAll();
  if(a){m.querySelectorAll(".rv").forEach((e,i)=>e.style.animationDelay=Math.min(i,14)*40+"ms");void m.offsetWidth;m.className="pg "+S.dir}
 }
@@ -1990,21 +2071,7 @@ function updTrail(dt,moving){const tr=PK.tr;if(!tr)return;const p=PK.prof,id=(p.
 
 /* ===== GAME orientation: landscape only inside the game; app shell stays portrait ===== */
 const LAND={on:false,rot:false};
-function layoutApp(){
-  const port=innerHeight>innerWidth,game=LAND.on,rotateApp=!game&&!port,rotateGame=game&&port;
-  const root=document.documentElement;
-  root.classList.toggle("land",game);
-  const app=$("#app");
-  if(app){
-    if(game){app.style.cssText="display:none";}
-    else if(rotateApp){
-      app.style.cssText=`position:fixed;left:0;top:0;width:${innerHeight}px;height:${innerWidth}px;max-width:none;margin:0;transform-origin:0 0;transform:translateY(${innerHeight}px) rotate(-90deg);`;
-    }else{app.style.cssText="";}
-  }
-  const gameCss=rotateGame?`position:fixed;left:0;top:0;width:${innerHeight}px;height:${innerWidth}px;max-width:none;margin:0;transform-origin:0 0;transform:translateX(${innerWidth}px) rotate(90deg);`+"z-index:9;":"z-index:9;";
-  const appCss=rotateApp?`position:fixed;left:0;top:0;width:${innerHeight}px;height:${innerWidth}px;max-width:none;margin:0;transform-origin:0 0;transform:translateY(${innerHeight}px) rotate(-90deg);`+"z-index:9;":"z-index:9;";
-  ["modal","modal2"].forEach((id,i)=>{const e=$("#"+id);if(e)e.style.cssText=game?gameCss:appCss.replace("z-index:9;",`z-index:${i?10:9};`)});
-}/* ===== records card (profile) ===== */
+/* ===== records card (profile) ===== */
 function recCard(){const p=PK.prof;return `<div class="mycard rv"><b class="fl" style="gap:8px">${ic("rank",26)} Parkour rekordlarim</b><div class="mg"><span>${ICX.timer(18)} Eng yaxshi vaqt<b>${p.best?fmtT(p.best):"-"}</b></span><span>${ICX.timer(18)} Oxirgi natija<b>${p.last?fmtT(p.last):"-"}</b></span><span>${ICX.flag(18)} Tugatgan<b>${p.count||0}</b></span><span>${ICX.flag(18)} Eng uzoq checkpoint<b>${p.maxCp||0}/${PKC.CPS}</b></span><span>Kubik<b>${nf(p.tr)} 🏆</b></span><span>${ICX.star(18)} Level<b>${p.lv}</b></span></div></div>`}
 /* ===== run state: checkpoint progress is saved, so leaving the game and coming back continues from the last checkpoint ===== */
 function saveRun(){const p=PK.prof;if(PK.run&&!PK.fin&&PK.cp>0)p.rs={cp:PK.cp,t:+PK.time.toFixed(2),got:[...PK.got]};queueSave()}
@@ -2647,11 +2714,11 @@ const STG={};
 function stageStop(){if(STG.raf)cancelAnimationFrame(STG.raf);STG.raf=0;if(STG.r){try{STG.r.dispose()}catch(e){}}STG.r=null}
 async function stageMount(cv,gid,eq,pem){stageStop();if(!cv)return;
  try{await loadThree()}catch(e){return}
- if(!document.body.contains(cv))return;ensureAssets();const T=THREE,w=cv.clientWidth||240,h=cv.clientHeight||280,dpr=Math.min(devicePixelRatio||1,2);cv.width=w*dpr;cv.height=h*dpr;
+ if(!document.body.contains(cv))return;ensureAssets();const T=THREE,w=cv.clientWidth||240,h=cv.clientHeight||280,dpr=Math.min((devicePixelRatio||1)*(window.LB?LB.s:1),3)*({low:.7,std:1,high:1.25}[setv("gfx")]||1);cv.width=w*dpr;cv.height=h*dpr;
  const r=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true});r.setSize(w*dpr,h*dpr,false);STG.r=r;const s=new T.Scene();s.add(new T.HemisphereLight(0xffffff,0x8899cc,1.05));const dl=new T.DirectionalLight(0xffffff,.9);dl.position.set(3,6,5);s.add(dl);
  const cam=new T.PerspectiveCamera(32,w/h,.1,60),m=makeChar(gid,eq,{preview:true});s.add(m);STG.m=m;STG.pem=pem;
  cv.onclick=()=>{if(STG.pem&&EMO[STG.pem]&&!m.userData.em){emoteStart(m,STG.pem,performance.now()/1000)}};
- const loop=t=>{if(!STG.r||STG.r!==r||!document.body.contains(cv)){try{r.dispose()}catch(e){}return}STG.raf=requestAnimationFrame(loop);const ts=t/1000;
+ const loop=t=>{if(!STG.r||STG.r!==r||!document.body.contains(cv)){try{r.dispose()}catch(e){}return}STG.raf=requestAnimationFrame(loop);if(+setv("fps")===30){if(t-(STG.lt||0)<30)return;STG.lt=t}const ts=t/1000;
   if(!m.userData.em){m.position.y=.015*Math.sin(ts*1.8);animChar(m,ts,false,false);m.rotation.y=.3+.12*Math.sin(ts*.6)}else animChar(m,ts,false,false);
   const em=m.userData.em,E=em&&EMO[em.id],ly=(E&&E.ly)||1.15,d=(E&&E.d)||7.6;cam.position.set(Math.sin(.2)*d,ly+.35,Math.cos(.2)*d);cam.lookAt(0,ly,0);r.render(s,cam)};
  STG.raf=requestAnimationFrame(loop)}
@@ -3006,7 +3073,7 @@ function viewAdmin(){
  setTimeout(adminLoad,0);
  if(AD.oid)return admOrderHTML();
  const T=[["home","Bosh sahifa"],["give","Berish"],["users","Foydalanuvchilar"],["pay","To‘lovlar"],["manage","Boshqaruv"]];
- return `<div class="bar rv"><button class="back" onclick="go('profile')">&larr; Profil</button><b style="flex:1">Admin panel · ${esc(SV.adminNick)}</b></div>
+ return `<div class="bar rv"><button class="back abk" onclick="lBack()">&larr; Lobi</button><b style="flex:1">Admin panel · ${esc(SV.adminNick)}</b></div>
  <div class="chips">${T.map(([k,l])=>`<button class="chip ${AD.sec===k?"on":""}" onclick="AD.sec='${k}';render()">${l}</button>`).join("")}</div><div id="adb"><p class="empty">Yuklanmoqda…</p></div>`}
 async function adminLoad(){
  if(AD.oid)return;const b=$("#adb");if(!b)return;
@@ -3089,6 +3156,7 @@ async function admFind(){if(!await admGuard())return;const q=($("#gid").value||"
   const d=s.docs[0],u=d.data(),uid=d.id,c=calcLedger(await ledgerOf(uid),SV.adminUid);
   r.innerHTML=`<div class="hero dk"><b>${esc(u.nick||"?")}</b><p style="margin-top:4px">ID: ${esc(q)} · CL: <b>${nf(c.cl)}</b> · Premium: <b>${c.pe>Date.now()?fmtD(c.pe)+" gacha":"yo‘q"}</b></p></div>
   <div class="st">CL berish (bepul)</div><div class="chips" style="flex-wrap:wrap">${[50,100,250,500,1000,5000].map(n=>`<button class="chip" onclick="admGiveN('${esc(uid)}',${n})">+${n}</button>`).join("")}</div><button class="btn sec" onclick="admGiveCL('${esc(uid)}')">Boshqa miqdor</button>
+  <button class="btn sec" onclick="admBan('${esc(uid)}')">Ban / Bandan chiqarish</button>
   <div class="st">Premium</div>${PLANS.map(p=>`<button class="btn sec" onclick="admPack('${esc(uid)}','prem','${p.id}')">${p.name} · ${fmt(p.price)}</button>`).join("")}`
  }catch(e){r.innerHTML=`<p class="empty">Qidirib bo‘lmadi.</p>`}}
 function admPack(uid,kind,key){let item,amt;
@@ -3128,7 +3196,7 @@ async function admSearch(){if(!await admGuard())return;const q=($("#uq").value||
   r.innerHTML=us.length?us.slice(0,30).map(u=>`<div class="row" onclick="admUser('${esc(u.id)}')"><img src="${CI[CI[u.g]?u.g:"boy"].head}" width="40" height="40" alt="" style="border-radius:10px;object-fit:cover"><div class="g"><b>${esc(u.nick||"?")}</b><small>ID: ${esc(u.playerId||u.id)}${(u.old||[]).length?" · oldingi: "+esc(u.old.join(", ")):""}</small></div></div>`).join(""):`<p class="empty">Topilmadi.</p>`}catch(e){r.innerHTML=`<p class="empty">Qidirib bo‘lmadi.</p>`}}
 async function admUser(uid){if(!await admGuard())return;
  try{const d=await svc("users").doc(uid).get(),u=d.exists?d.data():{nick:"?"},c=calcLedger(await ledgerOf(uid),SV.adminUid);
-  sheet(`<h3>${esc(u.nick||"?")}</h3><p style="word-break:break-all">ID: ${esc(u.playerId||uid)}</p><p>CL balans: <b>${nf(c.cl)}</b><br>Premium: <b>${c.pe>Date.now()?"faol, tugash sanasi "+fmtD(c.pe):"yo‘q"}</b></p><button class="btn" onclick="admGiveCL('${esc(uid)}')">CL berish</button><button class="btn" onclick="admGivePrem('${esc(uid)}')">Premium berish</button><button class="btn sec" onclick="closeM()">Yopish</button>`)}catch(e){info("Xatolik","Foydalanuvchi o‘qilmadi.")}}
+  sheet(`<h3>${esc(u.nick||"?")}</h3><p style="word-break:break-all">ID: ${esc(u.playerId||uid)}</p><p>CL balans: <b>${nf(c.cl)}</b><br>Premium: <b>${c.pe>Date.now()?"faol, tugash sanasi "+fmtD(c.pe):"yo‘q"}</b></p><button class="btn" onclick="admGiveCL('${esc(uid)}')">CL berish</button><button class="btn" onclick="admGivePrem('${esc(uid)}')">Premium berish</button><button class="btn sec" onclick="admBan('${esc(uid)}')">Ban / Bandan chiqarish</button><button class="btn sec" onclick="closeM()">Yopish</button>`)}catch(e){info("Xatolik","Foydalanuvchi o‘qilmadi.")}}
 function admGiveCL(uid){sheet(`<h3>CL berish</h3><p>Miqdorni yozing (1 – 100 000).</p><input id="gcl" type="number" inputmode="numeric" min="1" max="100000" placeholder="Masalan 80"><button class="btn" id="gcok">Tasdiqlash</button><button class="btn sec" onclick="admUser('${esc(uid)}')">Orqaga</button>`);
  $("#gcok").onclick=async()=>{const n=Math.floor(+$("#gcl").value);if(!(n>=1&&n<=100000))return appToast("Miqdor 1 dan 100 000 gacha");if(AD.busy)return;AD.busy=true;
   try{if(!await admGuard())return;const d=await svc("users").doc(uid).get(),nick=d.exists?d.data().nick:"?";
@@ -3266,7 +3334,7 @@ function soPaint(){
  const ae=document.activeElement;
  if(ae&&(ae.tagName==="INPUT"||ae.tagName==="TEXTAREA"))return;
  if($("#modal").innerHTML.trim())return;
- if(["home","team","chat","profile"].includes(S.tab))render()}
+ if(["home","team","chat","profile","friends"].includes(S.tab))render()}
 async function soSync(){
  if(SO.busy||!gsUn()||document.hidden)return;SO.busy=true;
  try{const j=await soCall("sync",{});
@@ -3411,6 +3479,220 @@ else{
  setInterval(soSync,4000);loadUserGames();
  document.addEventListener("visibilitychange",()=>{if(!document.hidden)soSync()});
 }
+
+/* ===== LOBBY: gorizontal ilova (Free Fire uslubi) ===== */
+const XPT=[0, 500, 1000, 2500, 3500, 6000, 9500, 13000, 16500, 20000, 23000, 25100, 27400, 30000, 32800, 35800, 39100, 42700, 46600, 51000, 55700, 60800, 66400, 72600, 79300, 86600, 94600, 103500, 113000, 123500, 134500, 147000, 161000, 175500, 192000, 209500, 229000, 250000, 273000, 298500, 326000, 356000, 389000, 425000, 464500, 507500, 554000, 605500, 661500, 722500, 789000, 862000, 942000, 1030000, 1125000, 1230000, 1340000, 1465000, 1600000, 1750000, 1910000, 2085000, 2280000, 2490000, 2720000, 2970000, 3245000, 3545000, 3875000, 4230000, 4625000, 5050000, 5515000, 6025000, 6585000, 7190000, 7855000, 8585000, 9375000, 10250000, 11200000, 12200000, 13350000, 14600000, 15950000, 17400000, 19000000, 20750000, 22700000, 24800000, 27100000, 29600000, 32300000, 35300000, 38550000, 42150000, 46000000, 50300000, 54900000, 60000000];
+const lvOf=xp=>{let l=1;for(let i=1;i<XPT.length;i++){if(xp>=XPT[i])l=i+1;else break}return l};
+const BANNERS=[{id:"b1",n:"GAMESET Classic"}];
+var LB={xp:0,dev:1,adm:false,s:1,dw:640,dh:360,rot:false,sig:""};
+const LS={tab:"main",d:null,hk:"fire"};
+const HUDN=[["jump","Sakrash"],["crouch","O‘tirish"],["prone","Yotish"],["run","Yugurish"],["fire","Otish"],["swap","Qurol"]];
+const HUDD={1:{jump:{x:89,y:60},crouch:{x:78,y:83},prone:{x:91,y:85},run:{x:72,y:58},fire:{x:80,y:36},swap:{x:58,y:86}},2:{fire:{x:12,y:58},jump:{x:88,y:52},crouch:{x:76,y:78},prone:{x:90,y:81},run:{x:70,y:54},swap:{x:50,y:88}}};
+Object.assign(DEFSET,{fps:60,shadow:true,joyS:1,hud:1,hudl:{}});
+const lAuth=()=>({uid:gsUid(),secret:gsSec()});
+const lApp=(op,x)=>gsCall("app",{op,...lAuth(),...x});
+
+/* --- ban: barcha so'rovlarda tekshiriladi --- */
+const _gsCall0=gsCall;
+gsCall=async function(n,b){try{return await _gsCall0(n,b)}catch(e){if(/bloklangan/i.test((e&&e.message)||""))lBanned();throw e}};
+function lBanned(){if($("#lban"))return;document.body.insertAdjacentHTML("beforeend",`<div id="lban"><b>Akkauntingiz bloklangan</b><p style="color:#a5b4fc;max-width:320px">Savollaringiz bo‘lsa, admin bilan bog‘laning.</p><button class="btn sec" style="width:auto;padding:10px 26px" onclick="lLogout(true)">Akkauntdan chiqish</button></div>`)}
+
+/* --- ekran o'lchami: portret bo'lsa 90° buriladi, hamma narsa 360px balandlikka moslanadi --- */
+function layoutApp(){
+ if(!window.LB)return;
+ const W0=innerWidth,H0=innerHeight,port=H0>W0,W=port?H0:W0,H=port?W0:H0;
+ const s=Math.min(H/360,W/560);LB.s=s;LB.dw=W/s;LB.dh=H/s;LB.rot=port;
+ const rot=port?`position:fixed;left:0;top:0;width:${H0}px;height:${W0}px;max-width:none;margin:0;transform-origin:0 0;transform:translateX(${W0}px) rotate(90deg);`:`position:fixed;left:0;top:0;width:100%;height:100%;max-width:none;margin:0;`;
+ [["lobby",5],["splash",30]].forEach(([id,z])=>{const e=$("#"+id);if(e)e.style.cssText=rot+"z-index:"+z+";"});
+ const app=$("#app");if(app)app.style.cssText=app.classList.contains("pnl")?rot+"z-index:8;display:flex;":"display:none;";
+ ["modal","modal2"].forEach((id,i)=>{const e=$("#"+id);if(e)e.style.cssText=(port?rot:"")+"z-index:"+(i?11:10)+";"});
+ document.querySelectorAll("#lobby .lyr").forEach(l=>{l.style.width=LB.dw+"px";l.style.height=LB.dh+"px";l.style.transform=`scale(${s})`})}
+let _lw=0,_lh=0;
+addEventListener("resize",()=>{if(innerWidth===_lw&&innerHeight===_lh)return;_lw=innerWidth;_lh=innerHeight;layoutApp();clearTimeout(lBoot.t);lBoot.t=setTimeout(()=>lobbyRefresh(true),250)});
+
+/* --- yordamchi --- */
+const lFace=(id,cls)=>{const c=CI[id];const nm=(S.name||"?").trim()[0]||"?";return `<div class="lfc ${cls||""}">${c&&c.head?`<img src="${c.head}" alt="">`:`<b>${esc(nm.toUpperCase())}</b>`}</div>`};
+const lPid=()=>{const p=String(gsID());return /^\d+$/.test(p)?"ID "+p:p};
+const lBn=()=>(S.set&&S.set.bn)||"b1";
+const lSoon=t=>appToast(t+" tez orada qo‘shiladi");
+function lOpen(){return !!document.querySelector("#lobby .lov")||$("#app").classList.contains("pnl")}
+
+/* --- lobby chizish --- */
+function lobbyRender(){
+ const lo=$("#lobby");if(!lo)return;
+ const xp=LB.xp,lv=Math.min(100,lvOf(xp)),a=XPT[lv-1]||0,b=XPT[lv]||a,pc=lv>=100?100:Math.max(0,Math.min(100,Math.round((xp-a)/(b-a)*100)));
+ const menu=[["lInv()","inventory","Inventar"],["lPanel('friends')","team","Do‘stlar"],["lPanel('chat')","chat","Chat"],["lSoon('Do‘kon')","shop","Do‘kon"]];
+ lo.innerHTML=`<div class="lyr"><div class="lbg"></div>
+ <div class="lcard"><div class="lbn ${lBn()}">${lFace(S.gender)}<div class="lnm"><b>${esc(S.name||"…")}</b><small>${esc(lPid())}</small></div></div>
+  <div class="llv"><b>LV ${lv}</b><div class="lxb"><u style="width:${pc}%"></u></div><small>${lv>=100?"MAX":xp+" / "+b+" XP"}</small></div>
+  <button class="lcl" onclick="gemShop()"><span class="cl">${ic("crystal",22)}</span><b id="lclv">${S.gems}</b><i>+</i></button></div>
+ <div class="ltr"><button class="lib" onclick="reqSheet()">${ic("bell",22)}${SO&&SO.req&&SO.req.length?'<i class="ldot"></i>':""}</button><button class="lib" onclick="lSettings()">${ic("settings",22)}</button></div>
+ <div class="lmn">${menu.map(m=>`<button class="lmb" onclick="${m[0]}">${ic(m[1],20)}<span>${m[2]}</span></button>`).join("")}</div>
+ <canvas id="lstage"></canvas>
+ <div class="lteam"><button class="lsl me">${S.gender&&CI[S.gender]&&CI[S.gender].head?`<img src="${CI[S.gender].head}" alt="">`:"Men"}</button>${[1,2,3].map(()=>`<button class="lsl add" onclick="lPanel('friends')">+</button>`).join("")}</div>
+ <button class="lmode" onclick="lSoon('Rejimlar')">Rejim tanlash <small>Tez orada</small></button>
+ <button class="lstart" onclick="lSoon('O‘yin')">START</button></div>`;
+ layoutApp();lStage();LB.sig=lSig()}
+const lSig=()=>[S.name,gsID(),S.gender,lBn(),LB.xp,JSON.stringify(S.eq||{}),S.pem,SO&&SO.req?SO.req.length:0].join("|");
+function lobbyRefresh(force){if(force||(!lOpen()&&lSig()!==LB.sig))lobbyRender()}
+async function lStage(){
+ const cv=$("#lstage");if(!cv)return;
+ try{await stageMount(cv,S.gender,S.eq,S.pem);const c=$("#lstage");if(c)c.onclick=lEmo}catch(e){}}
+function lEmo(){
+ const own=EMS.filter(e=>owns(e.id));
+ if(!own.length)return sheet(`<h3>Emotsalar</h3><p class="lmute" style="color:var(--mut)">Hozircha emotsa yo‘q. Tez orada qo‘shiladi.</p><button class="btn sec" onclick="closeM()">Yopish</button>`);
+ sheet(`<h3>Emotsalar</h3><div class="chips" style="flex-wrap:wrap;overflow:visible">${own.map(e=>`<button class="chip" onclick="lEmoGo('${e.id}')">${esc(e.n)}</button>`).join("")}</div><button class="btn sec" onclick="closeM()">Yopish</button>`)}
+function lEmoGo(id){closeM();try{if(STG.m&&EMO[id])emoteStart(STG.m,id,performance.now()/1000)}catch(e){}}
+
+/* --- panellar (chat, do'stlar, admin): eski ekranlar gorizontal oynada --- */
+function lPanel(tab){S.tab=tab;S.chat=null;const a=$("#app");a.classList.add("pnl");layoutApp();render(true);const v=$("#view");if(v)v.scrollTop=0}
+function lBack(){const a=$("#app");a.classList.remove("pnl");S.tab="lobby";layoutApp();lobbyRefresh(true)}
+function viewFriends(){return `<div class="st">Do‘stlar</div>${FRIENDS.length?FRIENDS.map(userRow).join(""):'<p class="empty">Hali do‘stlaringiz yo‘q.</p>'}<button class="btn sec" onclick="addFriendSheet()">Do‘st qo‘shish</button>`}
+function lAdmin(sec){lsClose(true);AD.sec=sec;AD.oid=null;lPanel("admin")}
+
+/* --- overlay umumiy ramka --- */
+function lOv(title,tabs,body,back,act){
+ const lyr=$("#lobby .lyr");const old=$("#lobby .lov");if(old)old.remove();
+ lyr.insertAdjacentHTML("beforeend",`<div class="lov"><div class="lovh"><button class="lback" onclick="${back}">‹</button><b>${title}</b>${act||""}</div><div class="lovb"><div class="lovt">${tabs}</div><div class="lovc" id="lovc">${body}</div></div></div>`)}
+
+/* --- INVENTAR --- */
+let LI="char";
+function lInv(tab){
+ LI=tab||LI||"char";
+ const T=[["char","Personaj"],["emo","Emotsalar"],["prof","Profil rasmi va banner"]];
+ const tabs=T.map(t=>`<button class="lt ${LI===t[0]?"on":""}" onclick="lInv('${t[0]}')">${t[1]}</button>`).join("")+`<button class="lt go ${LI==="weap"?"on":""}" onclick="lInv('weap')">Qurollar ›</button>`;
+ let body="";
+ if(LI==="char"){
+  const av=AVL.filter(a=>owns(a.id));
+  const groups=SLOTK.map(k=>[(SHOPT.find(x=>x[0]===k)||[k,k])[1],ITEMS.filter(i=>i.slot===k&&owns(i.id))]).filter(g=>g[1].length);
+  body=`<h4>Personaj tanlash</h4><div class="lgrid">${av.map(a=>`<button class="lc2 ${S.gender===a.id?"on":""}" onclick="invOpen('${a.id}')">${lFace(a.id)}<span>${esc(a.n)}</span></button>`).join("")}</div>
+  <h4 style="margin-top:16px">Kiyimlar</h4>${groups.length?groups.map(g=>`<div class="lsub">${g[0]}</div><div class="chips" style="flex-wrap:wrap;overflow:visible">${g[1].map(i=>`<button class="chip" onclick="invOpen('${i.id}')">${esc(i.n)}</button>`).join("")}</div>`).join(""):'<p class="lmute">Hozircha kiyim yo‘q. Tez orada qo‘shiladi.</p>'}`}
+ else if(LI==="emo"){
+  const own=EMS.filter(e=>owns(e.id));
+  body=`<h4>Emotsalar</h4>${own.length?`<div class="chips" style="flex-wrap:wrap;overflow:visible">${own.map(e=>`<button class="chip" onclick="invOpen('${e.id}')">${esc(e.n)}</button>`).join("")}</div>`:'<p class="lmute">Hozircha emotsa yo‘q. Tez orada qo‘shiladi.</p>'}`}
+ else if(LI==="prof"){
+  body=`<h4>Profil rasmi</h4><div style="display:flex;align-items:center;gap:12px"><div class="lfc" style="width:64px;height:64px">${CI[S.gender]&&CI[S.gender].head?`<img src="${CI[S.gender].head}" alt="">`:`<b>${esc((S.name||"?")[0].toUpperCase())}</b>`}</div><span class="lmute">Profil rasmi tanlangan personajingizning yuzi bo‘ladi.</span></div>
+  <h4 style="margin-top:16px">Banner</h4><div class="lgrid">${BANNERS.map(b=>`<button class="lc2 ${lBn()===b.id?"on":""}" style="width:auto;padding:8px" onclick="lSetBn('${b.id}')"><div class="lbn ${b.id} big" style="height:46px"><div class="lnm"><b>${esc(b.n)}</b></div></div></button>`).join("")}</div><p class="lmute">Yangi bannerlar tez orada qo‘shiladi.</p>`}
+ else body=`<div class="lsoon"><b>Qurollar</b><span>Tez orada: qurollar va ularning skinlari shu yerda bo‘ladi.</span></div>`;
+ lOv("Inventar",tabs,body,"lInvClose()");
+ const c=$("#lovc");if(c&&LI!=="weap")c.scrollTop=0}
+function lInvClose(){const o=$("#lobby .lov");if(o)o.remove();lobbyRefresh(true)}
+function lSetBn(id){S.set=S.set||{};S.set.bn=id;save();lApp("set_save",{set:S.set}).catch(()=>{});lInv("prof")}
+
+/* --- SOZLAMALAR --- */
+function lsDraft(){const d={};["vol","sfx","vib","gfx","fps","shadow","camS","joyS","hud"].forEach(k=>d[k]=setv(k));d.hudl=JSON.parse(JSON.stringify(setv("hudl")||{}));return d}
+function lSettings(tab){
+ if(!LS.d)LS.d=lsDraft();
+ LS.tab=tab||LS.tab||"main";
+ const T=[["main","Asosiy"],["gfx","Grafika"],["sens","Sezgirlik"],["acc","Hisob"]];if(LB.adm||isAdmin())T.push(["panel","Panel"]);
+ const tabs=T.map(t=>`<button class="lt ${LS.tab===t[0]?"on":""}" onclick="lSettings('${t[0]}')">${t[1]}</button>`).join("");
+ lOv("Sozlamalar",tabs,"","lsClose()",["main","gfx","sens"].includes(LS.tab)?'<button class="btn" style="width:auto;margin-left:auto;padding:8px 24px" onclick="lsSave()">Saqlash</button>':"");lsBody()}
+const lTg=(k,on)=>`<button class="tg ${on?"on":""}" onclick="lsTg('${k}',this)"></button>`;
+const lSl=(k,v,lo,hi,st,fmtf)=>`<input type="range" min="${lo}" max="${hi}" step="${st}" value="${v}" oninput="lsSl('${k}',this.value,this)"><span class="lv" id="lv_${k}">${fmtf?fmtf(v):v}</span>`;
+const lOptB=(k,arr,cur)=>`<div class="lopt">${arr.map(a=>`<button class="${String(cur)===String(a[0])?"on":""}" onclick="lsOpt('${k}','${a[0]}')">${a[1]}</button>`).join("")}</div>`;
+function lsBody(){
+ const d=LS.d,c=$("#lovc");if(!c)return;let h="";
+ const sv="";
+ if(LS.tab==="main")h=`<h4>Ovoz</h4>
+  <div class="lrow"><span>Ovoz balandligi</span>${lSl("vol",Math.round(d.vol*100),0,100,1,v=>v+"%")}</div>
+  <div class="lrow"><span>Tovush effektlari</span>${lTg("sfx",d.sfx)}</div>
+  <div class="lrow"><span>Tebranish</span>${lTg("vib",d.vib)}</div>
+  <h4 style="margin-top:16px">Tugmalar (HUD)</h4>
+  <div class="lrow"><span>HUD tanlash<small>Ikkita tayyor joylashuv</small></span>${lOptB("hud",[[1,"HUD 1"],[2,"HUD 2"]],d.hud)}</div>
+  <div class="lrow"><span>Tugmalarni o‘zgartirish<small>Surish, kattaligi va shaffofligi</small></span><button class="btn sec sm" onclick="lHud()">Tahrirlash</button></div>${sv}`;
+ else if(LS.tab==="gfx")h=`<h4>Grafika</h4>
+  <div class="lrow"><span>Sifat</span>${lOptB("gfx",[["low","Past"],["std","O‘rta"],["high","Yuqori"]],d.gfx)}</div>
+  <div class="lrow"><span>Kadr tezligi (FPS)</span>${lOptB("fps",[[30,"30"],[60,"60"]],d.fps)}</div>
+  <div class="lrow"><span>Soyalar</span>${lTg("shadow",d.shadow)}</div>${sv}`;
+ else if(LS.tab==="sens")h=`<h4>Sezgirlik</h4>
+  <div class="lrow"><span>Kamera sezgirligi</span>${lSl("camS",d.camS,0.4,2.5,0.1,v=>(+v).toFixed(1))}</div>
+  <div class="lrow"><span>Joystik sezgirligi</span>${lSl("joyS",d.joyS,0.4,2.5,0.1,v=>(+v).toFixed(1))}</div>
+  <p class="lmute">O‘zgarishlar "Saqlash" tugmasini bosganda akkauntingizga saqlanadi.</p>${sv}`;
+ else if(LS.tab==="acc")h=`<h4>Akkaunt</h4>
+  <div class="lrow"><span>Nik</span><b>${esc(S.name||"")}</b></div><div class="lrow"><span>ID</span><b>${esc(gsID())}</b></div>
+  <div class="lrow"><span>Akkauntga kirilgan qurilmalar<small>Shu akkauntga kirgan qurilmalar soni</small></span><b class="lv">${LB.dev}</b></div>
+  <h4 style="margin-top:16px">Parolni almashtirish</h4>
+  <div class="lpw"><input id="pw0" type="password" placeholder="Eski parol" autocomplete="current-password"><input id="pw1" type="password" placeholder="Yangi parol (kamida 6 belgi)" autocomplete="new-password"><input id="pw2" type="password" placeholder="Yangi parolni takrorlang" autocomplete="new-password"><button class="btn" onclick="lPw()">Parolni almashtirish</button></div>
+  <button class="btn sec" style="max-width:300px" onclick="lLogout()">Akkauntdan chiqish</button>`;
+ else if(LS.tab==="panel"){h=`<h4>Admin panel</h4><div id="lpst"><p class="lmute">Yuklanmoqda…</p></div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"><button class="btn sm" onclick="lAdmin('give')">CL berish</button><button class="btn sec sm" onclick="lAdmin('users')">Foydalanuvchilar va ban</button><button class="btn sec sm" onclick="lAdmin('pay')">To‘lovlar</button><button class="btn sec sm" onclick="lAdmin('manage')">Boshqaruv</button></div>`;lsPanel()}
+ c.innerHTML=h}
+function lsTg(k,b){LS.d[k]=!LS.d[k];b.classList.toggle("on",LS.d[k])}
+function lsSl(k,v,el){v=+v;LS.d[k]=k==="vol"?v/100:v;const e=$("#lv_"+k);if(e)e.textContent=k==="vol"?v+"%":v.toFixed(1)}
+function lsOpt(k,v){LS.d[k]=(k==="fps"||k==="hud")?+v:v;if(k==="hud")LS.d.hudl={};lsBody()}
+async function lsSave(){
+ S.set=S.set||{};Object.assign(S.set,JSON.parse(JSON.stringify(LS.d)));save();try{applySettings()}catch(e){}
+ try{await lApp("set_save",{set:S.set});appToast("Saqlandi")}catch(e){appToast("Qurilmaga saqlandi, serverga yetmadi")}}
+function lsClose(silent){LS.d=null;const o=$("#lobby .lov");if(o)o.remove();if(!silent)lobbyRefresh(true)}
+async function lsPanel(){
+ try{const [a,b]=await Promise.all([lApp("panel_stats"),gsCall("pay",{op:"stats",...lAuth()})]);const e=$("#lpst");if(!e)return;
+  const c=(t,v,s)=>`<div class="ac"><small>${t}</small><b>${v}</b>${s?`<em>${s}</em>`:""}</div>`;
+  e.innerHTML=`<div class="l4">${c("Jami akkaunt",nf(a.accounts))}${c("Hozir online",nf(a.online))}${c("Bugun kirgan",nf(a.today))}${c("Bugun yangi",nf(a.newToday))}</div>
+  <div class="l4">${c("O‘rnatilgan",nf(a.installs))}${c("Bloklangan",nf(a.banned))}${c("Bugungi daromad",fmt(b.daySum),b.dayCnt+" ta to‘lov")}${c("Jami daromad",fmt(b.sum),b.paid+" ta to‘lov")}</div>`}
+ catch(er){const e=$("#lpst");if(e)e.innerHTML='<p class="lmute">Statistika yuklanmadi.</p>'}}
+async function lPw(){
+ const o=$("#pw0").value,n=$("#pw1").value,r=$("#pw2").value;
+ if(n.length<6)return info("Parol qisqa","Yangi parol kamida 6 belgidan iborat bo‘lsin.");
+ if(n!==r)return info("Parollar mos emas","Yangi parolni ikki joyga bir xil yozing.");
+ try{await lApp("pw_change",{old:o,new:n});["pw0","pw1","pw2"].forEach(i=>$("#"+i).value="");appToast("Parol almashtirildi")}
+ catch(e){info("Almashmadi",esc(e.message||"Xatolik"))}}
+function lLogout(force){
+ const go=()=>{["gs_un","gs_uid","gs_sec","gs_pk"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});location.reload()};
+ if(force)return go();
+ sheet(`<h3>Akkauntdan chiqish</h3><p style="color:var(--mut)">Qayta kirish uchun nik va parolingiz kerak bo‘ladi. Parolni eslab qoling.</p><button class="btn" id="lgo">Chiqish</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);$("#lgo").onclick=go}
+
+/* --- HUD tahrirlash --- */
+const lHud1=k=>({s:1,o:1,...(HUDD[LS.d.hud]||HUDD[1])[k],...((LS.d.hudl||{})[k]||{})});
+function lHud(){
+ lOv("Tugmalarni joylashtirish",`<button class="lt ${LS.d.hud===1?"on":""}" onclick="lsOpt2(1)">HUD 1</button><button class="lt ${LS.d.hud===2?"on":""}" onclick="lsOpt2(2)">HUD 2</button><button class="lt" onclick="LS.d.hudl={};lHud()">Tiklash</button><button class="lt go" onclick="lSettings('main')">Tayyor</button>`,"","lSettings('main')");
+ const c=$("#lovc");c.style.cssText="position:relative;padding:0";
+ c.innerHTML=`<div class="lhda" id="hda" style="left:10px;right:200px;top:10px;bottom:10px">${HUDN.map(([k,n])=>{const h=lHud1(k);return `<button class="hbtn ${LS.hk===k?"sel":""}" data-k="${k}" style="left:${h.x}%;top:${h.y}%;opacity:${h.o};transform:scale(${h.s})" onpointerdown="lHudDrag(event,'${k}')">${n}</button>`}).join("")}</div>
+ <div class="lhdp" style="right:10px;top:10px"><b id="hsel"></b><div class="lrow" style="flex-direction:column;align-items:flex-start;gap:4px;border:0;padding:4px 0"><span>Kattalik</span><input id="hs" type="range" min="0.6" max="1.6" step="0.05" style="width:160px;accent-color:#22d3ee" oninput="lHudSet('s',this.value)"></div><div class="lrow" style="flex-direction:column;align-items:flex-start;gap:4px;border:0;padding:4px 0"><span>Shaffoflik</span><input id="ho" type="range" min="0.2" max="1" step="0.05" style="width:160px;accent-color:#22d3ee" oninput="lHudSet('o',this.value)"></div><p class="lmute">Tugmani bosib suring. Keyin "Tayyor" va "Saqlash" ni bosing.</p></div>`;
+ lHudSel()}
+function lsOpt2(h){LS.d.hud=h;LS.d.hudl={};lHud()}
+function lHudSel(){const h=lHud1(LS.hk),n=(HUDN.find(x=>x[0]===LS.hk)||[0,""])[1];const a=$("#hsel"),s=$("#hs"),o=$("#ho");if(a)a.textContent=n;if(s)s.value=h.s;if(o)o.value=h.o;document.querySelectorAll(".hbtn").forEach(b=>b.classList.toggle("sel",b.dataset.k===LS.hk))}
+function lHudSet(f,v){const k=LS.hk;LS.d.hudl=LS.d.hudl||{};LS.d.hudl[k]={...lHud1(k),[f]:+v};const b=document.querySelector(`.hbtn[data-k="${k}"]`);if(b){b.style.opacity=LS.d.hudl[k].o;b.style.transform=`scale(${LS.d.hudl[k].s})`}}
+function lPt(ev,el){const r=el.getBoundingClientRect();if(LB.rot)return{x:(ev.clientY-r.top)/r.height*100,y:(r.right-ev.clientX)/r.width*100};return{x:(ev.clientX-r.left)/r.width*100,y:(ev.clientY-r.top)/r.height*100}}
+function lHudDrag(e,k){
+ e.preventDefault();LS.hk=k;lHudSel();const a=$("#hda"),b=e.currentTarget;try{b.setPointerCapture(e.pointerId)}catch(x){}
+ const mv=ev=>{const p=lPt(ev,a),x=Math.round(Math.min(96,Math.max(4,p.x))*10)/10,y=Math.round(Math.min(94,Math.max(6,p.y))*10)/10;LS.d.hudl=LS.d.hudl||{};LS.d.hudl[k]={...lHud1(k),x,y};b.style.left=x+"%";b.style.top=y+"%"};
+ const up=()=>{b.removeEventListener("pointermove",mv);b.removeEventListener("pointerup",up)};
+ b.addEventListener("pointermove",mv);b.addEventListener("pointerup",up)}
+
+/* --- admin: ban --- */
+async function admBan(uid){
+ try{const j=await lApp("ban_list");const on=(j.list||[]).some(x=>x.uid===uid);
+  sheet(`<h3>${on?"Bandan chiqarish":"Ban qilish"}</h3><p style="color:var(--mut)">${on?"O‘yinchi yana kira oladi.":"Banlangan o‘yinchi kira olmaydi va chatga yoza olmaydi, hozirgi sessiyasi ham to‘xtaydi."}</p><button class="btn" id="bnok" style="${on?"":"background:#e11d48"}">${on?"Bandan chiqarish":"Ban qilish"}</button><button class="btn sec" onclick="closeM()">Bekor qilish</button>`);
+  $("#bnok").onclick=async()=>{try{await lApp(on?"unban":"ban",{target:uid,why:"admin"});closeM();appToast(on?"Bandan chiqarildi":"Ban qilindi")}catch(e){closeM();info("Xatolik",esc(e.message||"Bajarilmadi"))}}}
+ catch(e){info("Xatolik",esc(e.message||"Server xatosi"))}}
+
+/* --- boshlang'ich video --- */
+function lSplash(){
+ const sp=$("#splash");if(!sp)return;sp.hidden=false;
+ sp.innerHTML=`<video id="spv" src="/intro.mp4" playsinline preload="auto"></video><button class="spgo" id="spgo">Boshlash uchun bosing</button><button class="spsk" id="spsk" hidden>O‘tkazish ›</button>`;
+ const v=$("#spv"),fin=()=>{if(sp.hidden)return;sp.hidden=true;sp.innerHTML="";layoutApp()};
+ v.onerror=fin;v.onended=fin;
+ $("#spgo").onclick=async()=>{
+  try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();await screen.orientation.lock("landscape")}catch(e){}
+  $("#spgo").hidden=true;$("#spsk").hidden=false;try{await v.play()}catch(e){fin()}};
+ $("#spsk").onclick=fin;layoutApp()}
+
+/* --- o'rnatilganlarni sanash --- */
+function lInstall(){try{const st=matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches||(document.referrer||"").startsWith("android-app://");if(!st)return;gsCall("app",{op:"install",dev:gsId("gs_dev",32)}).catch(()=>{})}catch(e){}}
+addEventListener("appinstalled",lInstall);
+
+async function lMe(){
+ try{const j=await lApp("me");LB.xp=j.xp||0;LB.dev=j.dev||1;LB.adm=!!j.admin;
+  if(j.set){S.set=S.set||{};Object.assign(S.set,j.set);save();try{applySettings()}catch(e){}}
+  lobbyRefresh()}catch(e){}}
+
+function lBoot(){
+ if(!gsUn())return;
+ S.tab="lobby";const lo=$("#lobby");lo.hidden=false;_lw=innerWidth;_lh=innerHeight;
+ lobbyRender();lSplash();lMe();lInstall();
+ setInterval(()=>{const e=$("#lclv");if(e&&e.textContent!==String(S.gems))e.textContent=S.gems;if(!$("#lobby").hidden)lobbyRefresh()},800)}
+
+lBoot();
 </script>
 </body>
 </html>
