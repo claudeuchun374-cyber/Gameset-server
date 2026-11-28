@@ -549,6 +549,9 @@ async function shopApi(b) {
     const gem = Array.isArray(b.gem) ? b.gem.slice(0, 5).map((x) => String(x)) : [];
     const free = ["em_wave", "em_laugh", "em_dance", "em_clap", "em_victory"], seen = new Set();
     out.gem = [0, 1, 2, 3, 4].map((i) => { let id = gem[i]; if (!id || !id.startsWith("em_") || !canUse(id, owned) || seen.has(id)) id = free.find((f) => !seen.has(f) && !gem.includes(f)) || free.find((f) => !seen.has(f)); seen.add(id); return id; });
+    out.eq = EQ_PREFIX.map(() => "").join(",");
+    out.g = ["boy", "dgirl"].includes(out.g) ? out.g : "boy";
+    out.bg = ""; out.pem = ""; out.gem = ["", "", "", "", ""];
     out.t = Date.now();
     await putDoc("cust", uid, out);
     const u = (await getDoc("users", uid)) || {};
@@ -556,7 +559,8 @@ async function shopApi(b) {
     return [200, { ok: true, cust: out }];
   }
 
-  if (op === "buy") {
+  if (op === "buy") return [410, { error: "Do'kon hozircha yopiq" }];
+  if (op === "buy_old") {
     const id = String(b.id || "");
     if (!/^[a-z0-9_]{2,24}$/.test(id) || CATALOG[id] === undefined) return bad("buyum topilmadi");
     if (blocked("buy|" + uid, 60)) return [429, { error: "Juda ko'p so'rov" }];
@@ -759,6 +763,7 @@ function cleanSettings(x) {
   x = x && typeof x === "object" ? x : {};
   const out = {
     vol: numIn(x.vol, 0, 1, 0.7), sfx: x.sfx !== false, vib: x.vib !== false,
+    lang: ["uz", "en", "ru"].includes(x.lang) ? x.lang : "uz", bn: x.bn === "b1" ? "b1" : "b1",
     gfx: ["low", "std", "high"].includes(x.gfx) ? x.gfx : "std", fps: +x.fps === 30 ? 30 : 60, shadow: x.shadow !== false,
     camS: numIn(x.camS, 0.4, 2.5, 1), joyS: numIn(x.joyS, 0.4, 2.5, 1), hud: +x.hud === 2 ? 2 : 1, hudl: {},
   };
